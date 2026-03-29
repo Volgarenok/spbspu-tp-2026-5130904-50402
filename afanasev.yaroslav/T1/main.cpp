@@ -10,18 +10,22 @@
 #include <unordered_map>
 #include <vector>
 
-void hi()
-{
-  std::cout << "aaaaaaaaaAAAAAAAAAAaaaaaaaa" << '\n';
-}
-
 int main()
 {
   afanasev::note_t db;
 
   const std::unordered_map< std::string, afanasev::func_t > cmds
   {
+    {"note", afanasev::noteCmd},
+    {"line", afanasev::lineCmd},
+    {"show", afanasev::showCmd},
+    {"drop", afanasev::dropCmd},
 
+    {"link", afanasev::linkCmd},
+    {"halt", afanasev::haltCmd},
+    {"mind", afanasev::mindCmd},
+    {"expired", afanasev::expiredCmd},
+    {"refresh", afanasev::refreshCmd},
   };
 
   std::string cmd;
@@ -41,17 +45,6 @@ int main()
     {
       std::cout << e.what() << '\n';
     }
-
-/*
-    if (cmd == "hello")
-    {
-      hi();
-    }
-    else
-    {
-      std::cout << "not have this command" << '\n';
-    }
-*/
   }
 
   if (!std::cin.eof())
