@@ -10,6 +10,7 @@ namespace bukreev
   {
   public:
     Note() = default;
+    void appendLine(std::string line);
 
   private:
     std::vector< std::string > mLines;
