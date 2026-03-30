@@ -11,6 +11,7 @@ namespace bukreev
 
   void noteCommand(std::istream& in, std::ostream& out);
   void lineCommand(std::istream& in, std::ostream& out);
+  void invalidCommand(std::istream& in, std::ostream& out);
 }
 
 int main()
@@ -28,8 +29,7 @@ int main()
     }
     else
     {
-      std::cout << "<INVALID COMMAND>\n";
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      bukreev::invalidCommand(std::cin, std::cout);
     }
   }
 }
@@ -39,8 +39,7 @@ void bukreev::noteCommand(std::istream& in, std::ostream& out)
   std::string name;
   if (!(in >> name))
   {
-    out << "<INVALID COMMAND>\n";
-    in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    invalidCommand(in, out);
     return;
   }
 
@@ -52,17 +51,21 @@ void bukreev::lineCommand(std::istream& in, std::ostream& out)
   std::string name, line;
   if (!(in >> name >> std::quoted(line)))
   {
-    out << "<INVALID COMMAND>\n";
-    in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    invalidCommand(in, out);
     return;
   }
 
   if (!notesMap.count(name))
   {
-    out << "<INVALID COMMAND>\n";
-    in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    invalidCommand(in, out);
     return;
   }
 
   notesMap[name]->appendLine(line);
+}
+
+void bukreev::invalidCommand(std::istream& in, std::ostream& out)
+{
+  out << "<INVALID COMMAND>\n";
+  in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
 }
