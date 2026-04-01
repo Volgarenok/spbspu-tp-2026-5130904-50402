@@ -1,6 +1,8 @@
+#include <iomanip>
 #include <memory>
 #include <ostream>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace saldaev
@@ -28,7 +30,15 @@ namespace saldaev
     std::vector< std::string > lines_;
     std::vector< std::weak_ptr< Note > > links_;
   };
+
+  void handleNote(std::istream &in, std::ostream &out, NoteMap &notes);
+  void handleLine(std::istream &in, std::ostream &out, NoteMap &notes);
+  void handleShow(std::istream &in, std::ostream &out, NoteMap &notes);
+  void handleDrop(std::istream &in, std::ostream &out, NoteMap &notes);
 }
+
+using NoteMap = std::unordered_map< std::string, std::shared_ptr< saldaev::Note > >;
+using cmd_t = void (*)(std::istream &, std::ostream &, NoteMap);
 
 int main()
 {}
@@ -86,4 +96,54 @@ std::vector< std::shared_ptr< saldaev::Note > > saldaev::Note::getActiveLinks() 
     }
   }
   return ret;
+}
+
+void saldaev::handleNote(std::istream &in, std::ostream &out, NoteMap &notes)
+{
+  std::string name;
+  in >> name;
+
+  if (notes.find(name) == notes.end()) {
+    notes[name] = std::make_shared< saldaev::Note >(name);
+  } else {
+    out << "<INVALID COMMAND>\n";
+  }
+}
+
+void saldaev::handleLine(std::istream &in, std::ostream &out, NoteMap &notes)
+{
+  std::string name;
+  std::string line;
+  in >> name >> std::quoted(line);
+
+  if (notes.find(name) == notes.end()) {
+    out << "<INVALID COMMAND>\n";
+  } else {
+    notes[name]->addLine(line);
+  }
+}
+
+void saldaev::handleShow(std::istream &in, std::ostream &out, NoteMap &notes)
+{
+  std::string name;
+  in >> name;
+
+  if (notes.find(name) == notes.end()) {
+    out << "<INVALID COMMAND>\n";
+  } else {
+    notes[name]->show(out);
+  }
+}
+
+void saldaev::handleDrop(std::istream &in, std::ostream &out, NoteMap &notes)
+{
+  std::string name;
+  in >> name;
+
+  auto it = notes.find(name);
+  if (it != notes.end()) {
+    notes.erase(it);
+  } else {
+    out << "<INVALID COMMAND>\n";
+  }
 }
