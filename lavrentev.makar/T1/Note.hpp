@@ -1,7 +1,8 @@
 #ifndef NOTE_HPP
 #define NOTE_HPP
-#include <iostream>
-#include <memory>
+#include <cstddef>
+#include <string>
+#include <vector>
 
 namespace lavrentev{
   struct Note
@@ -11,4 +12,5 @@ namespace lavrentev{
     std::vector<std::weak_ptr<lavrentev::Note>> ptrs;
   };
 }
+
 #endif

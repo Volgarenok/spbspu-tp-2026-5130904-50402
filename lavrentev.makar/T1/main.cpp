@@ -4,7 +4,7 @@
 
 int main()
 {
-  std::vector< lavrentev::Note > db;
+  std::vector< std::shared_ptr<lavrentev::Note> > db;
   //using cmd_t = void(*)(std::istream&, std::ostream&, std::vector< std::string >&);
   std::unordered_map< std::string, cmd_t > cmds;
 
