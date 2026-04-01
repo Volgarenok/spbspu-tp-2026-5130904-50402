@@ -1,4 +1,6 @@
 #include <iomanip>
+#include <iostream>
+#include <limits>
 #include <memory>
 #include <ostream>
 #include <string>
@@ -44,10 +46,33 @@ namespace saldaev
 }
 
 using NoteMap = std::unordered_map< std::string, std::shared_ptr< saldaev::Note > >;
-using cmd_t = void (*)(std::istream &, std::ostream &, NoteMap);
+using cmd_t = void (*)(std::istream &, std::ostream &, NoteMap &);
 
 int main()
-{}
+{
+  NoteMap notes;
+  std::unordered_map< std::string, cmd_t > cmds;
+  cmds["note"] = saldaev::handleNote;
+  cmds["line"] = saldaev::handleLine;
+  cmds["show"] = saldaev::handleShow;
+  cmds["drop"] = saldaev::handleDrop;
+  cmds["link"] = saldaev::handleLink;
+  cmds["halt"] = saldaev::handleHalt;
+  cmds["mind"] = saldaev::handleMind;
+  cmds["expired"] = saldaev::handleExpired;
+  cmds["refresh"] = saldaev::handleRefresh;
+
+  std::string comand;
+  while (std::cin >> comand) {
+    try {
+      cmds.at(comand)(std::cin, std::cout, notes);
+    } catch (const std::out_of_range &) {
+      std::cout << "<INVALID COMMAND>\n";
+      auto toignore = std::numeric_limits< std::streamsize >::max();
+      std::cin.ignore(toignore, '\n');
+    }
+  }
+}
 
 saldaev::Note::Note(std::string name):
   name(name)
