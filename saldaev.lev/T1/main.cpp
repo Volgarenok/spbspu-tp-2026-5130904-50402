@@ -35,6 +35,12 @@ namespace saldaev
   void handleLine(std::istream &in, std::ostream &out, NoteMap &notes);
   void handleShow(std::istream &in, std::ostream &out, NoteMap &notes);
   void handleDrop(std::istream &in, std::ostream &out, NoteMap &notes);
+
+  void handleLink(std::istream &in, std::ostream &out, NoteMap &notes);
+  void handleHalt(std::istream &in, std::ostream &out, NoteMap &notes);
+  void handleMind(std::istream &in, std::ostream &out, NoteMap &notes);
+  void handleExpired(std::istream &in, std::ostream &out, NoteMap &notes);
+  void handleRefresh(std::istream &in, std::ostream &out, NoteMap &notes);
 }
 
 using NoteMap = std::unordered_map< std::string, std::shared_ptr< saldaev::Note > >;
@@ -145,5 +151,76 @@ void saldaev::handleDrop(std::istream &in, std::ostream &out, NoteMap &notes)
     notes.erase(it);
   } else {
     out << "<INVALID COMMAND>\n";
+  }
+}
+
+void saldaev::handleLink(std::istream &in, std::ostream &out, NoteMap &notes)
+{
+  std::string note_from;
+  std::string note_to;
+  in >> note_from >> note_to;
+
+  if ((notes.find(note_from) == notes.end()) || (notes.find(note_to) == notes.end())) {
+    out << "<INVALID COMMAND>\n";
+  } else {
+    if (!notes[note_from]->addLink(notes[note_to])) {
+      out << "<INVALID COMMAND>\n";
+    }
+  }
+}
+
+void saldaev::handleHalt(std::istream &in, std::ostream &out, NoteMap &notes)
+{
+  std::string note_from;
+  std::string note_to;
+  in >> note_from >> note_to;
+
+  if ((notes.find(note_from) == notes.end()) || (notes.find(note_to) == notes.end())) {
+    out << "<INVALID COMMAND>\n";
+  } else {
+    if (!(notes[note_from]->removeLink(notes[note_to]))) {
+      out << "<INVALID COMMAND>\n";
+    }
+  }
+}
+
+void saldaev::handleMind(std::istream &in, std::ostream &out, NoteMap &notes)
+{
+  std::string note_from;
+  in >> note_from;
+
+  if (notes.find(note_from) == notes.end()) {
+    out << "<INVALID COMMAND>\n";
+  } else {
+    for (const auto &link : notes[note_from]->getActiveLinks()) {
+      out << link->name << '\n';
+    }
+  }
+}
+
+void saldaev::handleExpired(std::istream &, std::ostream &out, NoteMap &notes)
+{
+  size_t res = 0;
+  for (const auto &note : notes) {
+    for (const auto &weak : note.second->getAllLinks()) {
+      if (weak.expired()) {
+        ++res;
+      }
+    }
+  }
+  out << res << '\n';
+}
+
+void saldaev::handleRefresh(std::istream &, std::ostream &out, NoteMap &notes)
+{
+  for (const auto &note : notes) {
+    auto &links = note.second->getAllLinks();
+    for (auto it = links.begin(); it != links.end();) {
+      if (it->expired()) {
+        it = links.erase(it);
+      } else {
+        ++it;
+      }
+    }
   }
 }
