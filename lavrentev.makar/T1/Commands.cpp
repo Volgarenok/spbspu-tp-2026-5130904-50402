@@ -44,9 +44,15 @@ void lavrentev::show(std::istream &in,
   in >> name;
   if (db.count(name) != 0)
   {
+    bool flag = false;
     for (size_t i = 0; i < db[name]->lines.size(); ++i)
     {
+      flag = true;
       out << db[name]->lines[i] << "\n";
+    }
+    if (!flag)
+    {
+      out << "\n";
     }
     return;
   }
@@ -103,10 +109,16 @@ void lavrentev::mind(std::istream &in,
   in >> name;
   if (db.count(name) != 0)
   {
+    bool flag = false;
     for (size_t i = 0; i < db[name]->ptrs.size(); ++i)
     {
+      flag = true;
       std::shared_ptr<Note> k = db[name]->ptrs[i].lock();
       out << k->name << "\n";
+    }
+    if (!flag)
+    {
+      out << "\n";
     }
     return;
   }
