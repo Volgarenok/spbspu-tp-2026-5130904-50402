@@ -1,4 +1,5 @@
 #include "Commands.hpp"
+#include <memory>
 #include <stdexcept>
 #include <iomanip>
 #include <unordered_map>
@@ -14,7 +15,8 @@ void lavrentev::note(std::istream& in, std::ostream&, std::unordered_map<std::st
   {
     throw std::logic_error("Node is already exists");
   }
-  std::shared_ptr<Note> newNote{};
+  std::shared_ptr<Note> newNote = std::make_shared<Note>();
+  newNote->name = newName;
   db[newName] = newNote;
 }
 
@@ -58,4 +60,27 @@ void lavrentev::drop(std::istream& in, std::ostream&, std::unordered_map<std::st
     return;
   }
   throw std::logic_error("No such Note");
+}
+
+void lavrentev::link(std::istream& in, std::ostream&, std::unordered_map<std::string, std::shared_ptr<Note> >& db)
+{
+  std::string noteTo, noteFrom;
+  in >> noteFrom >> noteTo;
+  if (db.count(noteTo) == 0 || db.count(noteFrom) == 0)
+  {
+    throw std::logic_error("No such Note");
+  }
+  for(size_t i = 0; i < db[noteFrom]->ptrs.size(); ++i)
+  {
+    std::shared_ptr<Note> k = db[noteFrom]->ptrs[i].lock();
+    if (k != nullptr)
+    {
+      if (k->name == noteTo)
+      {
+        throw std::logic_error("Link fot this Note is already exists");
+      }
+    }
+  }
+  std::weak_ptr<Note> newLink = db[noteTo];
+  db[noteFrom]->ptrs.push_back(newLink);
 }
