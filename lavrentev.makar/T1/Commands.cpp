@@ -99,3 +99,24 @@ void lavrentev::mind(std::istream& in, std::ostream& out, std::unordered_map<std
   }
   throw std::logic_error("No such Note");
 }
+
+void lavrentev::halt(std::istream& in, std::ostream&, std::unordered_map<std::string, std::shared_ptr<Note> >& db)
+{
+  std::string noteTo, noteFrom;
+  in >> noteFrom >> noteTo;
+  if (db.count(noteTo) == 0 || db.count(noteFrom) == 0)
+  {
+    throw std::logic_error("No such Note");
+  }
+  auto& ptrs = db.find(noteFrom)->second->ptrs;
+  for(size_t i = 0; i < ptrs.size(); ++i)
+  {
+    std::shared_ptr<Note> k = ptrs[i].lock();
+    if (k->name == noteTo)
+    {
+      ptrs.erase(ptrs.begin() + i);
+      return;
+    }
+  }
+  throw std::logic_error("Link not found");
+}
