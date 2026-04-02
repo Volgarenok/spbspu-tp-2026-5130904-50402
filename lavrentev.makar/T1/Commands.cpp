@@ -27,3 +27,17 @@ void lavrentev::line(std::istream& in, std::ostream&, std::unordered_map<std::st
   }
   throw std::logic_error("No such Note");
 }
+
+void lavrentev::show(std::istream& in, std::ostream& out, std::unordered_map<std::string, std::shared_ptr<Note> >& db)
+{
+  std::string name;
+  in >> name;
+  if(db.count(name) != 0)
+  {
+    for(size_t i = 0; i < db[name]->lines.size(); ++i)
+    {
+      out << db[name]->lines[i] << "\n";
+    }
+  }
+  throw std::logic_error("No such Note");
+}
