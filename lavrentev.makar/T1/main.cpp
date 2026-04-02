@@ -19,6 +19,7 @@ int main()
   cmds["refresh"] = lavrentev::refresh;
 
   std::string cmd;
+  std::cout << "Expected result is:\n";
   while (std::cin >> cmd)
   {
     try
@@ -31,7 +32,9 @@ int main()
       std::cin.ignore(toignore, '\n');
     } catch (const std::logic_error &e)
     {
-      std::cout << "<INVALID COMMAND: " << e.what() << ">\n";
+      std::cout << "<INVALID COMMAND>\n";
+      auto toignore = std::numeric_limits<std::streamsize>::max();
+      std::cin.ignore(toignore, '\n');
     }
   }
 
