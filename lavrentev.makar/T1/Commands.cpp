@@ -96,7 +96,7 @@ void lavrentev::link(std::istream &in,
 
 void lavrentev::mind(std::istream &in,
     std::ostream &out,
-    std::unordered_map<std::string, 
+    std::unordered_map<std::string,
     std::shared_ptr<Note>> &db)
 {
   std::string name;
