@@ -7,7 +7,7 @@
 namespace lavrentev{
   struct Note
   {
-    std::string name;
+    //std::string name;
     std::vector<std::string> lines;
     std::vector<std::weak_ptr<lavrentev::Note>> ptrs;
   };
