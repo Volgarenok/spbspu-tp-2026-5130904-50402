@@ -2,6 +2,9 @@
 #include <stdexcept>
 #include <iomanip>
 #include <unordered_map>
+#include <map>
+
+std::map<std::string, std::shared_ptr<lavrentev::Note> > deletedNotes;
 
 void lavrentev::note(std::istream& in, std::ostream&, std::unordered_map<std::string, std::shared_ptr<Note> >& db)
 {
@@ -38,6 +41,21 @@ void lavrentev::show(std::istream& in, std::ostream& out, std::unordered_map<std
     {
       out << db[name]->lines[i] << "\n";
     }
+    return;
+  }
+  throw std::logic_error("No such Note");
+}
+
+void lavrentev::drop(std::istream& in, std::ostream&, std::unordered_map<std::string, std::shared_ptr<Note> >& db)
+{
+  std::string name;
+  in >> name;
+  if(db.count(name) != 0)
+  {
+    std::shared_ptr<Note> toDelete = db[name];
+    db.erase(name);
+    deletedNotes[name] = toDelete;
+    return;
   }
   throw std::logic_error("No such Note");
 }
