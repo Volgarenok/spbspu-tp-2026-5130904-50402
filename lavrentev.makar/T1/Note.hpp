@@ -5,7 +5,8 @@
 #include <vector>
 #include <memory>
 
-namespace lavrentev{
+namespace lavrentev
+{
   struct Note
   {
     std::string name;
