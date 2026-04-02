@@ -159,7 +159,7 @@ void lavrentev::expired(
       ++count;
     }
   }
-  out << count;
+  out << count << "\n";
 }
 
 void lavrentev::refresh(

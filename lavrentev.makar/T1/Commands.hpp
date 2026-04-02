@@ -1,6 +1,9 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
 #include <iostream>
+#include <unordered_map>
+#include <memory>
+#include <string>
 #include "Note.hpp"
 
 using cmd_t = void (*)(
