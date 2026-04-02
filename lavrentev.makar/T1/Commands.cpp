@@ -54,9 +54,8 @@ void lavrentev::drop(std::istream& in, std::ostream&, std::unordered_map<std::st
   in >> name;
   if(db.count(name) != 0)
   {
-    std::shared_ptr<Note> toDelete = db[name];
+    deletedNotes[name] = db[name];
     db.erase(name);
-    deletedNotes[name] = toDelete;
     return;
   }
   throw std::logic_error("No such Note");
@@ -83,4 +82,20 @@ void lavrentev::link(std::istream& in, std::ostream&, std::unordered_map<std::st
   }
   std::weak_ptr<Note> newLink = db[noteTo];
   db[noteFrom]->ptrs.push_back(newLink);
+}
+
+void lavrentev::mind(std::istream& in, std::ostream& out, std::unordered_map<std::string, std::shared_ptr<Note> >& db)
+{
+  std::string name;
+  in >> name;
+  if(db.count(name) != 0)
+  {
+    for(size_t i = 0; i < db[name]->ptrs.size(); ++i)
+    {
+      std::shared_ptr<Note> k = db[name]->ptrs[i].lock();
+      out << k->name << "\n";
+    }
+    return;
+  }
+  throw std::logic_error("No such Note");
 }
