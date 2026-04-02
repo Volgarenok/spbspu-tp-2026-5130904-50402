@@ -114,7 +114,10 @@ void lavrentev::mind(std::istream &in,
     {
       flag = true;
       std::shared_ptr<Note> k = db[name]->ptrs[i].lock();
-      out << k->name << "\n";
+      if (k != nullptr)
+      {
+        out << k->name << "\n";
+      }
     }
     if (!flag)
     {
