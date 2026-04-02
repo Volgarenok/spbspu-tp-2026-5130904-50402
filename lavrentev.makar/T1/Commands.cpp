@@ -112,10 +112,10 @@ void lavrentev::mind(std::istream &in,
     bool flag = false;
     for (size_t i = 0; i < db[name]->ptrs.size(); ++i)
     {
-      flag = true;
       std::shared_ptr<Note> k = db[name]->ptrs[i].lock();
       if (k != nullptr)
       {
+        flag = true;
         out << k->name << "\n";
       }
     }
