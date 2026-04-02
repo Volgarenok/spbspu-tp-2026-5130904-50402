@@ -19,7 +19,6 @@ int main()
   cmds["refresh"] = lavrentev::refresh;
 
   std::string cmd;
-  std::cout << "Expected result is:\n";
   while (std::cin >> cmd)
   {
     try
