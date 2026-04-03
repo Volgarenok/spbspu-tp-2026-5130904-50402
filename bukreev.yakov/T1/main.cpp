@@ -14,6 +14,7 @@ namespace bukreev
   void noteCommand(std::istream& in, std::ostream& out);
   void lineCommand(std::istream& in, std::ostream& out);
   void showCommand(std::istream& in, std::ostream& out);
+  void dropCommand(std::istream& in, std::ostream& out);
   void invalidCommand(std::istream& in, std::ostream& out);
 }
 
@@ -39,6 +40,10 @@ void bukreev::executeCommand(std::string cmd)
   else if (cmd == "show")
   {
     bukreev::showCommand(std::cin, std::cout);
+  }
+  else if (cmd == "drop")
+  {
+    bukreev::dropCommand(std::cin, std::cout);
   }
   else
   {
@@ -92,6 +97,24 @@ void bukreev::showCommand(std::istream& in, std::ostream& out)
   }
 
   notesMap[name]->show(out);
+}
+
+void bukreev::dropCommand(std::istream& in, std::ostream& out)
+{
+  std::string name;
+  if (!(in >> name))
+  {
+    invalidCommand(in, out);
+    return;
+  }
+
+  if (!notesMap.count(name))
+  {
+    invalidCommand(in, out);
+    return;
+  }
+
+  notesMap.erase(name);
 }
 
 void bukreev::invalidCommand(std::istream& in, std::ostream& out)
