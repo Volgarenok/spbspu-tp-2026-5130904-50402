@@ -217,8 +217,12 @@ void saldaev::handleMind(std::istream &in, std::ostream &out, noteMap &notes)
   if (notes.find(note_from) == notes.end()) {
     out << "<INVALID COMMAND>\n";
   } else {
-    for (const std::shared_ptr< Note > &link : notes[note_from]->getActiveLinks()) {
+    std::vector< std::shared_ptr< saldaev::Note > > activeLinks = notes[note_from]->getActiveLinks();
+    for (const std::shared_ptr< Note > &link : activeLinks) {
       out << link->name << '\n';
+    }
+    if (activeLinks.empty()) {
+      out << '\n';
     }
   }
 }
