@@ -26,7 +26,7 @@ namespace saldaev
 
     std::vector< std::weak_ptr< Note > > &getAllLinks();
     std::vector< std::shared_ptr< Note > > getActiveLinks() const;
-    void show(std::ostream &) const;
+    const std::vector< std::string > &getLines() const;
 
   private:
     std::vector< std::string > lines_;
@@ -105,11 +105,9 @@ bool saldaev::Note::removeLink(std::shared_ptr< Note > note)
   return false;
 }
 
-void saldaev::Note::show(std::ostream &out) const
+const std::vector< std::string > &saldaev::Note::getLines() const
 {
-  for (const std::string &line : lines_) {
-    out << line << '\n';
-  }
+  return lines_;
 }
 
 std::vector< std::weak_ptr< saldaev::Note > > &saldaev::Note::getAllLinks()
@@ -162,7 +160,13 @@ void saldaev::handleShow(std::istream &in, std::ostream &out, noteMap &notes)
   if (notes.find(name) == notes.end()) {
     out << "<INVALID COMMAND>\n";
   } else {
-    notes[name]->show(out);
+    std::vector< std::string > lines = notes[name]->getLines();
+    for (const std::string &line : lines) {
+      out << line << '\n';
+    }
+    if (lines.empty()) {
+      out << '\n';
+    }
   }
 }
 
