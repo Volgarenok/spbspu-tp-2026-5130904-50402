@@ -11,6 +11,7 @@ namespace bukreev
   public:
     Note() = default;
     void appendLine(std::string line);
+    void show(std::ostream& out);
 
   private:
     std::vector< std::string > mLines;

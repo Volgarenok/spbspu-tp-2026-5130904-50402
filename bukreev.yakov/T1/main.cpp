@@ -9,8 +9,11 @@ namespace bukreev
 {
   std::unordered_map< std::string, std::shared_ptr< Note > > notesMap;
 
+  void executeCommand(std::string cmd);
+
   void noteCommand(std::istream& in, std::ostream& out);
   void lineCommand(std::istream& in, std::ostream& out);
+  void showCommand(std::istream& in, std::ostream& out);
   void invalidCommand(std::istream& in, std::ostream& out);
 }
 
@@ -19,18 +22,27 @@ int main()
   std::string cmd;
   while (std::cin >> cmd)
   {
-    if (cmd == "note")
-    {
-      bukreev::noteCommand(std::cin, std::cout);
-    }
-    else if (cmd == "line")
-    {
-      bukreev::lineCommand(std::cin, std::cout);
-    }
-    else
-    {
-      bukreev::invalidCommand(std::cin, std::cout);
-    }
+    bukreev::executeCommand(cmd);
+  }
+}
+
+void bukreev::executeCommand(std::string cmd)
+{
+  if (cmd == "note")
+  {
+    bukreev::noteCommand(std::cin, std::cout);
+  }
+  else if (cmd == "line")
+  {
+    bukreev::lineCommand(std::cin, std::cout);
+  }
+  else if (cmd == "show")
+  {
+    bukreev::showCommand(std::cin, std::cout);
+  }
+  else
+  {
+    bukreev::invalidCommand(std::cin, std::cout);
   }
 }
 
@@ -62,6 +74,24 @@ void bukreev::lineCommand(std::istream& in, std::ostream& out)
   }
 
   notesMap[name]->appendLine(line);
+}
+
+void bukreev::showCommand(std::istream& in, std::ostream& out)
+{
+  std::string name;
+  if (!(in >> name))
+  {
+    invalidCommand(in, out);
+    return;
+  }
+
+  if (!notesMap.count(name))
+  {
+    invalidCommand(in, out);
+    return;
+  }
+
+  notesMap[name]->show(out);
 }
 
 void bukreev::invalidCommand(std::istream& in, std::ostream& out)
