@@ -68,7 +68,7 @@ int main()
       cmds.at(comand)(std::cin, std::cout, notes);
     } catch (const std::out_of_range &) {
       std::cout << "<INVALID COMMAND>\n";
-      auto toignore = std::numeric_limits< std::streamsize >::max();
+      std::streamsize toignore = std::numeric_limits< std::streamsize >::max();
       std::cin.ignore(toignore, '\n');
     }
   }
@@ -85,7 +85,7 @@ void saldaev::Note::addLine(std::string line)
 
 bool saldaev::Note::addLink(std::shared_ptr< Note > note)
 {
-  for (const auto &link : links_) {
+  for (const std::weak_ptr< Note > &link : links_) {
     if (note == link.lock()) {
       return false;
     }
@@ -107,7 +107,7 @@ bool saldaev::Note::removeLink(std::shared_ptr< Note > note)
 
 void saldaev::Note::show(std::ostream &out) const
 {
-  for (const auto &line : lines_) {
+  for (const std::string &line : lines_) {
     out << line << '\n';
   }
 }
@@ -120,8 +120,8 @@ std::vector< std::weak_ptr< saldaev::Note > > &saldaev::Note::getAllLinks()
 std::vector< std::shared_ptr< saldaev::Note > > saldaev::Note::getActiveLinks() const
 {
   std::vector< std::shared_ptr< saldaev::Note > > ret;
-  for (const auto &link : links_) {
-    if (auto shared = link.lock()) {
+  for (const std::weak_ptr< Note > &link : links_) {
+    if (std::shared_ptr< Note > shared = link.lock()) {
       ret.push_back(shared);
     }
   }
@@ -217,7 +217,7 @@ void saldaev::handleMind(std::istream &in, std::ostream &out, noteMap &notes)
   if (notes.find(note_from) == notes.end()) {
     out << "<INVALID COMMAND>\n";
   } else {
-    for (const auto &link : notes[note_from]->getActiveLinks()) {
+    for (const std::shared_ptr< Note > &link : notes[note_from]->getActiveLinks()) {
       out << link->name << '\n';
     }
   }
@@ -234,7 +234,7 @@ void saldaev::handleExpired(std::istream &in, std::ostream &out, noteMap &notes)
     return;
   }
 
-  auto &links = notes[note_from]->getAllLinks();
+  std::vector< std::weak_ptr< Note > > &links = notes[note_from]->getAllLinks();
   for (auto it = links.begin(); it != links.end(); ++it) {
     if (it->expired()) {
       ++res;
@@ -253,7 +253,7 @@ void saldaev::handleRefresh(std::istream &in, std::ostream &out, noteMap &notes)
     return;
   }
 
-  auto &links = notes[note_from]->getAllLinks();
+  std::vector< std::weak_ptr< Note > > &links = notes[note_from]->getAllLinks();
   for (auto it = links.begin(); it != links.end();) {
     if (it->expired()) {
       it = links.erase(it);
