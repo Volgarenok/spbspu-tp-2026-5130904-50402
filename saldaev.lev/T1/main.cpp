@@ -33,25 +33,25 @@ namespace saldaev
     std::vector< std::weak_ptr< Note > > links_;
   };
 
-  void handleNote(std::istream &in, std::ostream &out, NoteMap &notes);
-  void handleLine(std::istream &in, std::ostream &out, NoteMap &notes);
-  void handleShow(std::istream &in, std::ostream &out, NoteMap &notes);
-  void handleDrop(std::istream &in, std::ostream &out, NoteMap &notes);
+  using noteMap = std::unordered_map< std::string, std::shared_ptr< saldaev::Note > >;
+  using cmd_t = void (*)(std::istream &, std::ostream &, noteMap &);
 
-  void handleLink(std::istream &in, std::ostream &out, NoteMap &notes);
-  void handleHalt(std::istream &in, std::ostream &out, NoteMap &notes);
-  void handleMind(std::istream &in, std::ostream &out, NoteMap &notes);
-  void handleExpired(std::istream &in, std::ostream &out, NoteMap &notes);
-  void handleRefresh(std::istream &in, std::ostream &out, NoteMap &notes);
+  void handleNote(std::istream &in, std::ostream &out, noteMap &notes);
+  void handleLine(std::istream &in, std::ostream &out, noteMap &notes);
+  void handleShow(std::istream &in, std::ostream &out, noteMap &notes);
+  void handleDrop(std::istream &in, std::ostream &out, noteMap &notes);
+
+  void handleLink(std::istream &in, std::ostream &out, noteMap &notes);
+  void handleHalt(std::istream &in, std::ostream &out, noteMap &notes);
+  void handleMind(std::istream &in, std::ostream &out, noteMap &notes);
+  void handleExpired(std::istream &in, std::ostream &out, noteMap &notes);
+  void handleRefresh(std::istream &in, std::ostream &out, noteMap &notes);
 }
-
-using NoteMap = std::unordered_map< std::string, std::shared_ptr< saldaev::Note > >;
-using cmd_t = void (*)(std::istream &, std::ostream &, NoteMap &);
 
 int main()
 {
-  NoteMap notes;
-  std::unordered_map< std::string, cmd_t > cmds;
+  saldaev::noteMap notes;
+  std::unordered_map< std::string, saldaev::cmd_t > cmds;
   cmds["note"] = saldaev::handleNote;
   cmds["line"] = saldaev::handleLine;
   cmds["show"] = saldaev::handleShow;
@@ -129,7 +129,7 @@ std::vector< std::shared_ptr< saldaev::Note > > saldaev::Note::getActiveLinks() 
   return ret;
 }
 
-void saldaev::handleNote(std::istream &in, std::ostream &out, NoteMap &notes)
+void saldaev::handleNote(std::istream &in, std::ostream &out, noteMap &notes)
 {
   std::string name;
   in >> name;
@@ -141,11 +141,12 @@ void saldaev::handleNote(std::istream &in, std::ostream &out, NoteMap &notes)
   }
 }
 
-void saldaev::handleLine(std::istream &in, std::ostream &out, NoteMap &notes)
+void saldaev::handleLine(std::istream &in, std::ostream &out, noteMap &notes)
 {
   std::string name;
   std::string line;
-  in >> name >> std::quoted(line);
+  in >> name;
+  in >> std::quoted(line);
 
   if (notes.find(name) == notes.end()) {
     out << "<INVALID COMMAND>\n";
@@ -154,7 +155,7 @@ void saldaev::handleLine(std::istream &in, std::ostream &out, NoteMap &notes)
   }
 }
 
-void saldaev::handleShow(std::istream &in, std::ostream &out, NoteMap &notes)
+void saldaev::handleShow(std::istream &in, std::ostream &out, noteMap &notes)
 {
   std::string name;
   in >> name;
@@ -166,7 +167,7 @@ void saldaev::handleShow(std::istream &in, std::ostream &out, NoteMap &notes)
   }
 }
 
-void saldaev::handleDrop(std::istream &in, std::ostream &out, NoteMap &notes)
+void saldaev::handleDrop(std::istream &in, std::ostream &out, noteMap &notes)
 {
   std::string name;
   in >> name;
@@ -179,7 +180,7 @@ void saldaev::handleDrop(std::istream &in, std::ostream &out, NoteMap &notes)
   }
 }
 
-void saldaev::handleLink(std::istream &in, std::ostream &out, NoteMap &notes)
+void saldaev::handleLink(std::istream &in, std::ostream &out, noteMap &notes)
 {
   std::string note_from;
   std::string note_to;
@@ -194,7 +195,7 @@ void saldaev::handleLink(std::istream &in, std::ostream &out, NoteMap &notes)
   }
 }
 
-void saldaev::handleHalt(std::istream &in, std::ostream &out, NoteMap &notes)
+void saldaev::handleHalt(std::istream &in, std::ostream &out, noteMap &notes)
 {
   std::string note_from;
   std::string note_to;
@@ -209,7 +210,7 @@ void saldaev::handleHalt(std::istream &in, std::ostream &out, NoteMap &notes)
   }
 }
 
-void saldaev::handleMind(std::istream &in, std::ostream &out, NoteMap &notes)
+void saldaev::handleMind(std::istream &in, std::ostream &out, noteMap &notes)
 {
   std::string note_from;
   in >> note_from;
@@ -223,7 +224,7 @@ void saldaev::handleMind(std::istream &in, std::ostream &out, NoteMap &notes)
   }
 }
 
-void saldaev::handleExpired(std::istream &, std::ostream &out, NoteMap &notes)
+void saldaev::handleExpired(std::istream &, std::ostream &out, noteMap &notes)
 {
   size_t res = 0;
   for (const auto &note : notes) {
@@ -236,7 +237,7 @@ void saldaev::handleExpired(std::istream &, std::ostream &out, NoteMap &notes)
   out << res << '\n';
 }
 
-void saldaev::handleRefresh(std::istream &, std::ostream &out, NoteMap &notes)
+void saldaev::handleRefresh(std::istream &, std::ostream &, noteMap &notes)
 {
   for (const auto &note : notes) {
     auto &links = note.second->getAllLinks();
