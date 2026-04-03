@@ -172,10 +172,10 @@ void saldaev::handleDrop(std::istream &in, std::ostream &out, noteMap &notes)
   in >> name;
 
   auto it = notes.find(name);
-  if (it != notes.end()) {
-    notes.erase(it);
-  } else {
+  if (it == notes.end()) {
     out << "<INVALID COMMAND>\n";
+  } else {
+    notes.erase(it);
   }
 }
 
