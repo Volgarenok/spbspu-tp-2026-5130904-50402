@@ -107,7 +107,6 @@ bool saldaev::Note::removeLink(std::shared_ptr< Note > note)
 
 void saldaev::Note::show(std::ostream &out) const
 {
-  out << name << ":\n";
   for (const auto &line : lines_) {
     out << line << '\n';
   }
