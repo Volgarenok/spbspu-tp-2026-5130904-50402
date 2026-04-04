@@ -18,3 +18,4 @@ namespace sogdanov
   void cmd_refresh(std::istream &in, std::ostream &out, NoteMap &notes);
 }
 #endif
+
