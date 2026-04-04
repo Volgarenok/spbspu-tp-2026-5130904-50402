@@ -12,7 +12,6 @@ namespace sogdanov
   void cmd_note(std::istream &in, std::ostream &, NoteMap &notes)
   {
     std::string name;
-    in >> name;
     auto it = notes.find(name);
     if (!(in >> name))
     {
@@ -63,7 +62,6 @@ namespace sogdanov
   void cmd_drop(std::istream &in, std::ostream &, NoteMap &notes)
   {
     std::string name;
-    in >> name;
     if (!(in >> name))
     {
       throw std::logic_error("No name");
@@ -78,7 +76,6 @@ namespace sogdanov
   void cmd_link(std::istream &in, std::ostream &, NoteMap &notes)
   {
     std::string from, to;
-    in >> from >> to;
     if (!(in >> from >> to))
     {
       throw std::logic_error("No arguments");
@@ -107,7 +104,6 @@ namespace sogdanov
   void cmd_halt(std::istream &in, std::ostream &, NoteMap &notes)
   {
     std::string from, to;
-    in >> from >> to;
     if (!(in >> from >> to))
     {
       throw std::logic_error("no arguments");
@@ -138,7 +134,6 @@ namespace sogdanov
   void cmd_mind(std::istream &in, std::ostream &out, NoteMap &notes)
   {
     std::string name;
-    in >> name;
     if (!(in >> name))
     {
       throw std::logic_error("no name");
@@ -160,7 +155,6 @@ namespace sogdanov
   void cmd_expired(std::istream &in, std::ostream &out, NoteMap &notes)
   {
     std::string name;
-    in >> name;
     if (!(in >> name))
     {
       throw std::logic_error("no name");
@@ -183,7 +177,6 @@ namespace sogdanov
   void cmd_refresh(std::istream &in, std::ostream &, NoteMap &notes)
   {
     std::string name;
-    in >> name;
     if (!(in >> name))
     {
       throw std::logic_error("no name");
