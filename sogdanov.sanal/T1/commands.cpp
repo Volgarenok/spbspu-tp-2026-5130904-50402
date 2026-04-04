@@ -7,38 +7,33 @@
 #include "commands.hpp"
 namespace sogdanov
 {
-  using NotePtr = std::shared_ptr<Note>;
-  using NoteMap = std::unordered_map<std::string, NotePtr>;
   void cmd_note(std::istream &in, std::ostream &, NoteMap &notes)
   {
     std::string name;
-    auto it = notes.find(name);
     if (!(in >> name))
     {
-      throw std::logic_error("No name");
+      throw std::logic_error("no name");
     }
+    auto it = notes.find(name);
     if (it != notes.end() && it->second)
     {
-      throw std::logic_error("Note already exists");
+      throw std::logic_error("note already exists");
     }
-    if (it == notes.end() || !it->second)
-    {
-      NotePtr n = std::make_shared<Note>();
-      n->name = name;
-      notes[name] = n;
-    }
+    NotePtr n = std::make_shared<Note>();
+    n->name = name;
+    notes[name] = n;
   }
   void cmd_line(std::istream &in, std::ostream &, NoteMap &notes)
   {
     std::string name, text;
     if (!(in >> name >> std::quoted(text)))
     {
-      throw std::logic_error("No line");
+      throw std::logic_error("no arguments");
     }
     auto it = notes.find(name);
     if (it == notes.end() || !it->second)
     {
-      throw std::logic_error("Note not found");
+      throw std::logic_error("note not found");
     }
     it->second->lines.push_back(text);
   }
@@ -47,25 +42,30 @@ namespace sogdanov
     std::string name;
     if (!(in >> name))
     {
-      throw std::logic_error("No name");
+      throw std::logic_error("no name");
     }
     auto it = notes.find(name);
     if (it == notes.end() || !it->second)
     {
-      throw std::logic_error("Note not found");
+      throw std::logic_error("note not found");
     }
+    bool outputted = false;
     for (const std::string &l : it->second->lines)
     {
       out << l << "\n";
+      outputted = true;
     }
-    out << '\n';
+    if (!outputted)
+    {
+      out << "\n";
+    }
   }
   void cmd_drop(std::istream &in, std::ostream &, NoteMap &notes)
   {
     std::string name;
     if (!(in >> name))
     {
-      throw std::logic_error("No name");
+      throw std::logic_error("no name");
     }
     auto it = notes.find(name);
     if (it == notes.end() || !it->second)
@@ -79,7 +79,7 @@ namespace sogdanov
     std::string from, to;
     if (!(in >> from >> to))
     {
-      throw std::logic_error("No arguments");
+      throw std::logic_error("no arguments");
     }
     auto it_from = notes.find(from);
     auto it_to = notes.find(to);
@@ -139,15 +139,20 @@ namespace sogdanov
     {
       throw std::logic_error("note not found");
     }
+    bool outputted = false;
     for (const std::weak_ptr<Note> &w : it->second->links)
     {
       NotePtr target = w.lock();
       if (target)
       {
         out << target->name << "\n";
+        outputted = true;
       }
     }
-    out << '\n';
+    if (!outputted)
+    {
+      out << "\n";
+    }
   }
   void cmd_expired(std::istream &in, std::ostream &out, NoteMap &notes)
   {
@@ -197,3 +202,4 @@ namespace sogdanov
     }
   }
 }
+
