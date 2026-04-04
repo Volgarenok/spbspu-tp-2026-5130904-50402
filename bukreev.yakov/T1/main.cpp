@@ -9,7 +9,7 @@ namespace bukreev
 {
   std::unordered_map< std::string, std::shared_ptr< Note > > notesMap;
 
-  void executeCommand(std::string cmd);
+  void executeCommand(std::string cmd, std::istream& in, std::ostream& out);
 
   void noteCommand(std::istream& in, std::ostream& out);
   void lineCommand(std::istream& in, std::ostream& out);
@@ -24,35 +24,35 @@ int main()
   std::string cmd;
   while (std::cin >> cmd)
   {
-    bukreev::executeCommand(cmd);
+    bukreev::executeCommand(cmd, std::cin, std::cout);
   }
 }
 
-void bukreev::executeCommand(std::string cmd)
+void bukreev::executeCommand(std::string cmd, std::istream& in, std::ostream& out)
 {
   if (cmd == "note")
   {
-    bukreev::noteCommand(std::cin, std::cout);
+    bukreev::noteCommand(in, out);
   }
   else if (cmd == "line")
   {
-    bukreev::lineCommand(std::cin, std::cout);
+    bukreev::lineCommand(in, out);
   }
   else if (cmd == "show")
   {
-    bukreev::showCommand(std::cin, std::cout);
+    bukreev::showCommand(in, out);
   }
   else if (cmd == "drop")
   {
-    bukreev::dropCommand(std::cin, std::cout);
+    bukreev::dropCommand(in, out);
   }
   else if (cmd == "link")
   {
-    bukreev::linkCommand(std::cin, std::cout);
+    bukreev::linkCommand(in, out);
   }
   else
   {
-    bukreev::invalidCommand(std::cin, std::cout);
+    bukreev::invalidCommand(in, out);
   }
 }
 
