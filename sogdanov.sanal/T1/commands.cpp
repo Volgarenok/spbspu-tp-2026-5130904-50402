@@ -135,5 +135,75 @@ namespace sogdanov
     }
     throw std::logic_error("link not found");
   }
-  
+  void cmd_mind(std::istream &in, std::ostream &out, NoteMap &notes)
+  {
+    std::string name;
+    in >> name;
+    if (!(in >> name))
+    {
+      throw std::logic_error("no name");
+    }
+    auto it = notes.find(name);
+    if (it == notes.end() || !it->second)
+    {
+      throw std::logic_error("note not found");
+    }
+    for (const std::weak_ptr<Note> &w : it->second->links)
+    {
+      NotePtr target = w.lock();
+      if (target)
+      {
+        out << target->name << "\n";
+      }
+    }
+  }
+  void cmd_expired(std::istream &in, std::ostream &out, NoteMap &notes)
+  {
+    std::string name;
+    in >> name;
+    if (!(in >> name))
+    {
+      throw std::logic_error("no name");
+    }
+    auto it = notes.find(name);
+    if (it == notes.end() || !it->second)
+    {
+      throw std::logic_error("note not found");
+    }
+    int count = 0;
+    for (const std::weak_ptr<Note> &w : it->second->links)
+    {
+      if (w.expired())
+      {
+        ++count;
+      }
+    }
+    out << count << "\n";
+  }
+  void cmd_refresh(std::istream &in, std::ostream &, NoteMap &notes)
+  {
+    std::string name;
+    in >> name;
+    if (!(in >> name))
+    {
+      throw std::logic_error("no name");
+    }
+    auto it = notes.find(name);
+    if (it == notes.end() || !it->second)
+    {
+      throw std::logic_error("note not found");
+    }
+    std::vector<std::weak_ptr<Note>> &links = it->second->links;
+    for (auto i = links.begin(); i != links.end();)
+    {
+      if (i->expired())
+      {
+        i = links.erase(i);
+      }
+      else
+      {
+        ++i;
+      }
+    }
+  }
 }
