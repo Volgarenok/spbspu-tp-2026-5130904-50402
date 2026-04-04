@@ -52,3 +52,17 @@ void bukreev::Note::showLinks(std::ostream& out)
     }
   }
 }
+
+size_t bukreev::Note::countExpired()
+{
+  size_t res = 0;
+  for (const NoteLink& link : mLinks)
+  {
+    if (link.second.expired())
+    {
+      res++;
+    }
+  }
+
+  return res;
+}
