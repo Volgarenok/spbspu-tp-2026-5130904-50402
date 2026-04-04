@@ -15,6 +15,7 @@ namespace bukreev
     std::string getName();
     void appendLine(std::string line);
     void addLink(std::shared_ptr< Note > to);
+    void removeLink(std::string to);
     void show(std::ostream& out);
     void showLinks(std::ostream& out);
 

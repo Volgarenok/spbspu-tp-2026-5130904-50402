@@ -16,6 +16,7 @@ namespace bukreev
   void showCommand(std::istream& in, std::ostream& out);
   void dropCommand(std::istream& in, std::ostream& out);
   void linkCommand(std::istream& in, std::ostream& out);
+  void haltCommand(std::istream& in, std::ostream& out);
   void mindCommand(std::istream& in, std::ostream& out);
   void invalidCommand(std::istream& in, std::ostream& out);
 }
@@ -50,6 +51,10 @@ void bukreev::executeCommand(std::string cmd, std::istream& in, std::ostream& ou
   else if (cmd == "link")
   {
     bukreev::linkCommand(in, out);
+  }
+  else if (cmd == "halt")
+  {
+    bukreev::haltCommand(in, out);
   }
   else if (cmd == "mind")
   {
@@ -152,6 +157,25 @@ void bukreev::linkCommand(std::istream& in, std::ostream& out)
     invalidCommand(in, out);
     return;
   }
+}
+
+void bukreev::haltCommand(std::istream& in, std::ostream& out)
+{
+  std::string from, to;
+
+  if (!(in >> from >> to))
+  {
+    invalidCommand(in, out);
+    return;
+  }
+
+  if (!notesMap.count(from))
+  {
+    invalidCommand(in, out);
+    return;
+  }
+
+  notesMap[from]->removeLink(to);
 }
 
 void bukreev::mindCommand(std::istream& in, std::ostream& out)

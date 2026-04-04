@@ -31,6 +31,17 @@ void bukreev::Note::addLink(std::shared_ptr< Note > to)
   mLinks.push_back({to->getName(), to});
 }
 
+void bukreev::Note::removeLink(std::string to)
+{
+  for (size_t i = 0; i < mLinks.size(); i++)
+  {
+    if (mLinks[i].first == to)
+    {
+      mLinks.erase(mLinks.begin() + i);
+    }
+  }
+}
+
 void bukreev::Note::showLinks(std::ostream& out)
 {
   for (const NoteLink& link : mLinks)
