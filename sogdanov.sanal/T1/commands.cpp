@@ -109,21 +109,16 @@ namespace sogdanov
       throw std::logic_error("no arguments");
     }
     auto it_from = notes.find(from);
-    auto it_to = notes.find(to);
     if (it_from == notes.end() || !it_from->second)
     {
       throw std::logic_error("note not found");
     }
-    if (it_to == notes.end() || !it_to->second)
-    {
-      throw std::logic_error("note not found");
-    }
     NotePtr note_from = it_from->second;
-    NotePtr note_to = it_to->second;
     std::vector<std::weak_ptr<Note>> &links = note_from->links;
     for (auto it = links.begin(); it != links.end(); ++it)
     {
-      if (it->lock() == note_to)
+      NotePtr target = it->lock();
+      if (target && target->name == to)
       {
         links.erase(it);
         return;
