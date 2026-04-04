@@ -30,3 +30,14 @@ void bukreev::Note::addLink(std::shared_ptr< Note > to)
   }
   mLinks.push_back({to->getName(), to});
 }
+
+void bukreev::Note::showLinks(std::ostream& out)
+{
+  for (const NoteLink& link : mLinks)
+  {
+    if (!link.second.expired())
+    {
+      out << link.first << '\n';
+    }
+  }
+}
