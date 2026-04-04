@@ -15,6 +15,7 @@ namespace bukreev
   void lineCommand(std::istream& in, std::ostream& out);
   void showCommand(std::istream& in, std::ostream& out);
   void dropCommand(std::istream& in, std::ostream& out);
+  void linkCommand(std::istream& in, std::ostream& out);
   void invalidCommand(std::istream& in, std::ostream& out);
 }
 
@@ -45,6 +46,10 @@ void bukreev::executeCommand(std::string cmd)
   {
     bukreev::dropCommand(std::cin, std::cout);
   }
+  else if (cmd == "link")
+  {
+    bukreev::linkCommand(std::cin, std::cout);
+  }
   else
   {
     bukreev::invalidCommand(std::cin, std::cout);
@@ -60,7 +65,7 @@ void bukreev::noteCommand(std::istream& in, std::ostream& out)
     return;
   }
 
-  notesMap[name] = std::make_shared< Note >();
+  notesMap[name] = std::make_shared< Note >(name);
 }
 
 void bukreev::lineCommand(std::istream& in, std::ostream& out)
@@ -115,6 +120,33 @@ void bukreev::dropCommand(std::istream& in, std::ostream& out)
   }
 
   notesMap.erase(name);
+}
+
+void bukreev::linkCommand(std::istream& in, std::ostream& out)
+{
+  std::string from, to;
+
+  if (!(in >> from >> to))
+  {
+    invalidCommand(in, out);
+    return;
+  }
+
+  if (!notesMap.count(from) || !notesMap.count(to))
+  {
+    invalidCommand(in, out);
+    return;
+  }
+
+  try
+  {
+    notesMap[from]->addLink(notesMap[to]);
+  }
+  catch(const std::logic_error& e)
+  {
+    invalidCommand(in, out);
+    return;
+  }
 }
 
 void bukreev::invalidCommand(std::istream& in, std::ostream& out)
