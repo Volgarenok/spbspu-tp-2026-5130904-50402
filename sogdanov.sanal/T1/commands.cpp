@@ -58,6 +58,7 @@ namespace sogdanov
     {
       out << l << "\n";
     }
+    out << '\n';
   }
   void cmd_drop(std::istream &in, std::ostream &, NoteMap &notes)
   {
@@ -146,6 +147,7 @@ namespace sogdanov
         out << target->name << "\n";
       }
     }
+    out << '\n';
   }
   void cmd_expired(std::istream &in, std::ostream &out, NoteMap &notes)
   {
