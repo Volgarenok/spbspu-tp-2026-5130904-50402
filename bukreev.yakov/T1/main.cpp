@@ -19,6 +19,7 @@ namespace bukreev
   void haltCommand(std::istream& in, std::ostream& out);
   void mindCommand(std::istream& in, std::ostream& out);
   void expiredCommand(std::istream& in, std::ostream& out);
+  void refreshCommand(std::istream& in, std::ostream& out);
   void invalidCommand(std::istream& in, std::ostream& out);
 }
 
@@ -64,6 +65,10 @@ void bukreev::executeCommand(std::string cmd, std::istream& in, std::ostream& ou
   else if (cmd == "expired")
   {
     bukreev::expiredCommand(in, out);
+  }
+  else if (cmd == "refresh")
+  {
+    bukreev::refreshCommand(in, out);
   }
   else
   {
@@ -219,6 +224,25 @@ void bukreev::expiredCommand(std::istream& in, std::ostream& out)
   }
 
   out << notesMap[name]->countExpired() << '\n';
+}
+
+void bukreev::refreshCommand(std::istream& in, std::ostream& out)
+{
+  std::string name;
+
+  if (!(in >> name))
+  {
+    invalidCommand(in, out);
+    return;
+  }
+
+  if (!notesMap.count(name))
+  {
+    invalidCommand(in, out);
+    return;
+  }
+
+  notesMap[name]->removeExpired();
 }
 
 void bukreev::invalidCommand(std::istream& in, std::ostream& out)

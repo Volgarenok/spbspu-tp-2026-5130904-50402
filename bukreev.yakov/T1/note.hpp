@@ -19,6 +19,7 @@ namespace bukreev
     void show(std::ostream& out);
     void showLinks(std::ostream& out);
     size_t countExpired();
+    void removeExpired();
 
   private:
     std::string mName;

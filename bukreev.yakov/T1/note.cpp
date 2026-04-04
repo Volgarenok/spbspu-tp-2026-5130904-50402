@@ -66,3 +66,21 @@ size_t bukreev::Note::countExpired()
 
   return res;
 }
+
+void bukreev::Note::removeExpired()
+{
+  std::vector< std::string > expired;
+
+  for (const NoteLink& link : mLinks)
+  {
+    if (link.second.expired())
+    {
+      expired.push_back(link.first);
+    }
+  }
+
+  for (const std::string& name : expired)
+  {
+    removeLink(name);
+  }
+}
