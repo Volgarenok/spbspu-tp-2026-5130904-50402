@@ -21,15 +21,15 @@ namespace petrov
   using notes_t = std::unordered_map< std::string, std::shared_ptr< Note > >;
   using func_t = void (*)(std::istream &, std::ostream &, notes_t &);
 
-  void addNote(std::istream &is, std::ostream &, notes_t &db);
-  void addDesc(std::istream &is, std::ostream &, notes_t &db);
-  void printNote(std::istream &is, std::ostream &os, notes_t &db);
-  void dropNote(std::istream &is, std::ostream &, notes_t &db);
-  void linkNote(std::istream &is, std::ostream &, notes_t &db);
-  void removeLink(std::istream &is, std::ostream &, notes_t &db);
-  void printLinks(std::istream &is, std::ostream &, notes_t &db);
-  void refreshLinks(std::istream &is, std::ostream &, notes_t &db);
-  void countExpired(std::istream &is, std::ostream &, notes_t &db);
+  void addNote(std::istream& is, std::ostream& os, notes_t& db);
+  void addDesc(std::istream& is, std::ostream& os, notes_t& db);
+  void printNote(std::istream& is, std::ostream& os, notes_t& db);
+  void dropNote(std::istream& is, std::ostream& os, notes_t& db);
+  void linkNote(std::istream& is, std::ostream& os, notes_t& db);
+  void removeLink(std::istream& is, std::ostream& os, notes_t& db);
+  void printLinks(std::istream& is, std::ostream& os, notes_t& db);
+  void refreshLinks(std::istream& is, std::ostream& os, notes_t& db);
+  void countExpired(std::istream& is, std::ostream& os, notes_t& db);
   using linkIt_t = std::vector< std::weak_ptr< Note > >::iterator;
   linkIt_t find(linkIt_t, linkIt_t, std::string name);
 }

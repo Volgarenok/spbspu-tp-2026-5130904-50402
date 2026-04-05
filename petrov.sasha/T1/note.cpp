@@ -24,7 +24,7 @@ petrov::linkIt_t petrov::find(linkIt_t start, linkIt_t end, std::string name)
   return end;
 }
 
-void petrov::addNote(std::istream &is, std::ostream &, notes_t &db)
+void petrov::addNote(std::istream& is, std::ostream& os, notes_t& db)
 {
   std::string name;
   is >> name;
@@ -35,7 +35,7 @@ void petrov::addNote(std::istream &is, std::ostream &, notes_t &db)
   }
 }
 
-void petrov::addDesc(std::istream &is, std::ostream &, notes_t &db)
+void petrov::addDesc(std::istream& is, std::ostream& os, notes_t& db)
 {
   std::string name, desc;
   is >> name;
@@ -47,7 +47,7 @@ void petrov::addDesc(std::istream &is, std::ostream &, notes_t &db)
   }
 }
 
-void petrov::printNote(std::istream &is, std::ostream &os, notes_t &db)
+void petrov::printNote(std::istream& is, std::ostream& os, notes_t& db)
 {
   std::string name;
   is >> name;
@@ -63,7 +63,7 @@ void petrov::printNote(std::istream &is, std::ostream &os, notes_t &db)
   }
 }
 
-void petrov::dropNote(std::istream &is, std::ostream &, notes_t &db)
+void petrov::dropNote(std::istream& is, std::ostream& os, notes_t& db)
 {
   std::string name;
   is >> name;
@@ -73,7 +73,7 @@ void petrov::dropNote(std::istream &is, std::ostream &, notes_t &db)
   db.erase(name);
 }
 
-void petrov::linkNote(std::istream &is, std::ostream &, notes_t &db)
+void petrov::linkNote(std::istream& is, std::ostream& os, notes_t& db)
 {
   std::string from, to;
   is >> from >> to;
@@ -88,7 +88,7 @@ void petrov::linkNote(std::istream &is, std::ostream &, notes_t &db)
   }
 }
 
-void petrov::removeLink(std::istream &is, std::ostream &, notes_t &db)
+void petrov::removeLink(std::istream& is, std::ostream& os, notes_t& db)
 {
   std::string from, to;
   is >> from >> to;
@@ -140,7 +140,7 @@ void petrov::countExpired(std::istream &is, std::ostream &os, notes_t &db)
   os << expired << '\n';
 }
 
-void petrov::refreshLinks(std::istream &is, std::ostream &, notes_t &db)
+void petrov::refreshLinks(std::istream& is, std::ostream& os, notes_t& db)
 {
   std::string name;
   std::vector< std::weak_ptr< Note > > vec;
