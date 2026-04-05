@@ -22,7 +22,7 @@ int main()
       auto toignore = std::numeric_limits< std::streamsize >::max();
       std::cin.ignore(toignore, '\n');
     } catch (const std::logic_error &e) {
-      std::cout << "<INVALID COMMAND: " << e.what() << ">\n";
+      std::cout << "<INVALID COMMAND>\n";
     }
   }
 

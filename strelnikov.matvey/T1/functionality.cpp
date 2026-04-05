@@ -88,7 +88,7 @@ void strelnikov::link(std::istream &in, std::ostream &, strelnikov::db_t &db)
   in >> from >> to;
 
   try {
-    std::vector< std::weak_ptr< Note > > links_tmp = db.at(from)->links;
+    std::vector< std::weak_ptr< Note > > &links_tmp = db.at(from)->links;
     if (findLink(links_tmp.begin(), links_tmp.end(), to) == links_tmp.end()) {
       db.at(from)->links.push_back(db.at(to));
     } else {
@@ -106,7 +106,7 @@ void strelnikov::showMindMap(std::istream &in, std::ostream &out, strelnikov::db
 
   bool flag = true;
   try {
-    std::vector< std::weak_ptr< Note > > links_tmp = db.at(from)->links;
+    std::vector< std::weak_ptr< Note > > &links_tmp = db.at(from)->links;
     for (const std::weak_ptr< Note > &l : links_tmp) {
       if (!l.expired()) {
         out << l.lock()->name << '\n';
@@ -128,12 +128,12 @@ void strelnikov::halt(std::istream &in, std::ostream &, strelnikov::db_t &db)
   in >> from >> to;
 
   try {
-    std::vector< std::weak_ptr< Note > > links_tmp = db.at(from)->links;
+    std::vector< std::weak_ptr< Note > > &links_tmp = db.at(from)->links;
     strelnikov::It_t it = strelnikov::findLink(links_tmp.begin(), links_tmp.end(), to);
-    if (it == db.at(from)->links.end()) {
+    if (it == links_tmp.end()) {
       throw std::logic_error("No link");
     }
-    db.at(from)->links.erase(it);
+    links_tmp.erase(it);
   } catch (const std::out_of_range &) {
     throw std::logic_error("Note does not exist");
   }
