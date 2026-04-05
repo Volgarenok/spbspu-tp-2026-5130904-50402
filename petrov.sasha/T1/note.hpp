@@ -24,6 +24,8 @@ namespace petrov
   void addNote(std::istream &is, std::ostream &, notes_t &db);
   void addDesc(std::istream &is, std::ostream &, notes_t &db);
   void printNote(std::istream &is, std::ostream &os, notes_t &db);
+  void dropNote(std::istream &is, std::ostream &, notes_t &db);
+  void linkNote(std::istream &is, std::ostream &, notes_t &db);
   using linkIt_t = std::vector< std::weak_ptr< Note > >::iterator;
   linkIt_t find(linkIt_t, linkIt_t, std::string name);
 }
