@@ -35,3 +35,31 @@ void petrov::addNote(std::istream &is, std::ostream &, notes_t &db)
   }
 }
 
+void petrov::addDesc(std::istream &is, std::ostream &, notes_t &db)
+{
+  std::string name, desc;
+  is >> name;
+  is >> std::quoted(desc);
+  try {
+    db.at(name)->desc.push_back(desc);
+  } catch (const std::out_of_range &) {
+    throw std::logic_error("no note with this name");
+  }
+}
+
+void petrov::printNote(std::istream &is, std::ostream &os, notes_t &db)
+{
+  std::string name;
+  is >> name;
+  try {
+    if (!db.at(name)->desc.size()) {
+      os << '\n';
+    }
+    for (const std::string &line : db.at(name)->desc) {
+      os << line << '\n';
+    }
+  } catch (const std::out_of_range &) {
+    throw std::logic_error("no note with this name");
+  }
+}
+
