@@ -1,6 +1,26 @@
 #ifndef NOTE_HPP
 #define NOTE_HPP
 
+#include <iosfwd>
+#include <limits>
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+namespace petrov {
+  class Note {
+  public:
+    Note(std::string name);
+    std::string name;
+    std::vector< std::string > desc;
+    std::vector< std::weak_ptr< Note > > links;
+  };
+  
+  constexpr std::streamsize streamMax = std::numeric_limits< std::streamsize >::max();
+  using notes_t = std::unordered_map< std::string, std::shared_ptr< Note > >;
+  using func_t = void (*)(std::istream& , std::ostream& , notes_t&);
+}
 
 #endif
 
