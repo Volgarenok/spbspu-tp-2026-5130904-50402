@@ -5,7 +5,7 @@
 
 namespace strelnikov
 {
-	struct Note;
+  struct Note;
   using It_t = std::vector< std::weak_ptr< Note > >::iterator;
   using db_t = std::unordered_map< std::string, std::shared_ptr< Note > >;
   void addNote(std::istream &, std::ostream &, db_t &);

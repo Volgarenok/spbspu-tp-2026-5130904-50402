@@ -1,8 +1,8 @@
-#include "functionality.hpp"
 #include <iomanip>
 #include <iostream>
 #include <string>
 #include <vector>
+#include "functionality.hpp"
 
 struct strelnikov::Note
 {
@@ -20,13 +20,13 @@ strelnikov::Note::Note(std::string str):
 
 strelnikov::It_t strelnikov::findLink(It_t start, It_t end, std::string name)
 {
-	while(start != end) {
-		if(!start->expired() && start->lock()->name == name) {
-			return start;
-		}
-		++start;
-	}
-	return end;
+  while (start != end) {
+    if (!start->expired() && start->lock()->name == name) {
+      return start;
+    }
+    ++start;
+  }
+  return end;
 }
 
 void strelnikov::addNote(std::istream &in, std::ostream &, strelnikov::db_t &db)
@@ -158,7 +158,7 @@ void strelnikov::expired(std::istream &in, std::ostream &out, strelnikov::db_t &
 
 void strelnikov::refresh(std::istream &in, std::ostream &, strelnikov::db_t &db)
 {
-	std::string str;
+  std::string str;
   std::vector< std::weak_ptr< Note > > v;
   in >> str;
   try {
