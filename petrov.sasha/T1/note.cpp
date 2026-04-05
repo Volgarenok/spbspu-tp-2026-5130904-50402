@@ -123,3 +123,37 @@ void petrov::printLinks(std::istream &is, std::ostream &os, notes_t &db)
   }
 }
 
+void petrov::countExpired(std::istream &is, std::ostream &os, notes_t &db)
+{
+  std::string name;
+  size_t expired = 0;
+  is >> name;
+  try {
+    for (const std::weak_ptr< Note > &link : db.at(name)->links) {
+      if (link.expired()) {
+        ++expired;
+      }
+    }
+  } catch (const std::out_of_range &) {
+    throw std::logic_error("No note with this name");
+  }
+  os << expired << '\n';
+}
+
+void petrov::refreshLinks(std::istream &is, std::ostream &, notes_t &db)
+{
+  std::string name;
+  std::vector< std::weak_ptr< Note > > vec;
+  is >> name;
+  try {
+    for (std::weak_ptr< Note > &link : db.at(name)->links) {
+      if (!link.expired()) {
+        vec.push_back(std::move(link));
+      }
+    }
+  } catch (const std::out_of_range &) {
+    throw std::logic_error("No note with this name");
+  }
+  db.at(name)->links.swap(vec);
+}
+

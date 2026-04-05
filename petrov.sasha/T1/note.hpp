@@ -28,6 +28,8 @@ namespace petrov
   void linkNote(std::istream &is, std::ostream &, notes_t &db);
   void removeLink(std::istream &is, std::ostream &, notes_t &db);
   void printLinks(std::istream &is, std::ostream &, notes_t &db);
+  void refreshLinks(std::istream &is, std::ostream &, notes_t &db);
+  void countExpired(std::istream &is, std::ostream &, notes_t &db);
   using linkIt_t = std::vector< std::weak_ptr< Note > >::iterator;
   linkIt_t find(linkIt_t, linkIt_t, std::string name);
 }
