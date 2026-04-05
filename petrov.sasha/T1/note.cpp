@@ -88,3 +88,38 @@ void petrov::linkNote(std::istream &is, std::ostream &, notes_t &db)
   }
 }
 
+void petrov::removeLink(std::istream &is, std::ostream &, notes_t &db)
+{
+  std::string from, to;
+  is >> from >> to;
+  try {
+    petrov::linkIt_t it = petrov::find(db.at(from)->links.begin(), db.at(from)->links.end(), to);
+    if (it == db.at(from)->links.end()) {
+      throw std::logic_error("No link with this name");
+    }
+    db.at(from)->links.erase(it);
+  } catch (const std::out_of_range &) {
+    throw std::logic_error("No note with this name");
+  }
+}
+
+void petrov::printLinks(std::istream &is, std::ostream &os, notes_t &db)
+{
+  std::string name;
+  is >> name;
+  bool print = true;
+  try {
+    for (const std::weak_ptr< Note > &link : db.at(name)->links) {
+      if (!link.expired()) {
+        os << link.lock()->name << '\n';
+        print = false;
+      }
+    }
+  } catch (const std::out_of_range &) {
+    throw std::logic_error("No note with this name");
+  }
+  if (print) {
+    os << '\n';
+  }
+}
+
