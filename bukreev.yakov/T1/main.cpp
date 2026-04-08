@@ -179,7 +179,7 @@ void bukreev::haltCommand(std::istream& in, std::ostream& out)
     return;
   }
 
-  if (!notesMap.count(from))
+  if (!notesMap.count(from) || !notesMap.count(to))
   {
     invalidCommand(in, out);
     return;

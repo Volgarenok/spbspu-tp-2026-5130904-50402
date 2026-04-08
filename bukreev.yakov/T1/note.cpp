@@ -38,6 +38,7 @@ void bukreev::Note::removeLink(std::string to)
     if (mLinks[i].first == to)
     {
       mLinks.erase(mLinks.begin() + i);
+      break;
     }
   }
 }
