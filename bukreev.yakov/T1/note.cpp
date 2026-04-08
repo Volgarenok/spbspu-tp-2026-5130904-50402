@@ -44,11 +44,18 @@ void bukreev::Note::removeLink(std::string to)
 
 void bukreev::Note::showLinks(std::ostream& out)
 {
-  for (const NoteLink& link : mLinks)
+  if (mLinks.size() == 0)
   {
-    if (!link.second.expired())
+    out << '\n';
+  }
+  else
+  {
+    for (const NoteLink& link : mLinks)
     {
-      out << link.first << '\n';
+      if (!link.second.expired())
+      {
+        out << link.first << '\n';
+      }
     }
   }
 }
