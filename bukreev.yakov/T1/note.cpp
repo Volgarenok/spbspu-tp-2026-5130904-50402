@@ -51,12 +51,19 @@ void bukreev::Note::showLinks(std::ostream& out)
   }
   else
   {
+    bool shown = false;
     for (const NoteLink& link : mLinks)
     {
       if (!link.second.expired())
       {
         out << link.first << '\n';
+        shown = true;
       }
+    }
+
+    if (!shown)
+    {
+      out << '\n';
     }
   }
 }
