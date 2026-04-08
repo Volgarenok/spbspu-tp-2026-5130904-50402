@@ -85,6 +85,12 @@ void bukreev::noteCommand(std::istream& in, std::ostream& out)
     return;
   }
 
+  if (notesMap.count(name))
+  {
+    invalidCommand(in, out);
+    return;
+  }
+
   notesMap[name] = std::make_shared< Note >(name);
 }
 
