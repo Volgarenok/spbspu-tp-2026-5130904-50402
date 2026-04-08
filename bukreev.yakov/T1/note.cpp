@@ -13,9 +13,16 @@ void bukreev::Note::appendLine(std::string line)
 
 void bukreev::Note::show(std::ostream& out)
 {
-  for (const std::string& str : mLines)
+  if (mLines.size() == 0)
   {
-    out << str << '\n';
+    out << '\n';
+  }
+  else
+  {
+    for (const std::string& str : mLines)
+    {
+      out << str << '\n';
+    }
   }
 }
 
