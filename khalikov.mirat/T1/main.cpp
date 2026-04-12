@@ -77,6 +77,30 @@ void dropCommand(std::istream& in, std::ostream&, d_t& data)
 	}
 }
 
+void linkCommand(std::istream& in, std::ostream&, d_t& data)
+{
+	std::string name, yaname;
+	in >> name >> yaname;
+	auto it = data.find(name);
+	auto yait = data.find(yaname);
+	if (it != data.cend() && yait != data.cend())
+	{
+		auto itlink = it->second->links.cbegin();
+		for (; itlink != it->second->links.cend(); ++itlink)
+		{
+			if (itlink->lock() && itlink->lock()->name == yaname)
+			{
+				throw std::logic_error("This note already linked with it");
+			}
+		}
+		it->second->links.push_back(yait->second);
+	}
+	else
+	{
+		throw std::logic_error("Note with this name doesn't exist.");
+	}
+}
+
 int main()
 {
 	using d_t = std::unordered_map< std::string, std::shared_ptr< Note > >;
