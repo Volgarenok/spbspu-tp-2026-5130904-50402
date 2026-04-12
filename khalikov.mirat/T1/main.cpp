@@ -125,6 +125,7 @@ void mindCommand(std::istream &in, std::ostream &out, d_t &data)
         out << itlink->lock()->name << '\n';
       }
     }
+    out << '\n';
   } else {
     throw std::logic_error("Note with this name doesn't exist.");
   }
@@ -192,6 +193,8 @@ int main()
       std::cin.ignore(toignore, '\n');
     } catch (const std::logic_error &e) {
       std::cout << "<INVALID COMMAND>\n";
+      auto toignore = std::numeric_limits< std::streamsize >::max();
+      std::cin.ignore(toignore, '\n');
     }
   }
   if (!std::cin.eof()) {
