@@ -10,8 +10,14 @@ struct Note
 {
 	std::string name;
 	std::vector< std::string > text;
-	std::vector< std::weak_ptr< Note > links;
-}
+	std::vector< std::weak_ptr< Note > > links;
+
+	Note(const std::string& nname):
+	name(nname)
+	{}
+};
+
+using d_t = std::unordered_map< std::string, std::shared_ptr< Note > >;
 
 void noteCommand(std::istream& in, std::ostream&, d_t& data)
 {
@@ -177,10 +183,35 @@ void expiredCommand(std::istream& in, std::ostream& out, d_t& data)
 	}
 }
 
+void refreshCommand(std::istream& in, std::ostream&, d_t& data)
+{
+	std::string name;
+	in >> name;
+	auto it = data.find(name);
+	if (it != data.cend())
+	{
+		auto itlink = it->second->links.begin();
+		for (; itlink != it->second->links.end();)
+		{
+			if (itlink->expired())
+			{
+				itlink = it->second->links.erase(itlink);
+			}
+			else
+			{
+				++itlink;
+			}
+		}
+	}
+	else
+	{
+		throw std::logic_error("Note with this name doesn't exist.");
+	}
+}
+
 
 int main()
 {
-	using d_t = std::unordered_map< std::string, std::shared_ptr< Note > >;
 	d_t data;
 	using cmd_t = void(*)(std::istream&, std::ostream&, d_t&);
 	std::unordered_map< std::string, cmd_t > cmds;
