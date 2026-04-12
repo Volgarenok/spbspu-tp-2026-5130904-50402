@@ -131,6 +131,28 @@ void haltCommand(std::istream& in, std::ostream&, d_t& data)
 	}
 }
 
+void mindCommand(std::istream& in, std::ostream& out, d_t& data)
+{
+	std::string name;
+	in >> name;
+	auto it = data.find(name);
+	if (it != data.cend())
+	{
+		auto itlink = it->second->links.begin();
+		for (; itlink != it->second->links.end(); ++itlink)
+		{
+			if (itlink->lock())
+			{
+				out << itlink->lock()->name << '\n';
+			}
+		}
+	}
+	else
+	{
+		throw std::logic_error("Note with this name doesn't exist.");
+	}
+}
+
 int main()
 {
 	using d_t = std::unordered_map< std::string, std::shared_ptr< Note > >;
