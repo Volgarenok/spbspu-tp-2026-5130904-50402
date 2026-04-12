@@ -90,10 +90,40 @@ void linkCommand(std::istream& in, std::ostream&, d_t& data)
 		{
 			if (itlink->lock() && itlink->lock()->name == yaname)
 			{
-				throw std::logic_error("This note already linked with it");
+				throw std::logic_error("This note already linked with this");
 			}
 		}
 		it->second->links.push_back(yait->second);
+	}
+	else
+	{
+		throw std::logic_error("Note with this name doesn't exist.");
+	}
+}
+
+void haltCommand(std::istream& in, std::ostream&, d_t& data)
+{
+	std::string name, yaname;
+	in >> name >> yaname;
+	auto it = data.find(name);
+	auto yait = data.find(yaname);
+	if (it != data.cend() && yait != data.cend())
+	{
+		bool deleted = false;
+		auto itlink = it->second->links.begin();
+		for (; itlink != it->second->links.end(); ++itlink)
+		{
+			if (itlink->lock() && itlink->lock()->name == yaname)
+			{
+				it->second->links.erase(itlink);
+				deleted = true;
+				break;
+			}
+		}
+		if (!deleted)
+		{
+			throw std::logic_error("Note is not linked with this.");
+		}
 	}
 	else
 	{
