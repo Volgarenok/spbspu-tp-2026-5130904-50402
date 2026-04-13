@@ -9,7 +9,7 @@
 namespace lachugin
 {
   using notesMap = std::unordered_map< std::string, std::shared_ptr< Note > >;
-  using cmd = void (*)(std::istream&, std::ostream&, notesMap&);
+  using cmd_t = void (*)(std::istream&, std::ostream&, notesMap&);
 
   void addNote(std::istream&, std::ostream&, notesMap&);
   void addLine(std::istream&, std::ostream&, notesMap&);
