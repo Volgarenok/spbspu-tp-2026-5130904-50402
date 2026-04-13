@@ -14,8 +14,8 @@ namespace lachugin
   void addNote(std::istream&, std::ostream&, notesMap&);
   void addLine(std::istream&, std::ostream&, notesMap&);
   void showNote(std::istream&, std::ostream&, notesMap&);
-  void dropNote(std::istream&, std::ostream&, notesMap&);
-  void linkTo(std::istream&, std::ostream&, notesMap&);
+  void removeNote(std::istream&, std::ostream&, notesMap&);
+  void addLink(std::istream&, std::ostream&, notesMap&);
   void printLinks(std::istream&, std::ostream&, notesMap&);
   void removeLink(std::istream&, std::ostream&, notesMap&);
   void allRemovedNotes(std::istream&, std::ostream&, notesMap&);
