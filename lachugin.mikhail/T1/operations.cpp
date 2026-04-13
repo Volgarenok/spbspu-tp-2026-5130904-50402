@@ -129,7 +129,7 @@ void lachugin::printLinks(std::istream &in, std::ostream &out, notesMap &db)
   for (size_t i = 0; i < it->second->links.size(); ++i)
   {
     auto sp = it->second->links[i].lock();
-    if (sp)
+    if (sp != nullptr)
     {
       out << sp->name << "\n";
     }

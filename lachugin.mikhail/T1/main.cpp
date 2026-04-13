@@ -29,10 +29,4 @@ int main() {
       std::cout << "<INVALID COMMAND>\n";
     }
   }
-
-  if (!std::cin.eof())
-  {
-    std::cerr << "Bad input\n";
-    return 1;
-  }
 }
