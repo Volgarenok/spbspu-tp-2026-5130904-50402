@@ -33,7 +33,7 @@ int main() {
     }
     catch (const std::logic_error& e)
     {
-      std::cout << "<INVALID COMMAND: " << e.what() << ">\n";
+      std::cout << "<INVALID COMMAND>\n";
     }
   }
 
