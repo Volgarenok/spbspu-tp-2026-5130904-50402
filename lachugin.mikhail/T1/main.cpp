@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <stdexcept>
+#include <limits>
 
 int main() {
   lachugin::notesMap db;
