@@ -158,7 +158,7 @@ void lachugin::allRemovedNotes(std::istream &in, std::ostream &out, notesMap &db
     }
   }
 
-  out << count << "\n";
+  out << count;
 }
 
 void lachugin::linksRemover(std::istream &in, std::ostream &, notesMap &db)

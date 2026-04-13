@@ -28,12 +28,14 @@ int main() {
     catch (const std::out_of_range&)
     {
       std::cout << "<INVALID COMMAND>\n";
-      auto toignore = std::numeric_limits< std::streamsize >::max();
+      auto toignore = std::numeric_limits<std::streamsize>::max();
       std::cin.ignore(toignore, '\n');
     }
-    catch (const std::logic_error& e)
+    catch (const std::logic_error&)
     {
       std::cout << "<INVALID COMMAND>\n";
+      auto toignore = std::numeric_limits<std::streamsize>::max();
+      std::cin.ignore(toignore, '\n');
     }
   }
 
