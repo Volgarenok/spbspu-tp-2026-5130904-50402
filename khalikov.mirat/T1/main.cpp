@@ -124,6 +124,7 @@ void mindCommand(std::istream &in, std::ostream &out, d_t &data)
         out << itlink->lock()->name << '\n';
       }
     }
+    out << '\n';
   } else {
     throw std::logic_error("Note with this name doesn't exist.");
   }
