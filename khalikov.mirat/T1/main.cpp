@@ -118,13 +118,15 @@ void mindCommand(std::istream &in, std::ostream &out, d_t &data)
   in >> name;
   auto it = data.find(name);
   if (it != data.cend()) {
+    if (it->second->links.empty()) {
+      out << '\n';
+    }
     auto itlink = it->second->links.begin();
     for (; itlink != it->second->links.end(); ++itlink) {
       if (itlink->lock()) {
         out << itlink->lock()->name << '\n';
       }
     }
-    out << '\n';
   } else {
     throw std::logic_error("Note with this name doesn't exist.");
   }
