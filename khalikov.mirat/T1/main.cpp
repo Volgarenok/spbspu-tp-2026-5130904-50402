@@ -49,8 +49,7 @@ void showCommand(std::istream &in, std::ostream &out, d_t &data)
   in >> name;
   auto it = data.find(name);
   if (it != data.cend()) {
-    auto yait = it->second->text.cbegin();
-    for (; yait != it->second->text.cend(); ++yait) {
+    for (auto yait = it->second->text.cbegin(); yait != it->second->text.cend(); ++yait) {
       out << *yait << '\n';
     }
   } else {
@@ -125,7 +124,6 @@ void mindCommand(std::istream &in, std::ostream &out, d_t &data)
         out << itlink->lock()->name << '\n';
       }
     }
-    out << '\n';
   } else {
     throw std::logic_error("Note with this name doesn't exist.");
   }
