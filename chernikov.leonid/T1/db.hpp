@@ -1,5 +1,5 @@
-#ifndef NOTE_HPP
-#define NOTE_HPP
+#ifndef DB_HPP
+#define DB_HPP
 
 #include <iostream>
 #include <vector>

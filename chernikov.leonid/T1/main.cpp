@@ -1,67 +1,139 @@
+#include "db.hpp"
 #include <iostream>
-#include <vector>
 #include <string>
 #include <iomanip>
 #include <limits>
-
-#include <map>
 #include <unordered_map>
+#include <functional>
 
-void hi(std::istream &, std::ostream &out, std::vector< std::string > &)
-{
-  out << "Hello, username!\n";
-}
-void noop(std::istream &, std::ostream &, std::vector< std::string > &)
-{
-}
+using CommandHandler = void (*)(std::istream &, std::ostream &, chernikov::NoteDB &);
 
-void add_string(std::istream &in, std::ostream &, std::vector< std::string > &db)
+void handle_note(std::istream &in, std::ostream &, chernikov::NoteDB &db)
 {
-  std::string str;
-  in >> std::quoted(str);
-  db.push_back(str);
-}
-
-void show_last(std::istream &, std::ostream &out, std::vector< std::string > &db)
-{
-  if (db.empty())
+  std::string name;
+  in >> name;
+  if (!db.createNote(name))
   {
-    throw std::logic_error("db is empty");
+    throw std::logic_error("note already exists or invalid");
   }
-  out << db.back() << "\n";
+}
+
+void handle_line(std::istream &in, std::ostream &, chernikov::NoteDB &db)
+{
+  std::string name;
+  in >> name;
+  std::string text;
+  in >> std::quoted(text);
+  if (!db.addLineToNote(name, text))
+  {
+    throw std::logic_error("note not found");
+  }
+}
+
+void handle_show(std::istream &in, std::ostream &out, chernikov::NoteDB &db)
+{
+  std::string name;
+  in >> name;
+  if (!db.showNote(name, out))
+  {
+    throw std::logic_error("note not found");
+  }
+}
+
+void handle_drop(std::istream &in, std::ostream &, chernikov::NoteDB &db)
+{
+  std::string name;
+  in >> name;
+  if (!db.dropNote(name))
+  {
+    throw std::logic_error("note not found");
+  }
+}
+
+void handle_link(std::istream &in, std::ostream &, chernikov::NoteDB &db)
+{
+  std::string from, to;
+  in >> from >> to;
+  if (!db.linkNotes(from, to))
+  {
+    throw std::logic_error("cannot link");
+  }
+}
+
+void handle_halt(std::istream &in, std::ostream &, chernikov::NoteDB &db)
+{
+  std::string from, to;
+  in >> from >> to;
+  if (!db.haltLink(from, to))
+  {
+    throw std::logic_error("cannot halt");
+  }
+}
+
+void handle_mind(std::istream &in, std::ostream &out, chernikov::NoteDB &db)
+{
+  std::string name;
+  in >> name;
+  if (!db.noteExists(name))
+  {
+    throw std::logic_error("note not found");
+  }
+  auto names = db.mindLinks(name);
+  for (const auto &n : names)
+  {
+    out << n << '\n';
+  }
+}
+
+void handle_expired(std::istream &, std::ostream &out, chernikov::NoteDB &db)
+{
+  out << db.expiredCount() << '\n';
+}
+
+void handle_refresh(std::istream &, std::ostream &, chernikov::NoteDB &db)
+{
+  db.refreshAll();
 }
 
 int main()
 {
-  std::vector< std::string > db;
+  chernikov::NoteDB db;
 
-  using cmd_t = void (*)(std::istream &, std::ostream &, std::vector< std::string > &);
-  std::unordered_map< std::string, cmd_t > cmds;
-  cmds["add"] = add_string;
-  cmds["show-last"] = show_last;
-  cmds["hello"] = hi;
-  cmds["noop"] = noop;
+  std::unordered_map< std::string, CommandHandler > handlers;
+  handlers["note"] = handle_note;
+  handlers["line"] = handle_line;
+  handlers["show"] = handle_show;
+  handlers["drop"] = handle_drop;
+  handlers["link"] = handle_link;
+  handlers["halt"] = handle_halt;
+  handlers["mind"] = handle_mind;
+  handlers["expired"] = handle_expired;
+  handlers["refresh"] = handle_refresh;
 
   std::string cmd;
   while (std::cin >> cmd)
   {
     try
     {
-      cmds.at(cmd)(std::cin, std::cout, db);
+      auto it = handlers.find(cmd);
+      if (it == handlers.end())
+      {
+        throw std::out_of_range("unknown command");
+      }
+      it->second(std::cin, std::cout, db);
     } catch (const std::out_of_range &)
     {
       std::cout << "<INVALID COMMAND>\n";
-      auto toignore = std::numeric_limits< std::streamsize >::max();
-      std::cin.ignore(toignore, '\n');
-    } catch (const std::logic_error &e)
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    } catch (const std::logic_error &)
     {
-      std::cout << "<INVALID COMMAND: " << e.what() << ">\n";
+      std::cout << "<INVALID COMMAND>\n";
     }
   }
-
   if (!std::cin.eof())
   {
     std::cerr << "Bad input\n";
     return 1;
   }
+  return 0;
 }
