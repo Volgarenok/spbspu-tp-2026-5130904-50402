@@ -45,6 +45,13 @@ void lachugin::showNote(std::istream &in, std::ostream &out, notesMap &db)
   {
     throw std::logic_error ("Err: note not exist");
   }
+
+  if (it->second->lines.empty())
+  {
+    out << "\n";
+    return;
+  }
+
   for (size_t i = 0; i < it->second->lines.size(); ++i)
   {
     out << it->second->lines[i] << "\n";
@@ -120,6 +127,8 @@ void lachugin::printLinks(std::istream &in, std::ostream &out, notesMap &db)
   std::string note;
   in >> note;
 
+  bool printed = false;
+
   auto it = db.find(note);
   if (it == db.end())
   {
@@ -132,7 +141,12 @@ void lachugin::printLinks(std::istream &in, std::ostream &out, notesMap &db)
     if (sp)
     {
       out << sp->name << "\n";
+      printed = true;
     }
+  }
+  if (!printed)
+  {
+    out << "\n";
   }
 }
 
