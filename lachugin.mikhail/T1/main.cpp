@@ -24,11 +24,24 @@ int main() {
     try
     {
       cmds.at(cmd)(std::cin, std::cout, db);
-    } catch (...)
+    }
+    catch (const std::out_of_range&)
     {
       std::cout << "<INVALID COMMAND>\n";
       auto toignore = std::numeric_limits<std::streamsize>::max();
       std::cin.ignore(toignore, '\n');
     }
+    catch (const std::logic_error&)
+    {
+      std::cout << "<INVALID COMMAND>\n";
+      auto toignore = std::numeric_limits<std::streamsize>::max();
+      std::cin.ignore(toignore, '\n');
+    }
+  }
+
+  if (!std::cin.eof())
+  {
+    std::cerr << "Bad input\n";
+    return 1;
   }
 }
