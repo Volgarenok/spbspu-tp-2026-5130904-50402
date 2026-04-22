@@ -68,7 +68,7 @@ void lachugin::addLink(std::istream &in, std::ostream &, notesMap &db)
   {
     auto sp = it1->second->links[i].lock();
 
-    if (sp && sp == it2->second)
+    if (sp == it2->second)
     {
       throw std::logic_error("duplicate");
     }
@@ -158,7 +158,7 @@ void lachugin::allRemovedNotes(std::istream &in, std::ostream &out, notesMap &db
     }
   }
 
-  out << count;
+  out << count << "\n";
 }
 
 void lachugin::linksRemover(std::istream &in, std::ostream &, notesMap &db)
