@@ -28,9 +28,9 @@ int main()
     {
       cmds.at(str)(std::cin, std::cout, result);
     }
-    catch (const std::exception &e)
+    catch (const std::exception&)
     {
-      std::cerr << "<INVALID COMMAND: " << e.what() << ">\n";
+      std::cerr << "<INVALID COMMAND>\n";
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
