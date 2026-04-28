@@ -34,11 +34,5 @@ int main()
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
-
-  if (!std::cin.eof())
-  {
-    std::cerr << "<BAD INPUT>\n";
-    return 1;
-  }
   return 0;
 }
