@@ -93,7 +93,7 @@ void muh::link(std::istream& in, std::ostream& out, NoteMap_t& map)
   {
     throw std::logic_error("Not find these notes");  
   }
-  for (size_t i = 0; i < itFrom->second->links_.size(); ++ i)
+  for (size_t i = 0; i < itFrom->second->links_.size(); ++i)
   {
     if (itFrom->second->links_[i].first == to)
     {
@@ -101,4 +101,34 @@ void muh::link(std::istream& in, std::ostream& out, NoteMap_t& map)
     }
   }
   itFrom->second->links.emplace_back(to, std::weak_ptr< Note >(itTo->second));
+}
+
+void muh::halt(std::istream& in, std::ostream& out, NoteMap_t& map)
+{
+  std::string from, to;
+  if (!(in >> from >> to))
+  {
+    throw std::logic_error("Not correct arguments");
+  }
+  NoteMap_t::iterator itFrom = map.find(from);
+  NoteMap_t::iterator itTo = map.find(to);
+  if (itFrom == map.end() || itTo == map.end())
+  {
+    throw std::logic_error("Not find these notes");  
+  }
+  bool hasFoundNote = false;
+  auto it = itFrom->second->links_.begin();
+  for (size_t i = 0; i < itFrom->second->links_.size(); ++i)
+  {
+    if (it.first == to)
+    {
+      hasFoundNote = true;
+      itFrom->second->links_.erase(it);
+    }
+    ++it;
+  }
+  if (!hasFoundNote)
+  {
+    throw std::logic_error("Not find to-note");
+  }
 }
