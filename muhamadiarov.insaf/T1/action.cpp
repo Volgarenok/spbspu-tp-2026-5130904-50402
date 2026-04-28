@@ -146,17 +146,18 @@ void muh::mind(std::istream& in, std::ostream& out, NoteMap_t& map)
   {
     throw std::logic_error("Not find this note");
   }
-  if (iter->second->links_.size() == 0)
-  {
-    out << '\n';
-    return;
-  }
+  bool ptd = false;
   for (size_t i = 0; i < iter->second->links_.size(); ++i)
   {
     if (!(iter->second->links_[i].second.expired()))
     {
       out << iter->second->links_[i].first << '\n';
+      ptd = true;
     }
+  }
+  if (!ptd)
+  {
+    out << '\n';
   }
 }
 
