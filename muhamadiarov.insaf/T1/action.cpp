@@ -42,3 +42,25 @@ void muh::line(std::istream& in, std::ostream& out, NoteMap_t& map)
     throw std::logic_error("Not find the cuurent note");
   }
 }
+
+void muh::show(std::istream& in, std::ostream& out, NoteMap_t& map)
+{
+  std::string name;
+  if (!(in >> name))
+  {
+    throw std::logic_error("Not name-note");
+  }
+  NoteMap_t::const_iterator iter = map.find(name);
+  if (iter == map.end())
+  {
+    throw std::logic_error("Not find this note");
+  }
+  if (iter->second->lines_.size() == 0)
+  {
+    out << '\n';
+  }
+  for (size_t i = 0; i < iter->second->lines_.size(); ++i)
+  {
+    out << iter->second->lines_[i] << '\n';
+  }
+}
