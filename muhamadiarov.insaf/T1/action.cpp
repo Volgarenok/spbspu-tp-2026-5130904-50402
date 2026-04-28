@@ -58,6 +58,7 @@ void muh::show(std::istream& in, std::ostream& out, NoteMap_t& map)
   if (iter->second->lines_.size() == 0)
   {
     out << '\n';
+    return;
   }
   for (size_t i = 0; i < iter->second->lines_.size(); ++i)
   {
@@ -148,6 +149,7 @@ void muh::mind(std::istream& in, std::ostream& out, NoteMap_t& map)
   if (iter->second->links_.size() == 0)
   {
     out << '\n';
+    return;
   }
   for (size_t i = 0; i < iter->second->links_.size(); ++i)
   {
@@ -156,4 +158,32 @@ void muh::mind(std::istream& in, std::ostream& out, NoteMap_t& map)
       out << iter->second->links_[i].first << '\n';
     }
   }
+}
+
+void muh::expired(std::istream& in, std::ostream& out, NoteMap_t& map)
+{
+  std::string name;
+  if (!(in >> name))
+  {
+    throw std::logic_error("Not name-note");
+  }
+  NoteMap_t::const_iterator iter = map.find(name);
+  if (iter == map.end())
+  {
+    throw std::logic_error("Not find this note");
+  }
+  if (iter->second->links_.size() == 0)
+  {
+    out << '\n';
+    return;
+  }
+  size_t count = 0;
+  for (size_t i = 0; i < iter->second->links_.size(); ++i)
+  {
+    if (iter->second->links_[i].second.expired())
+    {
+      ++count;
+    }
+  }
+  out << count << '\n';
 }
