@@ -172,11 +172,6 @@ void muh::expired(std::istream& in, std::ostream& out, NoteMap_t& map)
   {
     throw std::logic_error("Not find this note");
   }
-  if (iter->second->links_.size() == 0)
-  {
-    out << '\n';
-    return;
-  }
   size_t count = 0;
   for (size_t i = 0; i < iter->second->links_.size(); ++i)
   {
