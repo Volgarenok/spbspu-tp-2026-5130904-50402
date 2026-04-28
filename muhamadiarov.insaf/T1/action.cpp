@@ -196,7 +196,7 @@ void muh::refresh(std::istream& in, std::ostream&, NoteMap_t& map)
   {
     throw std::logic_error("Not find this note");
   }
-  std::vector< std::pair< std::string, std::weak_ptr< Note > > > links = iter->second->links_;
+  std::vector< std::pair< std::string, std::weak_ptr< Note > > > &links = iter->second->links_;
   size_t countCorrect = 0;
   for (size_t i = 0; i < links.size(); ++i)
   {
