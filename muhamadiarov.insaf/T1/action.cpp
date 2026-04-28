@@ -64,3 +64,18 @@ void muh::show(std::istream& in, std::ostream& out, NoteMap_t& map)
     out << iter->second->lines_[i] << '\n';
   }
 }
+
+void muh::drop(std::istream& in, std::ostream& out, NoteMap_t& map)
+{
+  std::string str;
+  if (!(in >> str))
+  {
+    throw std::logic_error("Not name-note");
+  }
+  NoteMap_t::iterator iter = map.find(name);
+  if (iter == map.end())
+  {
+    throw std::logic_error("Not find this note");
+  }
+  map.erase(iter);
+}
