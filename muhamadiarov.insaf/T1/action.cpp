@@ -92,7 +92,7 @@ void muh::link(std::istream& in, std::ostream&, NoteMap_t& map)
   NoteMap_t::iterator itTo = map.find(to);
   if (itFrom == map.end() || itTo == map.end())
   {
-    throw std::logic_error("Not find these notes");  
+    throw std::logic_error("Not find these notes");
   }
   for (size_t i = 0; i < itFrom->second->links_.size(); ++i)
   {
@@ -115,7 +115,7 @@ void muh::halt(std::istream& in, std::ostream&, NoteMap_t& map)
   NoteMap_t::iterator itTo = map.find(to);
   if (itFrom == map.end() || itTo == map.end())
   {
-    throw std::logic_error("Not find these notes");  
+    throw std::logic_error("Not find these notes");
   }
   bool hasFoundNote = false;
   auto it = itFrom->second->links_.begin();

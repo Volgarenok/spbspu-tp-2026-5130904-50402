@@ -16,9 +16,9 @@ namespace muhamadiarov
     std::vector< std::string > lines_;
     std::vector< std::pair< std::string, std::weak_ptr< Note > > > links_;
   };
-  
+
   using NoteMap_t = std::unordered_map<std::string, std::shared_ptr< Note > >;
-  
+
   void note(std::istream& in, std::ostream& out, NoteMap_t& map);
   void line(std::istream& in, std::ostream& out, NoteMap_t& map);
   void show(std::istream& in, std::ostream& out, NoteMap_t& map);

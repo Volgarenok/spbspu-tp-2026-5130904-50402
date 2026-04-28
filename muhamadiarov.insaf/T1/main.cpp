@@ -8,7 +8,7 @@ int main()
 {
   namespace muh = muhamadiarov;
   using cmd_t = void(*)(std::istream &, std::ostream &, muh::NoteMap_t &);
-  
+
   std::unordered_map< std::string, cmd_t > cmds;
   cmds["note"] = muh::note;
   cmds["line"] = muh::line;
