@@ -79,3 +79,26 @@ void muh::drop(std::istream& in, std::ostream& out, NoteMap_t& map)
   }
   map.erase(iter);
 }
+
+void muh::link(std::istream& in, std::ostream& out, NoteMap_t& map)
+{
+  std::string from, to;
+  if (!(in >> from >> to))
+  {
+    throw std::logic_error("Not correct arguments");
+  }
+  NoteMap_t::iterator itFrom = map.find(from);
+  NoteMap_t::iterator itTo = map.find(to);
+  if (itFrom == map.end() || itTo == map.end())
+  {
+    throw std::logic_error("Not find these notes");  
+  }
+  for (size_t i = 0; i < itFrom->second->links_.size(); ++ i)
+  {
+    if (itFrom->second->links_[i].first == to)
+    {
+      throw std::logic_error("Link already exists");
+    }
+  }
+  itFrom->second->links.emplace_back(to, std::weak_ptr< Note >(itTo->second));
+}
