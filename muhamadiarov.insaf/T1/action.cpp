@@ -132,3 +132,28 @@ void muh::halt(std::istream& in, std::ostream& out, NoteMap_t& map)
     throw std::logic_error("Not find to-note");
   }
 }
+
+void muh::mind(std::istream& in, std::ostream& out, NoteMap_t& map)
+{
+  std::string name;
+  if (!(in >> name))
+  {
+    throw std::logic_error("Not name-note");
+  }
+  NoteMap_t::const_iterator iter = map.find(name);
+  if (iter == map.end())
+  {
+    throw std::logic_error("Not find this note");
+  }
+  if (iter->second->links_.size() == 0)
+  {
+    out << '\n';
+  }
+  for (size_t i = 0; i < iter->second->links_.size(); ++i)
+  {
+    if (!(iter->second->links_[i].second.expired()))
+    {
+      out << iter->second->links_[i].first << '\n';
+    }
+  }
+}
