@@ -33,9 +33,10 @@ void muh::line(std::istream& in, std::ostream&, NoteMap_t& map)
   {
     throw std::logic_error("Incorrect command");
   }
-  if (map.find(str) != map.end())
+  NoteMap_t::iterator it = map.find(str);
+  if (it != map.end())
   {
-    map.at(str)->lines_.push_back(ln);
+    it->second->lines_.push_back(ln);
   }
   else
   {
@@ -58,7 +59,6 @@ void muh::show(std::istream& in, std::ostream& out, NoteMap_t& map)
   if (iter->second->lines_.size() == 0)
   {
     out << '\n';
-    return;
   }
   for (size_t i = 0; i < iter->second->lines_.size(); ++i)
   {
