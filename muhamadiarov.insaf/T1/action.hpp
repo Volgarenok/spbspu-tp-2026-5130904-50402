@@ -2,7 +2,7 @@
 #define ACTION_HPP
 #include <istream>
 #include <ostream>
-#include <memmory>
+#include <memory>
 #include <string>
 #include <vector>
 #include <utility>
@@ -14,7 +14,7 @@ namespace muhamadiarov
   {
     std::string name_;
     std::vector< std::string > lines_;
-    std::vector< std::pair< std::string, std::weak_ptr< Note > > links_;
+    std::vector< std::pair< std::string, std::weak_ptr< Note > > > links_;
   };
   
   using NoteMap_t = std::unordered_map<std::string, std::shared_ptr< Note > >;

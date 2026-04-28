@@ -10,15 +10,15 @@ int main()
   using cmd_t = void(*)(std::istream &, std::ostream &, muh::NoteMap_t &);
   
   std::unordered_map< std::string, cmd_t > cmds;
-  cmds["note"] = note;
-  cmds["line"] = line;
-  cmds["show"] = show;
-  cmds["drop"] = drop;
-  cmds["link"] = link;
-  cmds["halt"] = halt;
-  cmds["mind"] = mind;
-  cmds["expired"] = expired;
-  cmds["refresh"] = refresh;
+  cmds["note"] = muh::note;
+  cmds["line"] = muh::line;
+  cmds["show"] = muh::show;
+  cmds["drop"] = muh::drop;
+  cmds["link"] = muh::link;
+  cmds["halt"] = muh::halt;
+  cmds["mind"] = muh::mind;
+  cmds["expired"] = muh::expired;
+  cmds["refresh"] = muh::refresh;
 
   muh::NoteMap_t result;
   std::string str;
@@ -31,7 +31,7 @@ int main()
     catch (const std::exception &e)
     {
       std::cerr << "<INVALID COMMAND: " << e.what() << ">\n";
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), \n);
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
 

@@ -1,11 +1,11 @@
 #include <stdexcept>
-#include <memmory>
+#include <memory>
 #include <iomanip>
 #include "action.hpp"
 
 namespace muh = muhamadiarov;
 
-void muh::note(std::istream& in, std::ostream& out, NoteMap_t& map)
+void muh::note(std::istream& in, std::ostream&, NoteMap_t& map)
 {
   std::string str;
   if (!(in >> str))
@@ -25,7 +25,7 @@ void muh::note(std::istream& in, std::ostream& out, NoteMap_t& map)
   map[str] = note;
 }
 
-void muh::line(std::istream& in, std::ostream& out, NoteMap_t& map)
+void muh::line(std::istream& in, std::ostream&, NoteMap_t& map)
 {
   std::string str;
   std::string ln;
@@ -66,14 +66,14 @@ void muh::show(std::istream& in, std::ostream& out, NoteMap_t& map)
   }
 }
 
-void muh::drop(std::istream& in, std::ostream& out, NoteMap_t& map)
+void muh::drop(std::istream& in, std::ostream&, NoteMap_t& map)
 {
   std::string str;
   if (!(in >> str))
   {
     throw std::logic_error("Not name-note");
   }
-  NoteMap_t::iterator iter = map.find(name);
+  NoteMap_t::iterator iter = map.find(str);
   if (iter == map.end())
   {
     throw std::logic_error("Not find this note");
@@ -81,7 +81,7 @@ void muh::drop(std::istream& in, std::ostream& out, NoteMap_t& map)
   map.erase(iter);
 }
 
-void muh::link(std::istream& in, std::ostream& out, NoteMap_t& map)
+void muh::link(std::istream& in, std::ostream&, NoteMap_t& map)
 {
   std::string from, to;
   if (!(in >> from >> to))
@@ -101,10 +101,10 @@ void muh::link(std::istream& in, std::ostream& out, NoteMap_t& map)
       throw std::logic_error("Link already exists");
     }
   }
-  itFrom->second->links.emplace_back(to, std::weak_ptr< Note >(itTo->second));
+  itFrom->second->links_.emplace_back(to, std::weak_ptr< Note >(itTo->second));
 }
 
-void muh::halt(std::istream& in, std::ostream& out, NoteMap_t& map)
+void muh::halt(std::istream& in, std::ostream&, NoteMap_t& map)
 {
   std::string from, to;
   if (!(in >> from >> to))
@@ -121,7 +121,7 @@ void muh::halt(std::istream& in, std::ostream& out, NoteMap_t& map)
   auto it = itFrom->second->links_.begin();
   for (size_t i = 0; i < itFrom->second->links_.size(); ++i)
   {
-    if (it.first == to)
+    if ((*it).first == to)
     {
       hasFoundNote = true;
       itFrom->second->links_.erase(it);
@@ -188,7 +188,7 @@ void muh::expired(std::istream& in, std::ostream& out, NoteMap_t& map)
   out << count << '\n';
 }
 
-void muh::refresh(std::istream& in, std::ostream& out, NoteMap_t& map)
+void muh::refresh(std::istream& in, std::ostream&, NoteMap_t& map)
 {
   std::string name;
   if (!(in >> name))
