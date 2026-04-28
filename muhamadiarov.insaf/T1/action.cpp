@@ -1,7 +1,7 @@
 #include <stdexcept>
 #include <memmory>
-#include "action.hpp"
 #include <iomanip>
+#include "action.hpp"
 
 namespace muh = muhamadiarov;
 
@@ -186,4 +186,32 @@ void muh::expired(std::istream& in, std::ostream& out, NoteMap_t& map)
     }
   }
   out << count << '\n';
+}
+
+void muh::refresh(std::istream& in, std::ostream& out, NoteMap_t& map)
+{
+  std::string name;
+  if (!(in >> name))
+  {
+    throw std::logic_error("Not name-note");
+  }
+  NoteMap_t::iterator iter = map.find(name);
+  if (iter == map.end())
+  {
+    throw std::logic_error("Not find this note");
+  }
+  std::vector< std::pair< std::string, std::weak_ptr< Note > > > links = iter->second->links_;
+  size_t countCorrect = 0;
+  for (size_t i = 0; i < links.size(); ++i)
+  {
+    if (!(links[i].second.expired()))
+    {
+      if (countCorrect != i)
+      {
+        links[countCorrect] = links[i];
+      }
+      ++countCorrect;
+    }
+  }
+  links.resize(countCorrect);
 }
