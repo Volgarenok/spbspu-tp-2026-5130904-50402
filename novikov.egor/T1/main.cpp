@@ -10,6 +10,10 @@ int main()
   cmds["note"] = novikov::note;
   cmds["line"] = novikov::line;
   cmds["show"] = novikov::show;
+  cmds["drop"] = novikov::drop;
+  cmds["link"] = novikov::link;
+  cmds["halt"] = novikov::halt;
+  cmds["mind"] = novikov::mind;
 
   std::string cmd;
   while (std::cin >> cmd) {
