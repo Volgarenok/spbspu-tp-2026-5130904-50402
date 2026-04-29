@@ -14,6 +14,8 @@ int main()
   cmds["link"] = novikov::link;
   cmds["halt"] = novikov::halt;
   cmds["mind"] = novikov::mind;
+  cmds["expired"] = novikov::expired;
+  cmds["refresh"] = novikov::refresh;
 
   std::string cmd;
   while (std::cin >> cmd) {
