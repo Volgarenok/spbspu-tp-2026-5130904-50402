@@ -7,6 +7,7 @@ int main()
 {
   novikov::mapNotes db;
   std::unordered_map< std::string, novikov::cmd_t > cmds;
+  cmds["note"] = novikov::note;
 
   std::string cmd;
   while (std::cin >> cmd) {

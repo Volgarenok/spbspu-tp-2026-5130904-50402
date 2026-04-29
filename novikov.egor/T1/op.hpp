@@ -11,6 +11,7 @@ namespace novikov
   using mapNotes = std::unordered_map< std::string, std::shared_ptr< Note > >;
   using cmd_t = void (*)(std::istream &, std::ostream &, mapNotes &);
 
+  void note(std::istream&, std::ostream&, mapNotes&);
 }
 
 #endif
