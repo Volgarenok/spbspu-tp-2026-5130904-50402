@@ -109,17 +109,16 @@ void novikov::mind(std::istream &in, std::ostream &out, mapNotes &db)
   if (note == db.end()) {
     throw std::logic_error("Note not exist");
   }
-
-  if (note->second->links.empty()) {
-    out << "\n";
-    return;
-  }
-
+  bool printed = false;
   for (size_t i = 0; i < note->second->links.size(); ++i) {
     auto link = note->second->links[i].lock();
     if (link) {
       out << link->name << "\n";
+      printed = true;
     }
+  }
+  if (!printed) {
+    out << "\n";
   }
 }
 
