@@ -31,6 +31,39 @@ void line(std::ostream& out, std::istream& in, std::vector<vishnevskiy::Note>& v
   }
 }
 
+void show(std::ostream& out, std::istream& in, std::vector<vishnevskiy::Note>& vec)
+{
+  std::string name;
+  in >> name;
+  int ind = vishnevskiy::findByName(name, vec);
+  if (ind != -1)
+  {
+    for (size_t i = 0; i < vec[ind].lines.size(); ++i)
+    {
+      std::cout << vec[ind].lines[i] << "\n";
+    }
+  }
+  else
+  {
+    std::cerr << "Cannot find name!\n";
+  }
+}
+
+void drop(std::ostream& out, std::istream& in, std::vector<vishnevskiy::Note>& vec)
+{
+  std::string name;
+  in >> name;
+  int ind = vishnevskiy::findByName(name, vec);
+  if (ind != -1)
+  {
+    delete vec[ind];
+  }
+  else
+  {
+    std::cerr << "Cannot find name!\n";
+  }
+}
+
 int main()
 {
   using cm_t = void(*)(std::ostream&, std::istream&, std::vector<vishnevskiy::Note>&);
