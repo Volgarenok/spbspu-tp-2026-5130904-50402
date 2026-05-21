@@ -31,6 +31,7 @@ char lavrentev::check(std::istream &is, char expected)
 std::istream &lavrentev::operator>>(std::istream &is, Delimiter_t &del)
 {
   del.last = lavrentev::check(is, del.expected);
+  return is;
 }
 
 std::istream &lavrentev::operator>>(std::istream &is, DataStruct &obj)
@@ -45,10 +46,75 @@ std::istream &lavrentev::operator>>(std::istream &is, DataStruct &obj)
   UllOct y{0};
   std::string str;
   char last = 0;
-  is >> d_t{'(', last} >> d_t{':', last} >> x >> y >> str >> d_t{')', last};
+  d_t dlmInBracket{'(', last};
+  d_t dlmColon{':', last};
+  d_t dlmOutBracket{'(', last};
+  is >> dlmInBracket >> dlmColon >> x >> y >> str >> dlmOutBracket;
   if (is)
   {
     obj = DataStruct{x, y, str};
+  }
+  return is;
+}
+
+std::istream &lavrentev::operator>>(std::istream &is, SllLit &key1)
+{
+  std::istream::sentry s(is);
+  if (!s)
+  {
+    return is;
+  }
+  std::string key;
+  is >> key;
+  if (key != "key1")
+  {
+    is.setstate(std::ios_base::failbit);
+    return is;
+  }
+  long long value;
+  is >> value;
+
+  char postfix[3] = {0};
+  if (is.read(postfix, 3))
+  {
+    if (strcmp(postfix, "LL:") == 0 || strcmp(postfix, "ll:") == 0)
+    {
+      key1 = SllLit{value};
+    }
+    else
+    {
+      is.setstate(std::ios::failbit);
+    }
+  }
+  return is;
+}
+
+std::istream &lavrentev::operator>>(std::istream &is, UllOct &key2)
+{
+  std::istream::sentry s(is);
+  if (!s)
+  {
+    return is;
+  }
+  std::string key;
+  is >> key;
+  if (key != "key2")
+  {
+    is.setstate(std::ios_base::failbit);
+    return is;
+  }
+  unsigned long long value;
+  is >> value;
+
+  char postfix = 0;
+  is >> postfix;
+  if (postfix == ':')
+  {
+    key2 = UllOct{value};
+  }
+  else
+  {
+    is.setstate(std::ios_base::failbit);
   }
   return is;
 }
