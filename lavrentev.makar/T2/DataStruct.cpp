@@ -118,3 +118,36 @@ std::istream &lavrentev::operator>>(std::istream &is, UllOct &key2)
   }
   return is;
 }
+
+bool lavrentev::operator<(DataStruct lobj, DataStruct robj)
+{
+  if (lobj.key1 < robj.key1)
+  {
+    return true;
+  }
+  if (lobj.key1 == robj.key1)
+  {
+    if (lobj.key2 < robj.key2)
+    {
+      return true;
+    }
+    if (lobj.key2 == robj.key2)
+    {
+      if (lobj.key3 < robj.key3)
+      {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+bool lavrentev::operator<(SllLit lobj, SllLit robj)
+{
+  return lobj.data < robj.data ? true : false;
+}
+
+bool lavrentev::operator<(UllOct lobj, UllOct robj)
+{
+  return lobj.data < robj.data ? true : false;
+}
