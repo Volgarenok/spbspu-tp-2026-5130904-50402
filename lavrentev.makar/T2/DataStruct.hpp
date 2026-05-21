@@ -21,12 +21,12 @@ namespace lavrentev
 
   struct SllLit
   {
-    long long &data;
+    long long data;
   };
 
   struct UllOct
   {
-    long long &data;
+    unsigned long long data;
   };
 
   struct DataStruct
@@ -42,10 +42,18 @@ namespace lavrentev
     char &last;
   };
 
+  std::istream &operator>>(std::istream &is, Delimiter_t &del);
+
   std::istream &operator>>(std::istream &is, DataStruct &obj);
   std::ostream &operator<<(std::ostream &os, DataStruct obj);
 
+  std::istream &operator>>(std::istream &is, SllLit &key1);
+
+  std::istream &operator>>(std::istream &is, UllOct &key2);
+
   bool operator<(DataStruct lobj, DataStruct robj);
+
+  char check(std::istream &is, char expected);
 }
 
 #endif
