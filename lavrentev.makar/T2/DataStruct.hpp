@@ -1,8 +1,24 @@
+#ifndef DATASTRUCT_HPP
+#define DATASTRUCT_HPP
+#include <ios>
 #include <istream>
 #include <string>
 
 namespace lavrentev
 {
+  struct IOGuard
+  {
+    public:
+      explicit IOGuard(std::basic_ios< char > &s);
+      ~IOGuard();
+    private:
+      std::basic_ios< char > &s_;
+      std::streamsize precizion_;
+      std::streamsize width_;
+      std::basic_ios< char >::fmtflags flags_;
+      char fill_;
+  };
+
   struct SllLit
   {
     long long &data;
@@ -31,3 +47,5 @@ namespace lavrentev
 
   bool operator<(DataStruct lobj, DataStruct robj);
 }
+
+#endif
