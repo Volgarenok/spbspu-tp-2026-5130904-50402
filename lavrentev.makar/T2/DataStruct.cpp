@@ -89,6 +89,12 @@ std::istream &lavrentev::operator>>(std::istream &is, SllLit &key1)
   return is;
 }
 
+std::ostream &lavrentev::operator<<(std::ostream &os, SllLit key1)
+{
+  os << "key1 " << key1.data << "LL:";
+  return os;
+}
+
 std::istream &lavrentev::operator>>(std::istream &is, UllOct &key2)
 {
   std::istream::sentry s(is);
@@ -117,6 +123,12 @@ std::istream &lavrentev::operator>>(std::istream &is, UllOct &key2)
     is.setstate(std::ios_base::failbit);
   }
   return is;
+}
+
+std::ostream &lavrentev::operator<<(std::ostream &os, UllOct key2)
+{
+  os << "key2 " << key2.data << "LL:";
+  return os;
 }
 
 bool lavrentev::operator<(DataStruct lobj, DataStruct robj)

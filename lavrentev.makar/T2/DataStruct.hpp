@@ -45,14 +45,14 @@ namespace lavrentev
   std::istream &operator>>(std::istream &is, Delimiter_t &del);
   //std::ostream &operator<<(std::istream &os, Delimiter_t del); хз нужен ли
 
-  std::istream &operator>>(std::istream &is, DataStruct &obj);
+  std::istream &operator>>(std::istream &is, DataStruct &obj); //FIXME
   std::ostream &operator<<(std::ostream &os, DataStruct obj); //TODO
 
   std::istream &operator>>(std::istream &is, SllLit &key1);
-  std::ostream &operator<<(std::istream &os, SllLit key1); //TODO
+  std::ostream &operator<<(std::ostream &os, SllLit key1);
 
   std::istream &operator>>(std::istream &is, UllOct &key2);
-  std::ostream &operator<<(std::istream &os, UllOct key2); //TODO
+  std::ostream &operator<<(std::ostream &os, UllOct key2);
 
   bool operator<(DataStruct lobj, DataStruct robj); //FIXME
   bool operator<(SllLit lobj, SllLit robj);
