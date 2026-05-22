@@ -1,9 +1,11 @@
 #include "DataStruct.hpp"
 #include <ios>
+#include <cstring>
+#include <iostream>
 
 lavrentev::IOGuard::IOGuard(std::basic_ios< char > &s):
   s_(s),
-  precizion_(s.precision()),
+  precision_(s.precision()),
   width_(s.width()),
   flags_(s.flags()),
   fill_(s.fill())
@@ -11,7 +13,7 @@ lavrentev::IOGuard::IOGuard(std::basic_ios< char > &s):
 
 lavrentev::IOGuard::~IOGuard()
 {
-  s_.precision(precizion_);
+  s_.precision(precision_);
   s_.width(width_);
   s_.flags(flags_);
   s_.fill(fill_);
@@ -44,15 +46,18 @@ std::istream &lavrentev::operator>>(std::istream &is, DataStruct &obj)
   using d_t = Delimiter_t;
   SllLit x{0};
   UllOct y{0};
-  std::string str;
+  std::string strKey;
+  std::string strValue;
   char last = 0;
   d_t dlmInBracket{'(', last};
   d_t dlmColon{':', last};
   d_t dlmOutBracket{')', last};
-  is >> dlmInBracket >> dlmColon >> x >> y >> str >> dlmOutBracket;
+  is >> dlmInBracket >> dlmColon >> x >> y >> strKey;// >> strValue >> dlmColon >> dlmOutBracket;
+  std::getline(is, strValue, ':');
+  is >> dlmOutBracket;
   if (is)
   {
-    obj = DataStruct{x, y, str};
+    obj = DataStruct{x, y, strValue};
   }
   return is;
 }
@@ -70,7 +75,7 @@ std::ostream &lavrentev::operator<<(std::ostream &os, DataStruct obj)
   d_t dlmInBracket{'(', last};
   d_t dlmColon{':', last};
   d_t dlmOutBracket{')', last};
-  os << dlmInBracket << dlmColon << obj.key1 << obj.key2 << obj.key3 << dlmOutBracket;
+  os << dlmInBracket << dlmColon << obj.key1 << obj.key2 << "key3" << obj.key3 << dlmColon << dlmOutBracket;
   return os;
 }
 
@@ -94,7 +99,9 @@ std::istream &lavrentev::operator>>(std::istream &is, SllLit &key1)
   char postfix[3] = {0};
   if (is.read(postfix, 3))
   {
-    if (strcmp(postfix, "LL:") == 0 || strcmp(postfix, "ll:") == 0)
+    if ((postfix[0] == 'L' || postfix[0] == 'l') &&
+    (postfix[1] == 'L' || postfix[1] == 'l') &&
+     postfix[2] == ':')
     {
       key1 = SllLit{value};
     }
@@ -127,7 +134,7 @@ std::istream &lavrentev::operator>>(std::istream &is, UllOct &key2)
     return is;
   }
   unsigned long long value;
-  is >> value;
+  is >> std::oct >> value >> std::dec;
 
   char postfix = 0;
   is >> postfix;
@@ -144,7 +151,7 @@ std::istream &lavrentev::operator>>(std::istream &is, UllOct &key2)
 
 std::ostream &lavrentev::operator<<(std::ostream &os, UllOct key2)
 {
-  os << "key2 " << key2.data << "LL:";
+  os << "key2 0" << std::oct << key2.data << std::dec << ":";
   return os;
 }
 

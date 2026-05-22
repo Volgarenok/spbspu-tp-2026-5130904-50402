@@ -13,7 +13,7 @@ namespace lavrentev
       ~IOGuard();
     private:
       std::basic_ios< char > &s_;
-      std::streamsize precizion_;
+      std::streamsize precision_;
       std::streamsize width_;
       std::basic_ios< char >::fmtflags flags_;
       char fill_;
@@ -41,8 +41,6 @@ namespace lavrentev
     char expected;
     char &last;
   };
-
-  //enum dt {SllLit, UllOct, string};
 
   std::istream &operator>>(std::istream &is, Delimiter_t &del);
   std::ostream &operator<<(std::ostream &os, Delimiter_t del);
