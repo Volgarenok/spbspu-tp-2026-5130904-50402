@@ -52,7 +52,7 @@ std::istream &lavrentev::operator>>(std::istream &is, DataStruct &obj)
   d_t dlmInBracket{'(', last};
   d_t dlmColon{':', last};
   d_t dlmOutBracket{')', last};
-  is >> dlmInBracket >> dlmColon >> x >> y >> strKey;// >> strValue >> dlmColon >> dlmOutBracket;
+  is >> dlmInBracket >> dlmColon >> x >> y >> strKey;
   std::getline(is, strValue, ':');
   is >> dlmOutBracket;
   if (is)
