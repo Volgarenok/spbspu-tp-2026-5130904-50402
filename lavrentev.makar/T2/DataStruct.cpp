@@ -151,3 +151,13 @@ bool lavrentev::operator<(UllOct lobj, UllOct robj)
 {
   return lobj.data < robj.data ? true : false;
 }
+
+bool lavrentev::operator==(SllLit lobj, SllLit robj)
+{
+  return lobj.data == robj.data;
+}
+
+bool lavrentev::operator==(UllOct lobj, UllOct robj)
+{
+  return lobj.data == robj.data;
+}

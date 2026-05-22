@@ -58,8 +58,8 @@ namespace lavrentev
   bool operator<(SllLit lobj, SllLit robj);
   bool operator<(UllOct lobj, UllOct robj);
 
-  bool operator==(SllLit lobj, SllLit robj); //TODO
-  bool operator==(UllOct lobj, UllOct robj); //TODO
+  bool operator==(SllLit lobj, SllLit robj);
+  bool operator==(UllOct lobj, UllOct robj);
 
   char check(std::istream &is, char expected);
 }
