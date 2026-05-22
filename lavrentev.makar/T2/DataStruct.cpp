@@ -48,13 +48,30 @@ std::istream &lavrentev::operator>>(std::istream &is, DataStruct &obj)
   char last = 0;
   d_t dlmInBracket{'(', last};
   d_t dlmColon{':', last};
-  d_t dlmOutBracket{'(', last};
+  d_t dlmOutBracket{')', last};
   is >> dlmInBracket >> dlmColon >> x >> y >> str >> dlmOutBracket;
   if (is)
   {
     obj = DataStruct{x, y, str};
   }
   return is;
+}
+
+std::ostream &lavrentev::operator<<(std::ostream &os, Delimiter_t del)
+{
+  os << del.expected;
+  return os;
+}
+
+std::ostream &lavrentev::operator<<(std::ostream &os, DataStruct obj)
+{
+  using d_t = Delimiter_t;
+  char last = 0;
+  d_t dlmInBracket{'(', last};
+  d_t dlmColon{':', last};
+  d_t dlmOutBracket{')', last};
+  os << dlmInBracket << dlmColon << obj.key1 << obj.key2 << obj.key3 << dlmOutBracket;
+  return os;
 }
 
 std::istream &lavrentev::operator>>(std::istream &is, SllLit &key1)

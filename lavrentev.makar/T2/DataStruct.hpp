@@ -43,10 +43,10 @@ namespace lavrentev
   };
 
   std::istream &operator>>(std::istream &is, Delimiter_t &del);
-  //std::ostream &operator<<(std::istream &os, Delimiter_t del); хз нужен ли
+  std::ostream &operator<<(std::ostream &os, Delimiter_t del);
 
   std::istream &operator>>(std::istream &is, DataStruct &obj); //FIXME
-  std::ostream &operator<<(std::ostream &os, DataStruct obj); //TODO
+  std::ostream &operator<<(std::ostream &os, DataStruct obj);
 
   std::istream &operator>>(std::istream &is, SllLit &key1);
   std::ostream &operator<<(std::ostream &os, SllLit key1);
