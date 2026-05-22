@@ -150,25 +150,10 @@ std::ostream &lavrentev::operator<<(std::ostream &os, UllOct key2)
 
 bool lavrentev::operator<(DataStruct lobj, DataStruct robj)
 {
-  if (lobj.key1 < robj.key1)
-  {
-    return true;
-  }
-  if (lobj.key1 == robj.key1)
-  {
-    if (lobj.key2 < robj.key2)
-    {
-      return true;
-    }
-    if (lobj.key2 == robj.key2)
-    {
-      if (lobj.key3 < robj.key3)
-      {
-        return true;
-      }
-    }
-  }
-  return false;
+  bool cond = lobj.key1 < robj.key1;
+  bool cond2 = lobj.key1 == robj.key1 && lobj.key2 < robj.key2;
+  bool cond3 = lobj.key1 == robj.key1 && lobj.key2 == robj.key2 && lobj.key3 < robj.key3;
+  return cond || cond2 || cond3;
 }
 
 bool lavrentev::operator<(SllLit lobj, SllLit robj)

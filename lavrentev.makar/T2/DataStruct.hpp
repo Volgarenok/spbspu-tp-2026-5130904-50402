@@ -42,6 +42,8 @@ namespace lavrentev
     char &last;
   };
 
+  //enum dt {SllLit, UllOct, string};
+
   std::istream &operator>>(std::istream &is, Delimiter_t &del);
   std::ostream &operator<<(std::ostream &os, Delimiter_t del);
 
@@ -54,7 +56,7 @@ namespace lavrentev
   std::istream &operator>>(std::istream &is, UllOct &key2);
   std::ostream &operator<<(std::ostream &os, UllOct key2);
 
-  bool operator<(DataStruct lobj, DataStruct robj); //FIXME
+  bool operator<(DataStruct lobj, DataStruct robj);
   bool operator<(SllLit lobj, SllLit robj);
   bool operator<(UllOct lobj, UllOct robj);
 
