@@ -22,6 +22,7 @@ namespace lavrentev
   struct SllLit
   {
     long long data;
+    std::string pf;
   };
 
   struct UllOct

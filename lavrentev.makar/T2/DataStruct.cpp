@@ -99,11 +99,16 @@ std::istream &lavrentev::operator>>(std::istream &is, SllLit &key1)
   char postfix[3] = {0};
   if (is.read(postfix, 3))
   {
-    if ((postfix[0] == 'L' || postfix[0] == 'l') &&
-    (postfix[1] == 'L' || postfix[1] == 'l') &&
-     postfix[2] == ':')
+    if (postfix[2] == ':')
     {
-      key1 = SllLit{value};
+      if (postfix[0] == 'L' && postfix[1] == 'L')
+      {
+        key1 = SllLit{value, "LL:"};
+      }
+      else if (postfix[0] == 'l' || postfix[1] == 'l')
+      {
+        key1 = SllLit{value, "ll:"};
+      }
     }
     else
     {
@@ -115,7 +120,7 @@ std::istream &lavrentev::operator>>(std::istream &is, SllLit &key1)
 
 std::ostream &lavrentev::operator<<(std::ostream &os, SllLit key1)
 {
-  os << "key1 " << key1.data << "LL:";
+  os << "key1 " << key1.data << key1.pf;
   return os;
 }
 
