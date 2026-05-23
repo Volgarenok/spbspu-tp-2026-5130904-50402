@@ -60,6 +60,11 @@ namespace pozdnyakov
       return in;
     }
 
+    if (in.peek() != '0') {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+
     return in >> std::oct >> dest.ref;
   }
 
@@ -99,7 +104,7 @@ namespace pozdnyakov
       return in;
     }
 
-    DataStruct inputData;
+    DataStruct inputData{0, {0, 0}, ""};
     bool hasKey1 = false;
     bool hasKey2 = false;
     bool hasKey3 = false;
@@ -148,8 +153,8 @@ namespace pozdnyakov
 
     IoFmtGuard fmtGuard(out);
 
-    out << "(:key1 " << std::showbase << std::oct << src.key1 << std::dec << ":key2 (:N " << src.key2.first << ":D "
-        << src.key2.second << ":)"
+    out << "(:key1 0" << std::oct << src.key1 << std::dec << ":key2 (:N " << src.key2.first << ":D " << src.key2.second
+        << ":)"
         << ":key3 " << std::quoted(src.key3) << ":)";
 
     return out;
