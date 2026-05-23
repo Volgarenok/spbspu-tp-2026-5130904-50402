@@ -127,6 +127,85 @@ namespace sogdanov
     }
     return in;
   }
+  std::istream& operator>>(std::istream& in, DataStruct& dest)
+  {
+    std::istream::sentry sentry(in);
+    if (!sentry) {
+      return in;
+    }
+    DataStruct input;
+    bool hasKey1 = false;
+    bool hasKey2 = false;
+    bool hasKey3 = false;
+
+    in >> DelimiterIO{'('} >> DelimiterIO{':'};
+
+    for (int i = 0; i < 3; ++i) {
+      Key currentKey;
+      in >> KeyIO{currentKey};
+      switch (currentKey) {
+      case Key::KEY1:
+        if (hasKey1) {
+          in.setstate(std::ios::failbit);
+        } else {
+          in >> DblLitIO{input.key1};
+          hasKey1 = true;
+        }
+        break;
+      case Key::KEY2:
+        if (hasKey2) {
+          in.setstate(std::ios::failbit);
+        } else {
+          in >> SllLitIO{input.key2};
+          hasKey2 = true;
+        }
+        break;
+      case Key::KEY3:
+        if (hasKey3) {
+          in.setstate(std::ios::failbit);
+        } else {
+          in >> StringIO{input.key3};
+          hasKey3 = true;
+        }
+        break;
+      }
+      in >> DelimiterIO{':'};
+    }
+
+    in >> DelimiterIO{')'};
+
+    if (in && hasKey1 && hasKey2 && hasKey3) {
+      dest = input;
+    } else {
+      in.setstate(std::ios::failbit);
+    }
+    return in;
+  }
+
+  std::ostream& operator<<(std::ostream& out, const DataStruct& src)
+  {
+    std::ostream::sentry sentry(out);
+    if (!sentry) {
+      return out;
+    }
+    IoGuard guard(out);
+    out << "(:key1 " << std::fixed << std::setprecision(1) << src.key1 << "d";
+    out << ":key2 " << src.key2 << "ll";
+    out << ":key3 \"" << src.key3 << "\":)";
+    return out;
+  }
+
+  bool operator<(const DataStruct& lhs, const DataStruct& rhs)
+  {
+    if (lhs.key1 != rhs.key1) {
+      return lhs.key1 < rhs.key1;
+    }
+    if (lhs.key2 != rhs.key2) {
+      return lhs.key2 < rhs.key2;
+    }
+    return lhs.key3.length() < rhs.key3.length();
+  }
+
   IoGuard::IoGuard(std::basic_ios<char> &s):
    s_(s),
    fill_(s.fill()),
