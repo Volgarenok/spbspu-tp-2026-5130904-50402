@@ -5,14 +5,14 @@
 namespace pozdnyakov
 {
 
-  iofmtguard::iofmtguard(std::basic_ios< char > &s):
+  IoFmtGuard::IoFmtGuard(std::basic_ios< char > &s):
     s_(s),
     fill_(s.fill()),
     precision_(s.precision()),
     fmt_(s.flags())
   {}
 
-  iofmtguard::~iofmtguard()
+  IoFmtGuard::~IoFmtGuard()
   {
     s_.fill(fill_);
     s_.precision(precision_);
@@ -22,8 +22,10 @@ namespace pozdnyakov
   std::istream &operator>>(std::istream &in, LabelIO &&dest)
   {
     std::istream::sentry sentry(in);
-    if (!sentry)
+    if (!sentry) {
       return in;
+    }
+
     for (const char *p = dest.exp; *p != '\0'; ++p) {
       if (in.get() != *p) {
         in.setstate(std::ios::failbit);
@@ -36,12 +38,15 @@ namespace pozdnyakov
   std::istream &operator>>(std::istream &in, KeyIO &&dest)
   {
     std::istream::sentry sentry(in);
-    if (!sentry)
+    if (!sentry) {
       return in;
+    }
+
     dest.ref.clear();
     while (in && std::isalnum(in.peek())) {
       dest.ref += static_cast< char >(in.get());
     }
+
     if (dest.ref.empty()) {
       in.setstate(std::ios::failbit);
     }
@@ -51,25 +56,28 @@ namespace pozdnyakov
   std::istream &operator>>(std::istream &in, OctIO &&dest)
   {
     std::istream::sentry sentry(in);
-    if (!sentry)
+    if (!sentry) {
       return in;
+    }
+
     return in >> std::oct >> dest.ref;
   }
 
   std::istream &operator>>(std::istream &in, RatLspIO &&dest)
   {
     std::istream::sentry sentry(in);
-    if (!sentry)
+    if (!sentry) {
       return in;
+    }
 
-    long long n = 0;
-    unsigned long long d = 0;
+    long long numerator = 0;
+    unsigned long long denominator = 0;
 
-    in >> LabelIO{"(:N"} >> n >> LabelIO{":D"} >> d >> LabelIO{":)"};
+    in >> LabelIO{"(:N"} >> numerator >> LabelIO{":D"} >> denominator >> LabelIO{":)"};
 
     if (in) {
-      dest.ref.first = n;
-      dest.ref.second = d;
+      dest.ref.first = numerator;
+      dest.ref.second = denominator;
     }
     return in;
   }
@@ -77,35 +85,40 @@ namespace pozdnyakov
   std::istream &operator>>(std::istream &in, StringIO &&dest)
   {
     std::istream::sentry sentry(in);
-    if (!sentry)
+    if (!sentry) {
       return in;
+    }
+
     return in >> std::quoted(dest.ref);
   }
 
   std::istream &operator>>(std::istream &in, DataStruct &dest)
   {
     std::istream::sentry sentry(in);
-    if (!sentry)
+    if (!sentry) {
       return in;
+    }
 
-    DataStruct input;
-    bool has_key1 = false, has_key2 = false, has_key3 = false;
+    DataStruct inputData;
+    bool hasKey1 = false;
+    bool hasKey2 = false;
+    bool hasKey3 = false;
 
     in >> LabelIO{"(:"};
 
     for (int i = 0; i < 3; ++i) {
-      std::string key;
-      in >> KeyIO{key};
+      std::string currentKey;
+      in >> KeyIO{currentKey};
 
-      if (key == "key1") {
-        in >> OctIO{input.key1};
-        has_key1 = true;
-      } else if (key == "key2") {
-        in >> RatLspIO{input.key2};
-        has_key2 = true;
-      } else if (key == "key3") {
-        in >> StringIO{input.key3};
-        has_key3 = true;
+      if (currentKey == "key1") {
+        in >> OctIO{inputData.key1};
+        hasKey1 = true;
+      } else if (currentKey == "key2") {
+        in >> RatLspIO{inputData.key2};
+        hasKey2 = true;
+      } else if (currentKey == "key3") {
+        in >> StringIO{inputData.key3};
+        hasKey3 = true;
       } else {
         in.setstate(std::ios::failbit);
       }
@@ -117,8 +130,8 @@ namespace pozdnyakov
 
     in >> LabelIO{":)"};
 
-    if (in && has_key1 && has_key2 && has_key3) {
-      dest = input;
+    if (in && hasKey1 && hasKey2 && hasKey3) {
+      dest = inputData;
     } else {
       in.setstate(std::ios::failbit);
     }
@@ -129,10 +142,11 @@ namespace pozdnyakov
   std::ostream &operator<<(std::ostream &out, const DataStruct &src)
   {
     std::ostream::sentry sentry(out);
-    if (!sentry)
+    if (!sentry) {
       return out;
+    }
 
-    iofmtguard fmtguard(out);
+    IoFmtGuard fmtGuard(out);
 
     out << "(:key1 " << std::showbase << std::oct << src.key1 << std::dec << ":key2 (:N " << src.key2.first << ":D "
         << src.key2.second << ":)"
@@ -149,6 +163,7 @@ namespace pozdnyakov
 
     double r1 = static_cast< double >(lhs.key2.first) / lhs.key2.second;
     double r2 = static_cast< double >(rhs.key2.first) / rhs.key2.second;
+
     if (std::abs(r1 - r2) > 1e-9) {
       return r1 < r2;
     }

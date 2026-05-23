@@ -7,11 +7,11 @@
 
 int main()
 {
-  std::vector< pozdnyakov::DataStruct > data;
+  std::vector< pozdnyakov::DataStruct > parsedData;
 
   while (!std::cin.eof()) {
     std::copy(std::istream_iterator< pozdnyakov::DataStruct >(std::cin),
-              std::istream_iterator< pozdnyakov::DataStruct >(), std::back_inserter(data));
+              std::istream_iterator< pozdnyakov::DataStruct >(), std::back_inserter(parsedData));
 
     if (std::cin.fail() && !std::cin.eof()) {
       std::cin.clear();
@@ -19,8 +19,9 @@ int main()
     }
   }
 
-  std::sort(data.begin(), data.end());
-  std::copy(data.begin(), data.end(), std::ostream_iterator< pozdnyakov::DataStruct >(std::cout, "\n"));
+  std::sort(parsedData.begin(), parsedData.end());
+
+  std::copy(parsedData.begin(), parsedData.end(), std::ostream_iterator< pozdnyakov::DataStruct >(std::cout, "\n"));
 
   return 0;
 }

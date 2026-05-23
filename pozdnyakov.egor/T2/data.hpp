@@ -1,5 +1,5 @@
-#ifndef DATA_STRUCT_H
-#define DATA_STRUCT_H
+#ifndef DATA_HPP
+#define DATA_HPP
 
 #include <iostream>
 #include <string>
@@ -12,7 +12,7 @@ namespace pozdnyakov
   {
     unsigned long long key1;
     std::pair< long long, unsigned long long > key2;
-    std::string key3;                        
+    std::string key3;
   };
 
   std::istream &operator>>(std::istream &in, DataStruct &dest);
@@ -20,11 +20,11 @@ namespace pozdnyakov
 
   bool operator<(const DataStruct &lhs, const DataStruct &rhs);
 
-  class iofmtguard
+  class IoFmtGuard
   {
   public:
-    explicit iofmtguard(std::basic_ios< char > &s);
-    ~iofmtguard();
+    explicit IoFmtGuard(std::basic_ios< char > &s);
+    ~IoFmtGuard();
 
   private:
     std::basic_ios< char > &s_;
