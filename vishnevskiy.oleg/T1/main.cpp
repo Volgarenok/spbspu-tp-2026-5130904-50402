@@ -12,6 +12,10 @@ void note(std::ostream&, std::istream& in, std::vector<std::shared_ptr<vishnevsk
 {
   std::string name;
   in >> name;
+  if (vishnevskiy::findByName(name, vec) != -1)
+  {
+    throw std::logic_error("Note exists");
+  }
   vec.push_back(std::make_shared<vishnevskiy::Note>(name, std::vector<std::string>(), std::vector<std::weak_ptr<vishnevskiy::Note>>()));
 }
 
@@ -27,7 +31,9 @@ void line(std::ostream&, std::istream& in, std::vector<std::shared_ptr<vishnevsk
   }
   else
   {
-    std::cerr << "Cannot find name!\n";
+    auto toignore = std::numeric_limits<std::streamsize>::max();
+    in.ignore(toignore, '\n');
+    throw std::logic_error("Cannot find name!");
   }
 }
 
@@ -45,7 +51,7 @@ void show(std::ostream& out, std::istream& in, std::vector<std::shared_ptr<vishn
   }
   else
   {
-    std::cerr << "Cannot find name!\n";
+    throw std::logic_error("Cannot find name!");
   }
 }
 
@@ -60,7 +66,7 @@ void drop(std::ostream&, std::istream& in, std::vector<std::shared_ptr<vishnevsk
   }
   else
   {
-    std::cerr << "Cannot find name!\n";
+    throw std::logic_error("Cannot find name!");
   }
 }
 
@@ -74,11 +80,15 @@ void link(std::ostream&, std::istream& in, std::vector<std::shared_ptr<vishnevsk
   int ind2 = vishnevskiy::findByName(name2, vec);
   if (ind1 != -1 && ind2 != -1)
   {
+    if (vishnevskiy::findLink(name2, vec[ind1]->links) != -1)
+    {
+      throw std::logic_error("Link exists");
+    }
     vec[ind1]->links.push_back(vec[ind2]);
   }
   else
   {
-    std::cerr << "Cannot find name!\n";
+    throw std::logic_error("Cannot find name!");
   }
 }
 
@@ -99,7 +109,7 @@ void mind(std::ostream& out, std::istream& in, std::vector<std::shared_ptr<vishn
   }
   else
   {
-    std::cerr << "Cannot find name!\n";
+    throw std::logic_error("Cannot find name!");
   }
 }
 
@@ -119,12 +129,12 @@ void halt(std::ostream&, std::istream& in, std::vector<std::shared_ptr<vishnevsk
     }
     else
     {
-      std::cerr << "Link not found\n";
+      throw std::logic_error("Link not found");
     }
   }
   else
   {
-    std::cerr << "Cannot find name!\n";
+    throw std::logic_error("Cannot find name!");
   }
 }
 
@@ -143,12 +153,12 @@ void expired(std::ostream& out, std::istream& in, std::vector<std::shared_ptr<vi
         res++;
       }
     }
+    out << res << "\n";
   }
   else
   {
-    std::cerr << "Cannot find name!\n";
+    throw std::logic_error("Cannot find name!");
   }
-  out << res << "\n";
 }
 
 void refresh(std::ostream&, std::istream& in, std::vector<std::shared_ptr<vishnevskiy::Note>>& vec)
@@ -158,17 +168,17 @@ void refresh(std::ostream&, std::istream& in, std::vector<std::shared_ptr<vishne
   int ind = vishnevskiy::findByName(name, vec);
   if (ind != -1)
   {
-    for (size_t i = 0; i < vec[ind]->links.size(); ++i)
+    for (size_t i = vec[ind]->links.size(); i > 0; --i)
     {
-      if (vec[ind]->links[i].expired())
+      if (vec[ind]->links[i - 1].expired())
       {
-        vec[ind]->links.erase(vec[ind]->links.begin() + i);
+        vec[ind]->links.erase(vec[ind]->links.begin() + (i - 1));
       }
     }
   }
   else
   {
-    std::cerr << "Cannot find name!\n";
+    throw std::logic_error("Cannot find name!");
   }
 }
 
@@ -200,7 +210,7 @@ int main()
       std::cin.ignore(toignore, '\n');
     }
     catch (const std::logic_error& e) {
-      std::cout << "<INVALID COMMAND: " << e.what() << ">\n";
+      std::cout << "<INVALID COMMAND>\n";
     }
   }
   if (!std::cin.eof())
