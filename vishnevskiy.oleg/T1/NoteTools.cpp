@@ -21,9 +21,11 @@ namespace vishnevskiy
   {
     for (size_t i = 0; i < links.size(); ++i)
     {
-      if (links[i].lock()->name == name)
+      if (links[i].lock())
       {
-        return i;
+        if (links[i].lock()->name == name){
+          return i;
+        }
       }
     }
     return -1;
