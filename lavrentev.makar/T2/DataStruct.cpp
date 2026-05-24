@@ -76,7 +76,8 @@ std::ostream &lavrentev::operator<<(std::ostream &os, DataStruct obj)
   d_t dlmInBracket{'(', last};
   d_t dlmColon{':', last};
   d_t dlmOutBracket{')', last};
-  os << dlmInBracket << dlmColon << obj.key1 << obj.key2 << "key3" << obj.key3 << dlmColon << dlmOutBracket;
+  d_t dlmQMark{'"', last};
+  os << dlmInBracket << dlmColon << obj.key1 << obj.key2 << "key3 " << dlmQMark << obj.key3 << dlmQMark << dlmColon << dlmOutBracket;
   return os;
 }
 
