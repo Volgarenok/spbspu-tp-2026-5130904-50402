@@ -39,6 +39,7 @@ void line(std::ostream&, std::istream& in, std::vector<std::shared_ptr<vishnevsk
 
 void show(std::ostream& out, std::istream& in, std::vector<std::shared_ptr<vishnevskiy::Note>>& vec)
 {
+  bool hasOutput = false;
   std::string name;
   in >> name;
   int ind = vishnevskiy::findByName(name, vec);
@@ -46,12 +47,17 @@ void show(std::ostream& out, std::istream& in, std::vector<std::shared_ptr<vishn
   {
     for (size_t i = 0; i < vec[ind]->lines.size(); ++i)
     {
+      hasOutput = true;
       out << vec[ind]->lines[i] << "\n";
     }
   }
   else
   {
     throw std::logic_error("Cannot find name!");
+  }
+  if (!hasOutput)
+  {
+    out << "\n";
   }
 }
 
