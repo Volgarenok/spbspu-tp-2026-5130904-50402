@@ -1,5 +1,5 @@
-#ifndef NOTE_HPP
-#define NOTE_HPP
+#ifndef NOTETOOLS_HPP
+#define NOTETOOLS_HPP
 #include <string>
 #include <vector>
 #include <memory>
@@ -7,18 +7,8 @@
 
 namespace vishnevskiy
 {
-  template <class T>
-  int findByName(std::string name, std::vector<vishnevskiy::Note>* vec)
-  {
-    for (size_t i = 0; i < vec.size(); ++i)
-    {
-      if (vec[i].name == name)
-      {
-        return i;
-      }
-    }
-    return -1;
-  }
+  int findByName(const std::string& name, std::vector<std::shared_ptr<vishnevskiy::Note>>& vec);
+  int findLink(const std::string& name, std::vector<std::weak_ptr<vishnevskiy::Note>>& links);
 }
 
 #endif
