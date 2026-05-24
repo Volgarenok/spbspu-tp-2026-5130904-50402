@@ -63,6 +63,7 @@ namespace lavrentev
   bool operator==(UllOct lobj, UllOct robj);
 
   char check(std::istream &is, char expected);
+  void process(std::istream &is, DataStruct &d);
 }
 
 #endif

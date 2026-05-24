@@ -3,13 +3,14 @@
 #include <cstring>
 #include <iostream>
 
-lavrentev::IOGuard::IOGuard(std::basic_ios< char > &s):
+lavrentev::IOGuard::IOGuard(std::basic_ios<char> &s):
   s_(s),
   precision_(s.precision()),
   width_(s.width()),
   flags_(s.flags()),
   fill_(s.fill())
-{}
+{
+}
 
 lavrentev::IOGuard::~IOGuard()
 {
@@ -44,22 +45,24 @@ std::istream &lavrentev::operator>>(std::istream &is, DataStruct &obj)
     return is;
   }
   using d_t = Delimiter_t;
-  SllLit x{0};
-  UllOct y{0};
-  std::string strKey;
-  std::string strValue;
   char last = 0;
   d_t dlmInBracket{'(', last};
   d_t dlmColon{':', last};
   d_t dlmOutBracket{')', last};
-  d_t dlmQMark{'"', last};
-  is >> dlmInBracket >> dlmColon >> x >> y >> strKey >> dlmQMark;
-  std::getline(is, strValue, '"');
-  is >> dlmColon >> dlmOutBracket;
-  if (is)
+
+  is >> dlmInBracket >> dlmColon;
+  if (!is)
   {
-    obj = DataStruct{x, y, strValue};
+    return is;
   }
+  process(is, obj);
+  process(is, obj);
+  process(is, obj);
+  if (!is)
+  {
+    return is;
+  }
+  is >> dlmOutBracket;
   return is;
 }
 
@@ -77,7 +80,8 @@ std::ostream &lavrentev::operator<<(std::ostream &os, DataStruct obj)
   d_t dlmColon{':', last};
   d_t dlmOutBracket{')', last};
   d_t dlmQMark{'"', last};
-  os << dlmInBracket << dlmColon << obj.key1 << obj.key2 << "key3 " << dlmQMark << obj.key3 << dlmQMark << dlmColon << dlmOutBracket;
+  os << dlmInBracket << dlmColon << obj.key1 << obj.key2 << "key3 " << dlmQMark
+     << obj.key3 << dlmQMark << dlmColon << dlmOutBracket;
   return os;
 }
 
@@ -188,4 +192,59 @@ bool lavrentev::operator==(SllLit lobj, SllLit robj)
 bool lavrentev::operator==(UllOct lobj, UllOct robj)
 {
   return lobj.data == robj.data;
+}
+
+void lavrentev::process(std::istream &is, lavrentev::DataStruct &d)
+{
+  if (!is)
+  {
+    return;
+  }
+
+  std::string key;
+  is >> key;
+  if (!is)
+  {
+    return;
+  }
+
+  if (key == "key1" || key == "key2")
+  {
+    for (auto it = key.rbegin(); it != key.rend(); ++it)
+    {
+      is.putback(*it);
+    }
+
+    if (key == "key1")
+    {
+      is >> d.key1;
+    }
+    else
+    {
+      is >> d.key2;
+    }
+  }
+  else if (key == "key3")
+  {
+    char quote = 0;
+    is >> quote;
+    if (quote != '"')
+    {
+      is.setstate(std::ios::failbit);
+      return;
+    }
+
+    std::getline(is, d.key3, '"');
+
+    char colon = 0;
+    is >> colon;
+    if (colon != ':')
+    {
+      is.setstate(std::ios::failbit);
+    }
+  }
+  else
+  {
+    is.setstate(std::ios::failbit);
+  }
 }
