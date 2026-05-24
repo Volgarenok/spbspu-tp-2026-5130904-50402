@@ -95,6 +95,7 @@ void link(std::ostream&, std::istream& in, std::vector<std::shared_ptr<vishnevsk
 void mind(std::ostream& out, std::istream& in, std::vector<std::shared_ptr<vishnevskiy::Note>>& vec)
 {
   std::string name;
+  bool hasOutput = false;
   in >> name;
   int ind = vishnevskiy::findByName(name, vec);
   if (ind != -1)
@@ -103,6 +104,7 @@ void mind(std::ostream& out, std::istream& in, std::vector<std::shared_ptr<vishn
     {
       if (auto link = vec[ind]->links[i].lock())
       {
+        hasOutput = true;
         out << link->name << "\n";
       }
     }
@@ -110,6 +112,10 @@ void mind(std::ostream& out, std::istream& in, std::vector<std::shared_ptr<vishn
   else
   {
     throw std::logic_error("Cannot find name!");
+  }
+  if (!hasOutput)
+  {
+    out << "\n";
   }
 }
 
