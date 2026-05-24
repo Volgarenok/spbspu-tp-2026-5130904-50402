@@ -13,6 +13,7 @@ void note(std::ostream& out, std::istream& in, std::vector<std::shared_ptr<vishn
   std::string name;
   in >> name;
   vec.push_back(std::make_shared<vishnevskiy::Note>(name, std::vector<std::string>(), std::vector<std::weak_ptr<vishnevskiy::Note>>()));
+  out << "Created " << name << "\n";
 }
 
 void line(std::ostream& out, std::istream& in, std::vector<std::shared_ptr<vishnevskiy::Note>>& vec)
@@ -24,6 +25,7 @@ void line(std::ostream& out, std::istream& in, std::vector<std::shared_ptr<vishn
   {
     in >> std::quoted(text);
     vec[ind]->lines.push_back(text);
+    out << "Added line to " << name << "\n";
   }
   else
   {
@@ -40,7 +42,7 @@ void show(std::ostream& out, std::istream& in, std::vector<std::shared_ptr<vishn
   {
     for (size_t i = 0; i < vec[ind]->lines.size(); ++i)
     {
-      std::cout << vec[ind]->lines[i] << "\n";
+      out << vec[ind]->lines[i] << "\n";
     }
   }
   else
@@ -57,6 +59,7 @@ void drop(std::ostream& out, std::istream& in, std::vector<std::shared_ptr<vishn
   if (ind != -1)
   {
     vec.erase(vec.begin() + ind);
+    out << "Dropped " << name << "\n";
   }
   else
   {
@@ -75,6 +78,7 @@ void link(std::ostream& out, std::istream& in, std::vector<std::shared_ptr<vishn
   if (ind1 != -1 && ind2 != -1)
   {
     vec[ind1]->links.push_back(vec[ind2]);
+    out << "Linked " << name1 << " to " << name2 << "\n";
   }
   else
   {
@@ -116,6 +120,7 @@ void halt(std::ostream& out, std::istream& in, std::vector<std::shared_ptr<vishn
     if (link != -1)
     {
       vec[ind]->links.erase(vec[ind]->links.begin() + link);
+      out << "Halted link between " << name << " and " << to_delete << "\n";
     }
     else
     {
@@ -148,6 +153,7 @@ void expired(std::ostream& out, std::istream& in, std::vector<std::shared_ptr<vi
   {
     std::cerr << "Cannot find name!\n";
   }
+  out << res << "\n";
 }
 
 void refresh(std::ostream& out, std::istream& in, std::vector<std::shared_ptr<vishnevskiy::Note>>& vec)
@@ -169,6 +175,7 @@ void refresh(std::ostream& out, std::istream& in, std::vector<std::shared_ptr<vi
   {
     std::cerr << "Cannot find name!\n";
   }
+  out << "Refreshed " << name << "\n";
 }
 
 int main()
