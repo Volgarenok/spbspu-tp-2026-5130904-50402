@@ -52,9 +52,10 @@ std::istream &lavrentev::operator>>(std::istream &is, DataStruct &obj)
   d_t dlmInBracket{'(', last};
   d_t dlmColon{':', last};
   d_t dlmOutBracket{')', last};
-  is >> dlmInBracket >> dlmColon >> x >> y >> strKey;
-  std::getline(is, strValue, ':');
-  is >> dlmOutBracket;
+  d_t dlmQMark{'"', last};
+  is >> dlmInBracket >> dlmColon >> x >> y >> strKey >> dlmQMark;
+  std::getline(is, strValue, '"');
+  is >> dlmColon >> dlmOutBracket;
   if (is)
   {
     obj = DataStruct{x, y, strValue};
