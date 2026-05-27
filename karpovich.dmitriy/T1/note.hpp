@@ -1,5 +1,5 @@
-#ifndef COMMANDS_HPP
-#define COMMANDS_HPP
+#ifndef NOTE_HPP
+#define NOTE_HPP
 
 #include <istream>
 #include <memory>
