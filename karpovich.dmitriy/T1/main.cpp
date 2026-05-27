@@ -1,7 +1,7 @@
 #include <iostream>
+#include <limits>
 #include <string>
 #include <unordered_map>
-#include <limits>
 #include "note.hpp"
 
 int main()
@@ -22,6 +22,7 @@ int main()
   while (std::cin >> cmd) {
     try {
       cmds.at(cmd)(std::cin, std::cout, notes);
+      std::cout << '\n';
     } catch (const std::exception &) {
       std::cout << "<INVALID COMMAND>\n";
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
