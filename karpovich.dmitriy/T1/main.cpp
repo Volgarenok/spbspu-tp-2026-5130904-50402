@@ -22,7 +22,9 @@ int main()
   while (std::cin >> cmd) {
     try {
       cmds.at(cmd)(std::cin, std::cout, notes);
-      std::cout << '\n';
+      if (cmd == "show" || cmd == "mind" || cmd == "expired") {
+        std::cout << '\n';
+      }
     } catch (const std::exception &) {
       std::cout << "<INVALID COMMAND>\n";
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
