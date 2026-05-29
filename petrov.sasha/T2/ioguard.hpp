@@ -3,11 +3,11 @@
 #include <ios>
 namespace petrov
 {
-  class IOguard
+  class IOGuard
   {
   public:
-    explicit IOguard(std::basic_ios< char > &s);
-    ~IOguard();
+    explicit IOGuard(std::basic_ios< char > &s);
+    ~IOGuard();
 
   private:
     std::basic_ios< char > &s_;

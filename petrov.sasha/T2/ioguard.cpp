@@ -1,6 +1,6 @@
 #include "ioguard.hpp"
 
-petrov::IOguard::IOguard(std::basic_ios< char > &s):
+petrov::IOGuard::IOGuard(std::basic_ios< char > &s):
   s_(s),
   width_(s.width()),
   precision_(s.precision()),
@@ -8,7 +8,7 @@ petrov::IOguard::IOguard(std::basic_ios< char > &s):
   fill_(s.fill())
 {}
 
-petrov::IOguard::~IOguard()
+petrov::IOGuard::~IOGuard()
 {
   s_.width(width_);
   s_.precision(precision_);
