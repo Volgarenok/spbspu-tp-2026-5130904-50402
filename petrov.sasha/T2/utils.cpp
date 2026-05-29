@@ -1,7 +1,6 @@
 #include "utils.hpp"
-
+#include "ioguard.hpp"
 #include <iomanip>
-#include <ioguard.hpp>
 
 namespace petrov
 {
