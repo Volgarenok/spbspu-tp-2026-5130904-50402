@@ -1,5 +1,6 @@
 #include "utils.hpp"
-
+#include <iostream>
+#include <iostream>
 #include <iomanip>
 #include <ioguard.hpp>
 
@@ -97,6 +98,31 @@ namespace petrov
       in.setstate(std::ios::failbit);
     }
     return in;
+  }
+
+  std::ostream &operator<<(std::ostream &out, const DataStruct &src)
+  {
+    std::ostream::sentry sentry(out);
+    if (!sentry) {
+      return out;
+    }
+    IOGuard guard(out);
+    out << "(:" << "key1 " << std::oct << src.key1 << ':';
+    out << "key2 " << "0x" << std::uppercase << std::hex << src.key2 << ':';
+    out << "key3 " << std::quoted(src.key3) << ':' << ')';
+
+    return out;
+  }
+
+  bool operator<(const DataStruct &lhs, const DataStruct &rhs)
+  {
+    if (lhs.key1 != rhs.key1) {
+      return lhs.key1 < rhs.key1;
+    }
+    if (lhs.key2 != rhs.key2) {
+      return lhs.key2 < rhs.key2;
+    }
+    return lhs.key3.length() < rhs.key3.length();
   }
 }
 
