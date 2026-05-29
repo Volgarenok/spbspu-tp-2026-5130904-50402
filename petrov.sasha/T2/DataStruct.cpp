@@ -9,20 +9,25 @@
 
 namespace petrov
 {
-  const char OPEN_PAREN = '(';
-  const char CLOSE_PAREN = ')';
-  const char COLON = ':';
-
-  static bool isOctDigit(char c) {
-    return c >= '0' && c <= '7';
-  }
-
-  static bool isHexDigit(char c)
+  class IOGuard
   {
-    bool tmp = std::isdigit(static_cast<unsigned char>(c));
-    tmp = tmp || (c >= 'a' && c <= 'f');
-    tmp = tmp || (c >= 'A' && c <= 'F');
-    return tmp;
-  }
+  public:
+    explicit IOGuard(std::ios &stream):
+      stream_(stream),
+      flags_(stream.flags()),
+      fill_(stream.fill())
+    {}
+
+    ~IOGuard()
+    {
+      stream_.flags(flags_);
+      stream_.fill(fill_);
+    }
+
+  private:
+    std::ios &stream_;
+    std::ios::fmtflags flags_;
+    char fill_;
+  };
 }
 
