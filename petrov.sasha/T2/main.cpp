@@ -9,6 +9,7 @@
 int main()
 {
   using T = petrov::DataStruct;
+  std::cin >> std::ws;
   if (std::cin.peek() == std::char_traits< char >::eof()) {
     std::cout << "Looks like there is no supported record. Cannot determine input. Test skipped\n";
     return 0;
