@@ -36,10 +36,6 @@ namespace petrov
       in.setstate(std::ios::failbit);
       return in;
     }
-    if (token.size() > 1 && token[1] == '0') {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
     unsigned long long value = 0;
     for (char c : token) {
       if (c < '0' || c > '7') {
@@ -77,10 +73,6 @@ namespace petrov
     }
     std::string digits = token.substr(2);
     if (digits.empty()) {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-    if (digits.size() > 1 && digits[0] == '0') {
       in.setstate(std::ios::failbit);
       return in;
     }
