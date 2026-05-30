@@ -107,14 +107,24 @@ void lavrentev::mind(std::istream &in,
   in >> name;
   if (db.find(name) != db.end())
   {
-    if (db.find(name)->second->lines.empty())
+    if (db[name]->ptrs.empty())
     {
       return;
     }
 
     size_t i = 0;
-    out << db[name]->lines[i];
-    for (i = 1; i < db[name]->ptrs.size(); ++i)
+    for (; i < db[name]->ptrs.size(); ++i)
+    {
+      std::shared_ptr<Note> firstLink = db[name]->ptrs[i].lock();
+      if (firstLink != nullptr)
+      {
+        out << firstLink->name;
+        break;
+      }
+    }
+
+    ++i;
+    for (; i < db[name]->ptrs.size(); ++i)
     {
       std::shared_ptr<Note> k = db[name]->ptrs[i].lock();
       if (k != nullptr)
