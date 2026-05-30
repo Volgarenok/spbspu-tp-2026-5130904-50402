@@ -5,9 +5,6 @@
 
 int main()
 {
-  //auto toignore = std::numeric_limits< std::streamsize >::max();
-  //std::cin.ignore(toignore, '\n');
-
   std::unordered_map<std::string, std::shared_ptr<lavrentev::Note>> db;
   std::unordered_map<std::string, lavrentev::cmd_t> cmds;
 
@@ -27,10 +24,7 @@ int main()
     try
     {
       cmds.at(cmd)(std::cin, std::cout, db);
-      if (cmd == "show")
-      {
-        std::cout << "\n";
-      }
+      std::cout << "\n";
     }
     catch (const std::exception &)
     {

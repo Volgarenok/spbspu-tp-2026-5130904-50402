@@ -14,7 +14,7 @@ void lavrentev::note(std::istream &in, std::ostream &,
     throw std::logic_error("Node is already exists");
   }
   std::shared_ptr<Note> newNote = std::make_shared<Note>(newName);
-  db[newName] = newNote;
+  db.insert({newName, newNote});
 }
 
 void lavrentev::line(std::istream &in,
@@ -41,6 +41,11 @@ void lavrentev::show(std::istream &in,
   in >> name;
   if (db.find(name) != db.end())
   {
+    if (db.find(name)->second->lines.empty()) 
+    {
+      return;
+    }
+
     size_t i = 0;
     out << db[name]->lines[i];
     for (i = 1; i < db[name]->lines.size(); ++i)
@@ -102,19 +107,20 @@ void lavrentev::mind(std::istream &in,
   in >> name;
   if (db.find(name) != db.end())
   {
-    bool flag = false;
-    for (size_t i = 0; i < db[name]->ptrs.size(); ++i)
+    if (db.find(name)->second->lines.empty()) 
+    {
+      return;
+    }
+
+    size_t i = 0;
+    out << db[name]->lines[i];
+    for (i = 1; i < db[name]->ptrs.size(); ++i)
     {
       std::shared_ptr<Note> k = db[name]->ptrs[i].lock();
       if (k != nullptr)
       {
-        flag = true;
-        out << k->name << "\n";
+        out << "\n" << k->name;
       }
-    }
-    if (!flag)
-    {
-      out << "\n";
     }
     return;
   }
@@ -167,7 +173,7 @@ void lavrentev::expired(
       ++count;
     }
   }
-  out << count << "\n";
+  out << count;
 }
 
 void lavrentev::refresh(
