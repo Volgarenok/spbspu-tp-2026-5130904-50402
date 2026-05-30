@@ -22,81 +22,30 @@ namespace petrov
 
   std::istream &operator>>(std::istream &in, OctIO &&dest)
   {
-    std::istream::sentry sentry(in);
-    if (!sentry) {
+    std::istream::sentry s(in);
+    if (!s) {
       return in;
     }
-    std::string token;
-    in >> token;
-    if (!in || token.empty()) {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-    if (token[0] != '0') {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-    unsigned long long value = 0;
-    for (char c : token) {
-      if (c < '0' || c > '7') {
-        in.setstate(std::ios::failbit);
-        return in;
-      }
-      unsigned digit = static_cast<unsigned>(c - '0');
-      if (value >
-        (std::numeric_limits< unsigned long long >::max() - digit) / 8) {
-        in.setstate(std::ios::failbit);
-        return in;
-      }
-      value = value * 8 + digit;
-    }
-    dest.ref = value;
+    IOGuard guard(in);
+    in >> std::oct >> dest.ref;
     return in;
   }
 
   std::istream &operator>>(std::istream &in, HexIO &&dest)
   {
-    std::istream::sentry sentry(in);
-    if (!sentry) {
+    std::istream::sentry s(in);
+    if (!s) {
       return in;
     }
-    std::string token;
-    in >> token;
-    if (!in || token.size() < 3) {
+    char zero = '\0';
+    char x = '\0';
+    in >> zero >> x;
+    if (!in || zero != '0' || (x != 'x' && x != 'X')) {
       in.setstate(std::ios::failbit);
       return in;
     }
-    if (!(token[0] == '0' &&
-          (token[1] == 'x' || token[1] == 'X'))) {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-    std::string digits = token.substr(2);
-    if (digits.empty()) {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-    unsigned long long value = 0;
-    for (char c : digits) {
-      unsigned digit = 0;
-      if (c >= '0' && c <= '9') {
-        digit = static_cast<unsigned>(c - '0');
-      } else if (c >= 'a' && c <= 'f') {
-        digit = static_cast<unsigned>(c - 'a' + 10);
-      } else if (c >= 'A' && c <= 'F') {
-        digit = static_cast<unsigned>(c - 'A' + 10);
-      } else {
-        in.setstate(std::ios::failbit);
-        return in;
-      }
-      if (value >
-        (std::numeric_limits< unsigned long long >::max() - digit) / 16) {
-        in.setstate(std::ios::failbit);
-        return in;
-      }
-      value = value * 16 + digit;
-    }
-    dest.ref = value;
+    IOGuard guard(in);
+    in >> std::hex >> dest.ref;
     return in;
   }
 
