@@ -26,3 +26,4 @@ int main()
   using oit_t = std::ostream_iterator< T >;
   std::copy(data.begin(), data.end(), oit_t{std::cout, "\n"});
 }
+
