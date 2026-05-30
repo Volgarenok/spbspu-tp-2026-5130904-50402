@@ -4,19 +4,16 @@
 #include <iomanip>
 #include <unordered_map>
 
-void lavrentev::note(std::istream &in,
-    std::ostream &,
-    std::unordered_map<std::string,
-    std::shared_ptr<Note>> &db)
+void lavrentev::note(std::istream &in, std::ostream &,
+    std::unordered_map<std::string, std::shared_ptr<Note>> &db)
 {
   std::string newName;
   in >> newName;
-  if (db.count(newName) != 0)
+  if (db.at(newName))
   {
     throw std::logic_error("Node is already exists");
   }
-  std::shared_ptr<Note> newNote = std::make_shared<Note>();
-  newNote->name = newName;
+  std::shared_ptr<Note> newNote = std::make_shared<Note>(newName);
   db[newName] = newNote;
 }
 
@@ -27,7 +24,7 @@ void lavrentev::line(std::istream &in,
 {
   std::string name, text;
   in >> name;
-  if (db.count(name) == 0)
+  if (!db.at(name))
   {
     throw std::logic_error("No such Note");
   }
@@ -42,17 +39,13 @@ void lavrentev::show(std::istream &in,
 {
   std::string name;
   in >> name;
-  if (db.count(name) != 0)
+  if (db.at(name))
   {
-    bool flag = false;
-    for (size_t i = 0; i < db[name]->lines.size(); ++i)
+    size_t i = 0;
+    out << db[name]->lines[i];
+    for (i = 1; i < db[name]->lines.size(); ++i)
     {
-      flag = true;
-      out << db[name]->lines[i] << "\n";
-    }
-    if (!flag)
-    {
-      out << "\n";
+      out << "\n" << db[name]->lines[i];
     }
     return;
   }
@@ -66,7 +59,7 @@ void lavrentev::drop(std::istream &in,
 {
   std::string name;
   in >> name;
-  if (db.count(name) != 0)
+  if (db.at(name))
   {
     db.erase(name);
     return;
@@ -81,7 +74,7 @@ void lavrentev::link(std::istream &in,
 {
   std::string noteTo, noteFrom;
   in >> noteFrom >> noteTo;
-  if (db.count(noteTo) == 0 || db.count(noteFrom) == 0)
+  if (!db.at(noteTo) || !db.at(noteFrom))
   {
     throw std::logic_error("No such Note");
   }
@@ -107,7 +100,7 @@ void lavrentev::mind(std::istream &in,
 {
   std::string name;
   in >> name;
-  if (db.count(name) != 0)
+  if (db.at(name))
   {
     bool flag = false;
     for (size_t i = 0; i < db[name]->ptrs.size(); ++i)
@@ -135,7 +128,7 @@ void lavrentev::halt(std::istream &in,
 {
   std::string noteTo, noteFrom;
   in >> noteFrom >> noteTo;
-  if (db.count(noteTo) == 0 || db.count(noteFrom) == 0)
+  if (!db.at(noteTo) || !db.at(noteFrom))
   {
     throw std::logic_error("No such Note");
   }
@@ -161,7 +154,7 @@ void lavrentev::expired(
 {
   std::string name;
   in >> name;
-  if (db.count(name) == 0)
+  if (!db.at(name))
   {
     throw std::logic_error("No such Note");
   }
@@ -183,7 +176,7 @@ void lavrentev::refresh(
 {
   std::string name;
   in >> name;
-  if (db.count(name) == 0)
+  if (!db.at(name))
   {
     throw std::logic_error("No such Note");
   }

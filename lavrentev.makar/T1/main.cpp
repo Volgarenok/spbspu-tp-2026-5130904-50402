@@ -1,12 +1,15 @@
-#include "Note.hpp"
-#include "Commands.hpp"
 #include <iostream>
 #include <limits>
+#include "Note.hpp"
+#include "Commands.hpp"
 
 int main()
 {
+  auto toignore = std::numeric_limits< std::streamsize >::max();
+  std::cin.ignore(toignore, '\n');
+
   std::unordered_map<std::string, std::shared_ptr<lavrentev::Note>> db;
-  std::unordered_map<std::string, cmd_t> cmds;
+  std::unordered_map<std::string, lavrentev::cmd_t> cmds;
 
   cmds["note"] = lavrentev::note;
   cmds["line"] = lavrentev::line;
@@ -24,12 +27,12 @@ int main()
     try
     {
       cmds.at(cmd)(std::cin, std::cout, db);
-    } catch (const std::out_of_range &)
-    {
-      std::cout << "<INVALID COMMAND>\n";
-      auto toignore = std::numeric_limits<std::streamsize>::max();
-      std::cin.ignore(toignore, '\n');
-    } catch (const std::logic_error &e)
+      if (cmd == "show")
+      {
+        std::cout << "\n";
+      }
+    }
+    catch (const std::exception &)
     {
       std::cout << "<INVALID COMMAND>\n";
       auto toignore = std::numeric_limits<std::streamsize>::max();

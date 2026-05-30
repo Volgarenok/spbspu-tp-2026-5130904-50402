@@ -6,10 +6,6 @@
 #include <string>
 #include "Note.hpp"
 
-using cmd_t = void (*)(
-    std::istream &, std::ostream &,
-    std::unordered_map<std::string, std::shared_ptr<lavrentev::Note>> &);
-
 namespace lavrentev
 {
   void note(std::istream &in, std::ostream &, std::unordered_map<std::string, std::shared_ptr<Note>> &db);
@@ -21,6 +17,9 @@ namespace lavrentev
   void mind(std::istream &in, std::ostream &out, std::unordered_map<std::string, std::shared_ptr<Note>> &db);
   void expired(std::istream &in, std::ostream &out, std::unordered_map<std::string, std::shared_ptr<Note>> &db);
   void refresh(std::istream &in, std::ostream &, std::unordered_map<std::string, std::shared_ptr<Note>> &db);
+
+  using cmd_t = void (*)(std::istream &, std::ostream &,
+    std::unordered_map<std::string, std::shared_ptr<lavrentev::Note>> &);
 }
 
 #endif
