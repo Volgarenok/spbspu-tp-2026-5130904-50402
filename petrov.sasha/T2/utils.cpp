@@ -22,12 +22,12 @@ namespace petrov
 
   std::istream &operator>>(std::istream &in, OctIO &&dest)
   {
-    std::istream::sentry s(in);
-    if (!s) {
+    std::istream::sentry sentry(in);
+    if (!sentry) {
       return in;
     }
     IOGuard guard(in);
-    in >> std::oct >> dest.ref;
+    in >> DelimIO{'0'} >> std::oct >> dest.ref;
     return in;
   }
 
@@ -122,7 +122,7 @@ namespace petrov
     }
     IOGuard guard(out);
     out << "(:" << "key1 ";
-    out << std::oct << src.key1 << ':';
+    out << '0' << std::oct << src.key1 << ':';
     out << "key2 " << "0x" << std::uppercase << std::hex << src.key2 << ':';
     out << "key3 " << std::quoted(src.key3) << ':' << ')';
     return out;
