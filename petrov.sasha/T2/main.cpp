@@ -3,11 +3,16 @@
 #include <iterator>
 #include <limits>
 #include <vector>
+
 #include "utils.hpp"
 
 int main()
 {
   using T = petrov::DataStruct;
+  if (std::cin.peek() == std::char_traits< char >::eof()) {
+    std::cout << "Looks like there is no supported record. " << "Cannot determine input. Test skipped\n";
+    return 0;
+  }
   std::vector< T > data;
   using iit_t = std::istream_iterator< T >;
   while (!std::cin.eof()) {
