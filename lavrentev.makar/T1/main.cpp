@@ -5,8 +5,8 @@
 
 int main()
 {
-  auto toignore = std::numeric_limits< std::streamsize >::max();
-  std::cin.ignore(toignore, '\n');
+  //auto toignore = std::numeric_limits< std::streamsize >::max();
+  //std::cin.ignore(toignore, '\n');
 
   std::unordered_map<std::string, std::shared_ptr<lavrentev::Note>> db;
   std::unordered_map<std::string, lavrentev::cmd_t> cmds;

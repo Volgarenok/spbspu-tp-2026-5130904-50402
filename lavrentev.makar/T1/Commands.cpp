@@ -9,7 +9,7 @@ void lavrentev::note(std::istream &in, std::ostream &,
 {
   std::string newName;
   in >> newName;
-  if (db.at(newName))
+  if (db.find(newName) != db.end())
   {
     throw std::logic_error("Node is already exists");
   }
@@ -24,7 +24,7 @@ void lavrentev::line(std::istream &in,
 {
   std::string name, text;
   in >> name;
-  if (!db.at(name))
+  if (db.find(name) == db.end())
   {
     throw std::logic_error("No such Note");
   }
@@ -39,7 +39,7 @@ void lavrentev::show(std::istream &in,
 {
   std::string name;
   in >> name;
-  if (db.at(name))
+  if (db.find(name) != db.end())
   {
     size_t i = 0;
     out << db[name]->lines[i];
@@ -59,7 +59,7 @@ void lavrentev::drop(std::istream &in,
 {
   std::string name;
   in >> name;
-  if (db.at(name))
+  if (db.find(name) != db.end())
   {
     db.erase(name);
     return;
@@ -74,7 +74,7 @@ void lavrentev::link(std::istream &in,
 {
   std::string noteTo, noteFrom;
   in >> noteFrom >> noteTo;
-  if (!db.at(noteTo) || !db.at(noteFrom))
+  if (db.find(noteTo) == db.end() || db.find(noteFrom) == db.end())
   {
     throw std::logic_error("No such Note");
   }
@@ -100,7 +100,7 @@ void lavrentev::mind(std::istream &in,
 {
   std::string name;
   in >> name;
-  if (db.at(name))
+  if (db.find(name) != db.end())
   {
     bool flag = false;
     for (size_t i = 0; i < db[name]->ptrs.size(); ++i)
@@ -128,7 +128,7 @@ void lavrentev::halt(std::istream &in,
 {
   std::string noteTo, noteFrom;
   in >> noteFrom >> noteTo;
-  if (!db.at(noteTo) || !db.at(noteFrom))
+  if (db.find(noteTo) == db.end() || db.find(noteFrom) == db.end())
   {
     throw std::logic_error("No such Note");
   }
@@ -154,7 +154,7 @@ void lavrentev::expired(
 {
   std::string name;
   in >> name;
-  if (!db.at(name))
+  if (db.find(name) == db.end())
   {
     throw std::logic_error("No such Note");
   }
@@ -176,7 +176,7 @@ void lavrentev::refresh(
 {
   std::string name;
   in >> name;
-  if (!db.at(name))
+  if (db.find(name) == db.end())
   {
     throw std::logic_error("No such Note");
   }
