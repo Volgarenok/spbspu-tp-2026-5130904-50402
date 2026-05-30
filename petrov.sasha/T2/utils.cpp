@@ -1,6 +1,8 @@
 #include "utils.hpp"
 #include "ioguard.hpp"
+
 #include <iomanip>
+#include <limits>
 
 namespace petrov
 {
@@ -24,8 +26,35 @@ namespace petrov
     if (!sentry) {
       return in;
     }
-    IOGuard guard(in);
-    in >> DelimIO{'0'} >> std::oct >> dest.ref;
+    std::string token;
+    in >> token;
+    if (!in || token.empty()) {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    if (token[0] != '0') {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    if (token.size() > 1 && token[1] == '0') {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    unsigned long long value = 0;
+    for (char c : token) {
+      if (c < '0' || c > '7') {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      unsigned digit = static_cast<unsigned>(c - '0');
+      if (value >
+        (std::numeric_limits< unsigned long long >::max() - digit) / 8) {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      value = value * 8 + digit;
+    }
+    dest.ref = value;
     return in;
   }
 
@@ -35,15 +64,47 @@ namespace petrov
     if (!sentry) {
       return in;
     }
-    IOGuard guard(in);
-    char zero = '\0';
-    char x = '\0';
-    in >> zero >> x;
-    if (!in || zero != '0' || (x != 'x' && x != 'X')) {
+    std::string token;
+    in >> token;
+    if (!in || token.size() < 3) {
       in.setstate(std::ios::failbit);
       return in;
     }
-    in >> std::hex >> dest.ref;
+    if (!(token[0] == '0' &&
+          (token[1] == 'x' || token[1] == 'X'))) {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    std::string digits = token.substr(2);
+    if (digits.empty()) {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    if (digits.size() > 1 && digits[0] == '0') {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    unsigned long long value = 0;
+    for (char c : digits) {
+      unsigned digit = 0;
+      if (c >= '0' && c <= '9') {
+        digit = static_cast<unsigned>(c - '0');
+      } else if (c >= 'a' && c <= 'f') {
+        digit = static_cast<unsigned>(c - 'a' + 10);
+      } else if (c >= 'A' && c <= 'F') {
+        digit = static_cast<unsigned>(c - 'A' + 10);
+      } else {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      if (value >
+        (std::numeric_limits< unsigned long long >::max() - digit) / 16) {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      value = value * 16 + digit;
+    }
+    dest.ref = value;
     return in;
   }
 
@@ -105,10 +166,10 @@ namespace petrov
       return out;
     }
     IOGuard guard(out);
-    out << "(:" << "key1 " << std::oct << src.key1 << ':';
+    out << "(:" << "key1 ";
+    out << std::oct << src.key1 << ':';
     out << "key2 " << "0x" << std::uppercase << std::hex << src.key2 << ':';
     out << "key3 " << std::quoted(src.key3) << ':' << ')';
-
     return out;
   }
 
