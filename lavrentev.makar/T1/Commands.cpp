@@ -41,7 +41,7 @@ void lavrentev::show(std::istream &in,
   in >> name;
   if (db.find(name) != db.end())
   {
-    if (db.find(name)->second->lines.empty()) 
+    if (db.find(name)->second->lines.empty())
     {
       return;
     }
@@ -107,7 +107,7 @@ void lavrentev::mind(std::istream &in,
   in >> name;
   if (db.find(name) != db.end())
   {
-    if (db.find(name)->second->lines.empty()) 
+    if (db.find(name)->second->lines.empty())
     {
       return;
     }
