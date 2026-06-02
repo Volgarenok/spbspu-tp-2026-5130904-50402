@@ -39,4 +39,6 @@ namespace lavrentev
   void count(std::istream& is, std::vector< Polygon > plgs);
   void maxseq(std::istream& is, std::vector< Polygon > plgs);
   void intersections(std::istream& is, std::vector< Polygon > plgs);
+
+  static bool isEven(Polygon p);
 }

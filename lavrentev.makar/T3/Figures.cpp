@@ -1,8 +1,12 @@
-#include <cstddef>
+#include <iostream>
+#include <iterator>
 #include <map>
 #include <numeric>
 #include <cmath>
+#include <algorithm>
 #include "Figures.hpp"
+
+using namespace std::placeholders;
 
 void lavrentev::area(std::istream& is, std::vector< Polygon > plgs)
 {
@@ -40,13 +44,26 @@ void lavrentev::area(std::istream& is, std::vector< Polygon > plgs)
 
 void lavrentev::areaEven(std::vector< Polygon > plgs)
 {
+  std::vector< Polygon > evenPlgs;
+  std::copy_if(plgs.begin(), plgs.end(), std::back_inserter(evenPlgs), isEven);
+  std::vector< float > areas;
+  std::transform(
+    evenPlgs.begin(),
+    evenPlgs.end(),
+    areas.begin(),
+    std::bind(&lavrentev::Polygon::getArea, _1)
+  );
+  float total = std::accumulate(areas.begin(), areas.end(), 0.0f);
+  std::cout << total << "\n";
+}
 
+bool lavrentev::isEven(Polygon p)
+{
+  return p.points.size() % 2 == 0;
 }
 
 const float lavrentev::Polygon::getArea() const
 {
-  using namespace std::placeholders;
-
   std::vector< Triangle > triangles(points.size() - 2);
   size_t index = 1;
   std::generate(
@@ -60,7 +77,8 @@ const float lavrentev::Polygon::getArea() const
     triangles.begin(),
     triangles.end(),
     areas.begin(),
-    std::bind(&lavrentev::Triangle::getArea, _1));
+    std::bind(&lavrentev::Triangle::getArea, _1)
+  );
   float total = std::accumulate(areas.begin(), areas.end(), 0.0f);
 
   return total;
