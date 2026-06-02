@@ -10,7 +10,7 @@ using namespace std::placeholders;
 
 void lavrentev::area(std::istream& is, std::vector< Polygon > plgs)
 {
-  std::map< std::string, void (*)(std::vector< Polygon >) > cmds;
+  std::map< std::string, void (*)(const std::vector< Polygon >&) > cmds;
   cmds["EVEN"] = areaEven;
   cmds["ODD"] = areaOdd;
   cmds["MEAN"] = areaMean;
@@ -42,11 +42,11 @@ void lavrentev::area(std::istream& is, std::vector< Polygon > plgs)
   }
 }
 
-void lavrentev::areaEven(std::vector< Polygon > plgs)
+void lavrentev::areaEven(const std::vector< Polygon >& plgs)
 {
   std::vector< Polygon > evenPlgs;
   std::copy_if(plgs.begin(), plgs.end(), std::back_inserter(evenPlgs), isEven);
-  std::vector< float > areas;
+  std::vector< float > areas(evenPlgs.size());
   std::transform(
     evenPlgs.begin(),
     evenPlgs.end(),
@@ -60,6 +60,26 @@ void lavrentev::areaEven(std::vector< Polygon > plgs)
 bool lavrentev::isEven(Polygon p)
 {
   return p.points.size() % 2 == 0;
+}
+
+bool lavrentev::isOdd(Polygon p)
+{
+  return !isEven(p);
+}
+
+void lavrentev::areaOdd(const std::vector< Polygon >& plgs)
+{
+  std::vector< Polygon > oddPlgs;
+  std::copy_if(plgs.begin(), plgs.end(), std::back_inserter(oddPlgs), isOdd);
+  std::vector< float > areas(oddPlgs.size());
+  std::transform(
+    oddPlgs.begin(),
+    oddPlgs.end(),
+    areas.begin(),
+    std::bind(&lavrentev::Polygon::getArea, _1)
+  );
+  float total = std::accumulate(areas.begin(), areas.end(), 0.0f);
+  std::cout << total << "\n";
 }
 
 const float lavrentev::Polygon::getArea() const

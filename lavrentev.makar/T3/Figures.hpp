@@ -30,9 +30,9 @@ namespace lavrentev
   };
 
   void area(std::istream& is, std::vector< Polygon > plgs);
-  void areaEven(std::vector< Polygon > plgs);
-  void areaOdd(std::vector< Polygon > plgs);
-  void areaMean(std::vector< Polygon > plgs);
+  void areaEven(const std::vector< Polygon >& plgs);
+  void areaOdd(const std::vector< Polygon >& plgs);
+  void areaMean(const std::vector< Polygon >& plgs);
   void areaVrtxs(std::vector< Polygon > plgs, size_t n);
   void max(std::istream& is, std::vector< Polygon > plgs);
   void min(std::istream& is, std::vector< Polygon > plgs);
@@ -41,4 +41,5 @@ namespace lavrentev
   void intersections(std::istream& is, std::vector< Polygon > plgs);
 
   static bool isEven(Polygon p);
+  static bool isOdd(Polygon p);
 }
