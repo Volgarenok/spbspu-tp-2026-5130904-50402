@@ -59,7 +59,7 @@ void lavrentev::areaEven(std::istream&, const std::vector< Polygon >& plgs)
 
 bool lavrentev::isEven(Polygon p)
 {
-  return p.points.size() % 2 == 0;
+  return p.getSize() % 2 == 0;
 }
 
 bool lavrentev::isOdd(Polygon p)
@@ -101,7 +101,7 @@ void lavrentev::areaMean(std::istream&, const std::vector< Polygon >& plgs)
 
 bool lavrentev::isAmount(Polygon p, size_t n)
 {
-  return p.points.size() == n;
+  return p.getSize() == n;
 }
 
 void lavrentev::areaVrtxs(std::istream& is, const std::vector< Polygon >& plgs)
@@ -161,9 +161,27 @@ void lavrentev::maxArea(std::istream&, const std::vector< Polygon >& plgs)
   }
 }
 
+const size_t lavrentev::Polygon::getSize() const
+{
+  return points.size();
+}
+
+void lavrentev::maxVrtxs(std::istream&, const std::vector< Polygon >& plgs)
+{
+  auto mp = std::max_element(
+    plgs.begin(),
+    plgs.end(),
+    std::bind(&lavrentev::Polygon::getSize, _1)
+  );
+  if (mp != plgs.end())
+  {
+    std::cout << (*mp).getSize() << "\n";
+  }
+}
+
 const float lavrentev::Polygon::getArea() const
 {
-  std::vector< Triangle > triangles(points.size() - 2);
+  std::vector< Triangle > triangles(getSize() - 2);
   size_t index = 1;
   std::generate(
     triangles.begin(), 

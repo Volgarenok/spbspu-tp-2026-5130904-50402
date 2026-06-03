@@ -24,6 +24,7 @@ namespace lavrentev
   {
     std::vector< Point > points;
     const float getArea() const;
+    const size_t getSize() const;
 
     private:
       static Triangle helpArea(const std::vector< Point >& points, size_t& index);
@@ -36,7 +37,7 @@ namespace lavrentev
   void areaVrtxs(std::istream& is, const std::vector< Polygon >& plgs);
   void max(std::istream& is, const std::vector< Polygon >& plgs);
   void maxArea(std::istream&, const std::vector< Polygon >& plgs);
-  void maxVrtxs(std::istream&, const std::vector< Polygon >& plgs); //TODO
+  void maxVrtxs(std::istream&, const std::vector< Polygon >& plgs);
   void min(std::istream& is, const std::vector< Polygon >& plgs); //TODO
   void minArea(std::istream&, const std::vector< Polygon >& plgs); //TODO
   void minVrtxs(std::istream&, const std::vector< Polygon >& plgs); //TODO
