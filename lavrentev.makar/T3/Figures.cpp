@@ -179,6 +179,50 @@ void lavrentev::maxVrtxs(std::istream&, const std::vector< Polygon >& plgs)
   }
 }
 
+void lavrentev::min(std::istream& is, const std::vector< Polygon >& plgs)
+{
+  std::map< std::string, void (*)(std::istream&, const std::vector< Polygon >&) > cmds;
+  cmds["AREA"] = minArea;
+  cmds["VERTEXES"] = minVrtxs;
+  std::string param;
+  is >> param;
+  if (cmds.find(param) != cmds.end())
+  {
+    cmds[param](is, plgs);
+    return;
+  }
+  else
+  {
+    throw std::invalid_argument("Invalid command");
+  }
+}
+
+void lavrentev::minArea(std::istream&, const std::vector< Polygon >& plgs)
+{
+  auto mp = std::min_element(
+    plgs.begin(),
+    plgs.end(),
+    std::bind(&lavrentev::Polygon::getArea, _1)
+  );
+  if (mp != plgs.end())
+  {
+    std::cout << (*mp).getArea() << "\n";
+  }
+}
+
+void lavrentev::minVrtxs(std::istream&, const std::vector< Polygon >& plgs)
+{
+  auto mp = std::min_element(
+    plgs.begin(),
+    plgs.end(),
+    std::bind(&lavrentev::Polygon::getSize, _1)
+  );
+  if (mp != plgs.end())
+  {
+    std::cout << (*mp).getSize() << "\n";
+  }
+}
+
 const float lavrentev::Polygon::getArea() const
 {
   std::vector< Triangle > triangles(getSize() - 2);
