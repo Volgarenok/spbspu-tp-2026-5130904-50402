@@ -82,6 +82,19 @@ void lavrentev::areaOdd(const std::vector< Polygon >& plgs)
   std::cout << total << "\n";
 }
 
+void lavrentev::areaMean(const std::vector< Polygon >& plgs)
+{
+  std::vector< float > areas(plgs.size());
+  std::transform(
+    plgs.begin(),
+    plgs.end(),
+    areas.begin(),
+    std::bind(&lavrentev::Polygon::getArea, _1)
+  );
+  float total = std::accumulate(areas.begin(), areas.end(), 0.0f);
+  std::cout << total / areas.size() << "\n";
+}
+
 const float lavrentev::Polygon::getArea() const
 {
   std::vector< Triangle > triangles(points.size() - 2);

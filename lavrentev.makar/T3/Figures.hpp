@@ -32,13 +32,13 @@ namespace lavrentev
   void area(std::istream& is, std::vector< Polygon > plgs);
   void areaEven(const std::vector< Polygon >& plgs);
   void areaOdd(const std::vector< Polygon >& plgs);
-  void areaMean(const std::vector< Polygon >& plgs);
-  void areaVrtxs(std::vector< Polygon > plgs, size_t n);
-  void max(std::istream& is, std::vector< Polygon > plgs);
-  void min(std::istream& is, std::vector< Polygon > plgs);
-  void count(std::istream& is, std::vector< Polygon > plgs);
-  void maxseq(std::istream& is, std::vector< Polygon > plgs);
-  void intersections(std::istream& is, std::vector< Polygon > plgs);
+  void areaMean(const std::vector< Polygon >& plgs); //TODO
+  void areaVrtxs(std::vector< Polygon > plgs, size_t n); //TODO
+  void max(std::istream& is, std::vector< Polygon > plgs); //TODO
+  void min(std::istream& is, std::vector< Polygon > plgs); //TODO
+  void count(std::istream& is, std::vector< Polygon > plgs); //TODO
+  void maxseq(std::istream& is, std::vector< Polygon > plgs); //TODO
+  void intersections(std::istream& is, std::vector< Polygon > plgs); //TODO
 
   static bool isEven(Polygon p);
   static bool isOdd(Polygon p);
