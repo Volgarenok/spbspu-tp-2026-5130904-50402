@@ -29,16 +29,20 @@ namespace lavrentev
       static Triangle helpArea(const std::vector< Point >& points, size_t& index);
   };
 
-  void area(std::istream& is, std::vector< Polygon > plgs);
-  void areaEven(const std::vector< Polygon >& plgs);
-  void areaOdd(const std::vector< Polygon >& plgs);
-  void areaMean(const std::vector< Polygon >& plgs);
-  void areaVrtxs(std::istream& is, std::vector< Polygon > plgs); //TODO
-  void max(std::istream& is, std::vector< Polygon > plgs); //TODO
-  void min(std::istream& is, std::vector< Polygon > plgs); //TODO
-  void count(std::istream& is, std::vector< Polygon > plgs); //TODO
-  void maxseq(std::istream& is, std::vector< Polygon > plgs); //TODO
-  void intersections(std::istream& is, std::vector< Polygon > plgs); //TODO
+  void area(std::istream& is, const std::vector< Polygon > plgs);
+  void areaEven(std::istream&, const std::vector< Polygon >& plgs);
+  void areaOdd(std::istream&, const std::vector< Polygon >& plgs);
+  void areaMean(std::istream&, const std::vector< Polygon >& plgs);
+  void areaVrtxs(std::istream& is, const std::vector< Polygon >& plgs);
+  void max(std::istream& is, const std::vector< Polygon >& plgs);
+  void maxArea(std::istream&, const std::vector< Polygon >& plgs);
+  void maxVrtxs(std::istream&, const std::vector< Polygon >& plgs); //TODO
+  void min(std::istream& is, const std::vector< Polygon >& plgs); //TODO
+  void minArea(std::istream&, const std::vector< Polygon >& plgs); //TODO
+  void minVrtxs(std::istream&, const std::vector< Polygon >& plgs); //TODO
+  void count(std::istream& is, const std::vector< Polygon >& plgs); //TODO
+  void maxseq(std::istream& is, const std::vector< Polygon >& plgs); //TODO
+  void intersections(std::istream& is, const std::vector< Polygon >& plgs); //TODO
 
   static bool isEven(Polygon p);
   static bool isOdd(Polygon p);

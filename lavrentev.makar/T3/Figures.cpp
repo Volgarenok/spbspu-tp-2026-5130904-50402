@@ -8,9 +8,9 @@
 
 using namespace std::placeholders;
 
-void lavrentev::area(std::istream& is, std::vector< Polygon > plgs)
+void lavrentev::area(std::istream& is, const std::vector< Polygon > plgs)
 {
-  std::map< std::string, void (*)(const std::vector< Polygon >&) > cmds;
+  std::map< std::string, void (*)(std::istream&, const std::vector< Polygon >&) > cmds;
   cmds["EVEN"] = areaEven;
   cmds["ODD"] = areaOdd;
   cmds["MEAN"] = areaMean;
@@ -18,7 +18,7 @@ void lavrentev::area(std::istream& is, std::vector< Polygon > plgs)
   is >> param;
   if (cmds.find(param) != cmds.end())
   {
-    cmds[param](plgs);
+    cmds[param](is, plgs);
     return;
   }
   try
@@ -42,7 +42,7 @@ void lavrentev::area(std::istream& is, std::vector< Polygon > plgs)
   }
 }
 
-void lavrentev::areaEven(const std::vector< Polygon >& plgs)
+void lavrentev::areaEven(std::istream&, const std::vector< Polygon >& plgs)
 {
   std::vector< Polygon > evenPlgs;
   std::copy_if(plgs.begin(), plgs.end(), std::back_inserter(evenPlgs), isEven);
@@ -67,7 +67,7 @@ bool lavrentev::isOdd(Polygon p)
   return !isEven(p);
 }
 
-void lavrentev::areaOdd(const std::vector< Polygon >& plgs)
+void lavrentev::areaOdd(std::istream&, const std::vector< Polygon >& plgs)
 {
   std::vector< Polygon > oddPlgs;
   std::copy_if(plgs.begin(), plgs.end(), std::back_inserter(oddPlgs), isOdd);
@@ -82,7 +82,7 @@ void lavrentev::areaOdd(const std::vector< Polygon >& plgs)
   std::cout << total << "\n";
 }
 
-void lavrentev::areaMean(const std::vector< Polygon >& plgs)
+void lavrentev::areaMean(std::istream&, const std::vector< Polygon >& plgs)
 {
   if (!plgs.size())
   {
@@ -104,7 +104,7 @@ bool lavrentev::isAmount(Polygon p, size_t n)
   return p.points.size() == n;
 }
 
-void lavrentev::areaVrtxs(std::istream& is, std::vector< Polygon > plgs)
+void lavrentev::areaVrtxs(std::istream& is, const std::vector< Polygon >& plgs)
 {
   size_t n;
   is >> n;
@@ -128,6 +128,37 @@ void lavrentev::areaVrtxs(std::istream& is, std::vector< Polygon > plgs)
   );
   float total = std::accumulate(areas.begin(), areas.end(), 0.0f);
   std::cout << total << "\n";
+}
+
+void lavrentev::max(std::istream& is, const std::vector< Polygon >& plgs)
+{
+  std::map< std::string, void (*)(std::istream&, const std::vector< Polygon >&) > cmds;
+  cmds["AREA"] = maxArea;
+  cmds["VERTEXES"] = maxVrtxs;
+  std::string param;
+  is >> param;
+  if (cmds.find(param) != cmds.end())
+  {
+    cmds[param](is, plgs);
+    return;
+  }
+  else
+  {
+    throw std::invalid_argument("Invalid command");
+  }
+}
+
+void lavrentev::maxArea(std::istream&, const std::vector< Polygon >& plgs)
+{
+  auto mp = std::max_element(
+    plgs.begin(),
+    plgs.end(),
+    std::bind(&lavrentev::Polygon::getArea, _1)
+  );
+  if (mp != plgs.end())
+  {
+    std::cout << (*mp).getArea() << "\n";
+  }
 }
 
 const float lavrentev::Polygon::getArea() const
