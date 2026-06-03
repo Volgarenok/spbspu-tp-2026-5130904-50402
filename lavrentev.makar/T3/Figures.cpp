@@ -31,7 +31,7 @@ void lavrentev::area(std::istream& is, std::vector< Polygon > plgs)
     unsigned long long result = std::stoull(param, &pos);
     if (pos == param.length()) {
       size_t n = static_cast<size_t>(result);
-      areaVrtxs(plgs, n);
+      areaVrtxs(is, plgs);
     } else {
       throw std::invalid_argument("Invalid number");
     }
@@ -84,6 +84,10 @@ void lavrentev::areaOdd(const std::vector< Polygon >& plgs)
 
 void lavrentev::areaMean(const std::vector< Polygon >& plgs)
 {
+  if (!plgs.size())
+  {
+    return;
+  }
   std::vector< float > areas(plgs.size());
   std::transform(
     plgs.begin(),
@@ -93,6 +97,37 @@ void lavrentev::areaMean(const std::vector< Polygon >& plgs)
   );
   float total = std::accumulate(areas.begin(), areas.end(), 0.0f);
   std::cout << total / areas.size() << "\n";
+}
+
+bool lavrentev::isAmount(Polygon p, size_t n)
+{
+  return p.points.size() == n;
+}
+
+void lavrentev::areaVrtxs(std::istream& is, std::vector< Polygon > plgs)
+{
+  size_t n;
+  is >> n;
+  std::vector< Polygon > needPlgs;
+  std::copy_if(
+    plgs.begin(),
+    plgs.end(),
+    std::back_inserter(needPlgs),
+    std::bind(isAmount, _1, n)
+  );
+  if (!needPlgs.size())
+  {
+    return;
+  }
+  std::vector< float > areas(needPlgs.size());
+  std::transform(
+    needPlgs.begin(),
+    needPlgs.end(),
+    areas.begin(),
+    std::bind(&lavrentev::Polygon::getArea, _1)
+  );
+  float total = std::accumulate(areas.begin(), areas.end(), 0.0f);
+  std::cout << total << "\n";
 }
 
 const float lavrentev::Polygon::getArea() const
