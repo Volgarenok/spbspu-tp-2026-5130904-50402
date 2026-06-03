@@ -34,14 +34,17 @@ namespace lavrentev
   void areaEven(std::istream&, const std::vector< Polygon >& plgs);
   void areaOdd(std::istream&, const std::vector< Polygon >& plgs);
   void areaMean(std::istream&, const std::vector< Polygon >& plgs);
-  void areaVrtxs(std::istream& is, const std::vector< Polygon >& plgs);
+  void areaVrtxs(const std::vector< Polygon >& plgs, size_t n);
   void max(std::istream& is, const std::vector< Polygon >& plgs);
   void maxArea(std::istream&, const std::vector< Polygon >& plgs);
   void maxVrtxs(std::istream&, const std::vector< Polygon >& plgs);
   void min(std::istream& is, const std::vector< Polygon >& plgs);
   void minArea(std::istream&, const std::vector< Polygon >& plgs);
   void minVrtxs(std::istream&, const std::vector< Polygon >& plgs);
-  void count(std::istream& is, const std::vector< Polygon >& plgs); //TODO
+  void count(std::istream& is, const std::vector< Polygon >& plgs);
+  void countEven(std::istream&, const std::vector< Polygon >& plgs);
+  void countOdd(std::istream&, const std::vector< Polygon >& plgs);
+  void countVrtxs(const std::vector< Polygon >& plgs, size_t n); //TODO
   void maxseq(std::istream& is, const std::vector< Polygon >& plgs); //TODO
   void intersections(std::istream& is, const std::vector< Polygon >& plgs); //TODO
 
