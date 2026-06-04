@@ -158,6 +158,8 @@ std::istream& lavrentev::operator>>(std::istream& is, Polygon& plg)
 
   if (tail.find_first_not_of(" \t\r") != std::string::npos)
   {
+    is.clear();
+    is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     plg.points.clear();
     return is;
   }
