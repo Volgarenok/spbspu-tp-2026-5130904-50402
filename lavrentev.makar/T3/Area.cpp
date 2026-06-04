@@ -83,9 +83,9 @@ void lavrentev::areaOdd(std::istream &, const std::vector<Polygon> &plgs)
 
 void lavrentev::areaMean(std::istream &, const std::vector<Polygon> &plgs)
 {
-  if (!plgs.size())
+  if (plgs.empty())
   {
-    return;
+    throw std::logic_error("No figures"); 
   }
   std::vector<float> areas(plgs.size());
   std::transform(
@@ -100,6 +100,10 @@ void lavrentev::areaMean(std::istream &, const std::vector<Polygon> &plgs)
 
 void lavrentev::areaVrtxs(const std::vector<Polygon> &plgs, size_t n)
 {
+  if (plgs.empty())
+  {
+    throw std::logic_error("No figures"); 
+  }
   std::vector<Polygon> needPlgs;
   std::copy_if(
     plgs.begin(),
