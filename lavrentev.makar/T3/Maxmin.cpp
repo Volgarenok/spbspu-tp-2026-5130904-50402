@@ -30,7 +30,7 @@ void lavrentev::maxArea(std::istream &, const std::vector<Polygon> &plgs)
 {
   if (plgs.empty())
   {
-    throw std::logic_error("No shapes for MAX");
+    throw std::logic_error("No figures");
   }
   auto mp = std::max_element(
     plgs.begin(),
@@ -51,7 +51,7 @@ void lavrentev::maxVrtxs(std::istream &, const std::vector<Polygon> &plgs)
 {
   if (plgs.empty())
   {
-    throw std::logic_error("No shapes for MAX");
+    throw std::logic_error("No figures");
   }
   auto mp = std::max_element(
     plgs.begin(),
@@ -90,7 +90,7 @@ void lavrentev::minArea(std::istream &, const std::vector<Polygon> &plgs)
 {
   if (plgs.empty())
   {
-    throw std::logic_error("No shapes for MAX");
+    throw std::logic_error("No figures");
   }
   auto mp = std::min_element(
     plgs.begin(),
@@ -111,7 +111,7 @@ void lavrentev::minVrtxs(std::istream &, const std::vector<Polygon> &plgs)
 {
   if (plgs.empty())
   {
-    throw std::logic_error("No shapes for MAX");
+    throw std::logic_error("No figures");
   }
   auto mp = std::min_element(
     plgs.begin(),
