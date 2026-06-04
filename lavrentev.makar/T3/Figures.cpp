@@ -87,14 +87,21 @@ void lavrentev::maxseq(std::istream &is, const std::vector<Polygon> &plgs)
   std::vector<size_t> lengths(plgs.size());
   std::iota(lengths.begin(), lengths.end(), 1);
 
-  auto it = std::partition_point(
+  std::vector<bool> checks(plgs.size());
+
+  std::transform(
     lengths.begin(),
     lengths.end(),
+    checks.begin(),
     std::bind(helpMS, _1, std::ref(plgs), std::ref(p))
   );
 
-  size_t ms = std::distance(lengths.begin(), it);
-  std::cout << ms << "\n";
+  auto it = std::find(checks.rbegin(), checks.rend(), true);
+
+  size_t result = (it == checks.rend()) ? 0 :
+    std::distance(checks.begin(), it.base()) ;
+
+  std::cout << result << "\n";
 }
 
 bool lavrentev::helpMS(int n, const std::vector<Polygon> &plgs, const Polygon &p)
