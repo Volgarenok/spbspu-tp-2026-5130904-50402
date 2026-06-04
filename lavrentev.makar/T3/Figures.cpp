@@ -307,7 +307,7 @@ size_t rayAccum(
 
   if ((a.y > pt->y) != (b.y > pt->y))
   {
-    double x = a.x + (double)(pt->y - a.y) * (b.x - a.x) / (b.y - a.y);
+    double x = a.x + static_cast<double>(pt->y - a.y) * (b.x - a.x) / (b.y - a.y);
 
     if (x > pt->x)
     {
