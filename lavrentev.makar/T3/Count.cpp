@@ -3,6 +3,7 @@
 #include <map>
 #include <algorithm>
 #include <functional>
+#include <stdexcept>
 #include "Figures.hpp"
 #include "Count.hpp"
 
@@ -36,6 +37,10 @@ void lavrentev::count(std::istream &is, const std::vector<Polygon> &plgs)
     if (pos == param.length())
     {
       size_t n = static_cast<size_t>(result);
+      if (n < 3)
+      {
+        throw std::invalid_argument("Polygon has 3 or more points");
+      }
       countVrtxs(plgs, n);
     }
     else
@@ -50,21 +55,21 @@ void lavrentev::count(std::istream &is, const std::vector<Polygon> &plgs)
 
 void lavrentev::countEven(std::istream &, const std::vector<Polygon> &plgs)
 {
-  std::vector<Polygon> evenPlgs;
+  std::vector< Polygon > evenPlgs;
   std::copy_if(plgs.begin(), plgs.end(), std::back_inserter(evenPlgs), isEven);
   std::cout << evenPlgs.size() << "\n";
 }
 
 void lavrentev::countOdd(std::istream &, const std::vector<Polygon> &plgs)
 {
-  std::vector<Polygon> oddPlgs;
+  std::vector< Polygon > oddPlgs;
   std::copy_if(plgs.begin(), plgs.end(), std::back_inserter(oddPlgs), isOdd);
   std::cout << oddPlgs.size() << "\n";
 }
 
 void lavrentev::countVrtxs(const std::vector<Polygon> &plgs, size_t n)
 {
-  std::vector<Polygon> needPlgs;
+  std::vector< Polygon > needPlgs;
   std::copy_if(
     plgs.begin(),
     plgs.end(),

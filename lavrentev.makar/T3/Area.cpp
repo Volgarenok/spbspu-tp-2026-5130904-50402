@@ -35,6 +35,10 @@ void lavrentev::area(std::istream &is, const std::vector<Polygon> &plgs)
     if (pos == param.length())
     {
       size_t n = static_cast<size_t>(result);
+      if (n < 3)
+      {
+        throw std::invalid_argument("Polygon has 3 or more points");
+      }
       areaVrtxs(plgs, n);
     }
     else
