@@ -101,13 +101,28 @@ std::istream& lavrentev::operator>>(std::istream &is, Polygon& plg)
   {
     return is;
   }
-  size_t n;
-  is >> n;
+
+  size_t n = 0;
+  if (!(is >> n))
+  {
+    if (is.eof())
+    {
+      return is;
+    }
+    is.clear();
+    is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    plg.points.clear();
+    return is;
+  }
+
   std::copy_n(std::istream_iterator< Point >(is), n, plg.points.begin());
+  std::sort(plg.points.begin(), plg.points.end());
 
   if (!is)
   {
     is.clear();
+    is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    plg.points.clear();
   }
   return is;
 }
@@ -149,4 +164,14 @@ std::istream &lavrentev::operator>>(std::istream &is, Delimiter_t &del)
 {
   del.last = lavrentev::check(is, del.expected);
   return is;
+}
+
+bool lavrentev::Point::operator==(const Point& p)
+{
+  return (x == p.x) && (y == p.y);
+}
+
+bool lavrentev::Polygon::isEmpty() const
+{
+  return getSize() == 0;
 }

@@ -8,7 +8,7 @@
 
 using namespace std::placeholders;
 
-void lavrentev::area(std::istream& is, const std::vector< Polygon > plgs)
+void lavrentev::area(std::istream& is, const std::vector< Polygon >& plgs)
 {
   std::map< std::string, void (*)(std::istream&, const std::vector< Polygon >&) > cmds;
   cmds["EVEN"] = areaEven;

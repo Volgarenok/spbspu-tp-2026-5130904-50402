@@ -8,6 +8,8 @@ namespace lavrentev
   struct Point
   {
     int x, y;
+
+    bool operator==(const Point& p);
   };
 
   struct Triangle
@@ -27,6 +29,7 @@ namespace lavrentev
     std::vector< Point > points;
     const float getArea() const;
     const size_t getSize() const;
+    bool isEmpty() const;
 
     bool operator==(const Polygon& p);
 
