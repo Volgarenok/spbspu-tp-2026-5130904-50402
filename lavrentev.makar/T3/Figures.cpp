@@ -215,7 +215,7 @@ bool lavrentev::Point::operator<(const Point &other) const
   return c1 || c2;
 }
 
-lavrentev::Point readPoint(std::istream* is)
+lavrentev::Point lavrentev::readPoint(std::istream* is)
   {
     lavrentev::Point p;
     (*is) >> p;
