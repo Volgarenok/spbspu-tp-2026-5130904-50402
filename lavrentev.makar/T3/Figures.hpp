@@ -1,6 +1,6 @@
 #ifndef FIGURES_HPP
 #define FIGURES_HPP
-#include <cstddef>
+#include <iostream>
 #include <vector>
 
 namespace lavrentev

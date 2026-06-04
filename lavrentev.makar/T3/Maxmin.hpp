@@ -1,5 +1,6 @@
 #ifndef MAXMIN_HPP
 #define MAXMIN_HPP
+#include <istream>
 #include "Figures.hpp"
 
 namespace lavrentev

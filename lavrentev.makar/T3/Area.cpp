@@ -3,6 +3,7 @@
 #include <map>
 #include <numeric>
 #include <algorithm>
+#include <functional>
 #include "Area.hpp"
 #include "Figures.hpp"
 

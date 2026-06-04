@@ -2,6 +2,7 @@
 #include <iterator>
 #include <map>
 #include <algorithm>
+#include <functional>
 #include "Figures.hpp"
 #include "Count.hpp"
 

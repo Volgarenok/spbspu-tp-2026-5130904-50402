@@ -1,6 +1,7 @@
 #ifndef COUNT_HPP
 #define COUNT_HPP
 #include <iostream>
+#include <istream>
 #include "Figures.hpp"
 
 namespace lavrentev

@@ -1,4 +1,7 @@
 #include <fstream>
+#include <algorithm>
+#include <iterator>
+#include <functional>
 #include "readfile.hpp"
 #include "Figures.hpp"
 

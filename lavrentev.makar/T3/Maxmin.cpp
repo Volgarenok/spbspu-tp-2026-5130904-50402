@@ -1,6 +1,7 @@
 #include <iostream>
 #include <map>
 #include <algorithm>
+#include <functional>
 #include "Figures.hpp"
 #include "Maxmin.hpp"
 
