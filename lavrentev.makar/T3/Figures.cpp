@@ -79,7 +79,7 @@ void lavrentev::maxseq(std::istream &is, const std::vector<Polygon> &plgs)
   Polygon p;
   is >> p;
 
-  if (p.isEmpty())
+  if (p.isEmpty() || !is)
   {
     throw std::invalid_argument("Invalid data");
   }
@@ -390,7 +390,7 @@ void lavrentev::intersections(std::istream& is, const std::vector<Polygon>& plgs
   Polygon p;
   is >> p;
 
-  if (p.isEmpty())
+  if (p.isEmpty() || !is)
   {
     throw std::invalid_argument("Invalid data");
   }
