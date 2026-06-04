@@ -117,7 +117,7 @@ std::istream &lavrentev::operator>>(std::istream &is, Polygon &plg)
   }
 
   size_t n = 0;
-  if (!(is >> n))
+  if (!(is >> n) || n < 3)
   {
     if (is.eof())
     {

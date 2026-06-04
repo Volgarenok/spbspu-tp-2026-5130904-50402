@@ -91,7 +91,7 @@ void lavrentev::areaMean(std::istream &, const std::vector<Polygon> &plgs)
     std::bind(&lavrentev::Polygon::getArea, _1)
   );
   float total = std::accumulate(areas.begin(), areas.end(), 0.0f);
-  std::cout << total / areas.size() << "\n";
+  std::cout << std::fixed << std::setprecision(1) << total / areas.size() << "\n";
 }
 
 void lavrentev::areaVrtxs(const std::vector<Polygon> &plgs, size_t n)
