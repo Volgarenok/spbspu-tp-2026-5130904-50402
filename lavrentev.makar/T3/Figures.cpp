@@ -132,10 +132,14 @@ std::istream& lavrentev::operator>>(std::istream& is, Polygon& plg)
   std::vector<Point> temp;
   temp.reserve(n);
 
-  std::copy_n(
-    std::istream_iterator<Point>(is),
-    n,
-    std::back_inserter(temp)
+  auto it = std::istream_iterator<Point>(is);
+  auto end = std::istream_iterator<Point>();
+
+  std::copy_if(
+    it,
+    end,
+    std::back_inserter(temp),
+    std::bind(lessThanN, std::placeholders::_1, &temp, n)
   );
 
   if (temp.size() != n)
@@ -151,8 +155,6 @@ std::istream& lavrentev::operator>>(std::istream& is, Polygon& plg)
 
   if (tail.find_first_not_of(" \t\r") != std::string::npos)
   {
-    is.clear();
-    is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     plg.points.clear();
     return is;
   }
@@ -215,6 +217,11 @@ bool lavrentev::Point::operator<(const Point &other) const
   bool c1 = x < other.x;
   bool c2 = x == other.x && y < other.y;
   return c1 || c2;
+}
+
+bool lavrentev::lessThanN(const Point&, std::vector<Point>* vec, size_t n)
+{
+  return vec->size() < n;
 }
 
 void lavrentev::intersections(std::istream &, const std::vector<Polygon> &)
