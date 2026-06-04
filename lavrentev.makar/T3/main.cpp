@@ -1,10 +1,11 @@
 #include <iostream>
 #include <map>
+#include <limits>
 #include "Figures.hpp"
 #include "Area.hpp"
 #include "Maxmin.hpp"
 #include "Count.hpp"
-#include "readfile.cpp"
+#include "readfile.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -34,5 +35,28 @@ int main(int argc, char* argv[])
   commands["MAXSEQ"] = lavrentev::maxseq;
   commands["INTERSECTIONS"] = lavrentev::intersections;
 
+  std::string cmd;
+  while (std::cin >> cmd)
+  {
+    try
+    {
+      if (commands.find(cmd) == commands.end())
+      {
+        throw std::logic_error("Unknown command");
+      }
+      commands[cmd](std::cin, plgs);
+    }
+    catch (...)
+    {
+      std::cout << "<INVALID COMMAND>" << "\n";
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    }
+  }
 
+  if (!std::cin.eof())
+  {
+    std::cerr << "Bad input\n";
+    return 1;
+  }
 }

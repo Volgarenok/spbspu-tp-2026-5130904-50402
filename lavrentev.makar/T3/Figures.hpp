@@ -9,7 +9,8 @@ namespace lavrentev
   {
     int x, y;
 
-    bool operator==(const Point& p);
+    bool operator==(const Point& p) const;
+    bool operator<(const Point& other) const;
   };
 
   struct Triangle
@@ -17,21 +18,22 @@ namespace lavrentev
     static const size_t size = 3;
     std::vector< Point > points = std::vector< Point >(size);
 
+    Triangle() = default;
     Triangle(Point a, Point b, Point c):
       points{a, b, c}
     {}
 
-    const float getArea() const;
+    float getArea() const;
   };
 
   struct Polygon
   {
     std::vector< Point > points;
-    const float getArea() const;
-    const size_t getSize() const;
+    float getArea() const;
+    size_t getSize() const;
     bool isEmpty() const;
 
-    bool operator==(const Polygon& p);
+    bool operator==(const Polygon& p) const;
 
     private:
       static Triangle helpArea(const std::vector< Point >& points, size_t& index);

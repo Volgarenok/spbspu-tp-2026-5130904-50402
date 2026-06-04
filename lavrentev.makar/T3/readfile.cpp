@@ -1,12 +1,8 @@
 #include <fstream>
+#include "readfile.hpp"
 #include "Figures.hpp"
 
-namespace lavrentev
-{
-  void readfile(std::string name, std::vector< Polygon >& plgs);
-}
-
-inline void lavrentev::readfile(std::string name, std::vector< Polygon >& plgs)
+void lavrentev::readfile(std::string name, std::vector< Polygon >& plgs)
 {
   std::ifstream file(name);
   if (!file.is_open())

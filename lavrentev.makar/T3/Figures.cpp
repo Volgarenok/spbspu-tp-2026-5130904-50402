@@ -22,12 +22,12 @@ bool lavrentev::isAmount(Polygon p, size_t n)
   return p.getSize() == n;
 }
 
-const size_t lavrentev::Polygon::getSize() const
+size_t lavrentev::Polygon::getSize() const
 {
   return points.size();
 }
 
-const float lavrentev::Polygon::getArea() const
+float lavrentev::Polygon::getArea() const
 {
   std::vector< Triangle > triangles(getSize() - 2);
   size_t index = 1;
@@ -51,12 +51,12 @@ const float lavrentev::Polygon::getArea() const
 
 lavrentev::Triangle lavrentev::Polygon::helpArea(const std::vector< Point >& points, size_t& index)
 {
-  Triangle ans = Triangle(points[0], points[index], points[index + 1]);
+  Triangle ans = Triangle{points[0], points[index], points[index + 1]};
   ++index;
   return ans;
 }
 
-const float lavrentev::Triangle::getArea() const
+float lavrentev::Triangle::getArea() const
 {
   int x1 = points[0].x;
   int x2 = points[1].x;
@@ -89,7 +89,7 @@ bool lavrentev::helpMS(int n, const std::vector< Polygon >& plgs, const Polygon&
   return std::search_n(plgs.begin(), plgs.end(), n, p, std::equal_to<Polygon>{}) != plgs.end();
 }
 
-bool lavrentev::Polygon::operator==(const Polygon& p)
+bool lavrentev::Polygon::operator==(const Polygon& p) const
 {
   return points == p.points;
 }
@@ -116,7 +116,6 @@ std::istream& lavrentev::operator>>(std::istream &is, Polygon& plg)
   }
 
   std::copy_n(std::istream_iterator< Point >(is), n, plg.points.begin());
-  std::sort(plg.points.begin(), plg.points.end());
 
   if (!is)
   {
@@ -166,7 +165,7 @@ std::istream &lavrentev::operator>>(std::istream &is, Delimiter_t &del)
   return is;
 }
 
-bool lavrentev::Point::operator==(const Point& p)
+bool lavrentev::Point::operator==(const Point& p) const
 {
   return (x == p.x) && (y == p.y);
 }
@@ -175,3 +174,12 @@ bool lavrentev::Polygon::isEmpty() const
 {
   return getSize() == 0;
 }
+
+bool lavrentev::Point::operator<(const Point& other) const
+{
+  bool c1 = x < other.x;
+  bool c2 = x == other.x && y < other.y;
+  return c1 || c2;
+}
+
+void lavrentev::intersections(std::istream&, const std::vector< Polygon >&) {}
