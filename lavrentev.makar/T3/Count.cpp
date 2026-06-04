@@ -15,6 +15,10 @@ void lavrentev::count(std::istream &is, const std::vector<Polygon> &plgs)
   cmds["ODD"] = countOdd;
   std::string param;
   is >> param;
+  if (param.empty())
+  {
+    return;
+  }
   if (cmds.find(param) != cmds.end())
   {
     cmds[param](is, plgs);

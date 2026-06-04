@@ -31,6 +31,10 @@ size_t lavrentev::Polygon::getSize() const
 
 float lavrentev::Polygon::getArea() const
 {
+  if (getSize() < 3)
+  {
+    return 0;
+  }
   std::vector<Triangle> triangles(getSize() - 2);
   size_t index = 1;
   std::generate(
@@ -122,6 +126,7 @@ std::istream &lavrentev::operator>>(std::istream &is, Polygon &plg)
     return is;
   }
 
+  plg.points.resize(n);
   std::copy_n(std::istream_iterator<Point>(is), n, plg.points.begin());
 
   if (!is)
