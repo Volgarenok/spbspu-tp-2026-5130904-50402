@@ -132,17 +132,12 @@ std::istream& lavrentev::operator>>(std::istream& is, Polygon& plg)
   std::vector<Point> temp;
   temp.reserve(n);
 
-  auto it = std::istream_iterator<Point>(is);
+  auto begin = std::istream_iterator<Point>(is);
   auto end = std::istream_iterator<Point>();
 
-  std::copy_if(
-    it,
-    end,
-    std::back_inserter(temp),
-    std::bind(lessThanN, std::placeholders::_1, &temp, n)
-  );
+  std::copy_n(begin, n, std::back_inserter(temp));
 
-  if (temp.size() != n)
+  if (temp.size() != n || !is)
   {
     is.clear();
     is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
