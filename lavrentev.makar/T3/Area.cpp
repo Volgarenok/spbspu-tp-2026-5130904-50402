@@ -3,6 +3,7 @@
 #include <map>
 #include <numeric>
 #include <algorithm>
+#include <iomanip>
 #include <functional>
 #include "Area.hpp"
 #include "Figures.hpp"
@@ -58,7 +59,7 @@ void lavrentev::areaEven(std::istream &, const std::vector<Polygon> &plgs)
     std::bind(&lavrentev::Polygon::getArea, _1)
   );
   float total = std::accumulate(areas.begin(), areas.end(), 0.0f);
-  std::cout << total << "\n";
+  std::cout << std::fixed << std::setprecision(1) << total << "\n";
 }
 
 void lavrentev::areaOdd(std::istream &, const std::vector<Polygon> &plgs)
@@ -73,7 +74,7 @@ void lavrentev::areaOdd(std::istream &, const std::vector<Polygon> &plgs)
     std::bind(&lavrentev::Polygon::getArea, _1)
   );
   float total = std::accumulate(areas.begin(), areas.end(), 0.0f);
-  std::cout << total << "\n";
+  std::cout << std::fixed << std::setprecision(1) << total << "\n";
 }
 
 void lavrentev::areaMean(std::istream &, const std::vector<Polygon> &plgs)
@@ -114,5 +115,5 @@ void lavrentev::areaVrtxs(const std::vector<Polygon> &plgs, size_t n)
     std::bind(&lavrentev::Polygon::getArea, _1)
   );
   float total = std::accumulate(areas.begin(), areas.end(), 0.0f);
-  std::cout << total << "\n";
+  std::cout << std::fixed << std::setprecision(1) << total << "\n";
 }

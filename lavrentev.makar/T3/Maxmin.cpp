@@ -2,6 +2,7 @@
 #include <map>
 #include <algorithm>
 #include <functional>
+#include <iomanip>
 #include "Figures.hpp"
 #include "Maxmin.hpp"
 
@@ -38,7 +39,7 @@ void lavrentev::maxArea(std::istream &, const std::vector<Polygon> &plgs)
   );
   if (mp != plgs.end())
   {
-    std::cout << (*mp).getArea() << "\n";
+    std::cout << std::fixed << std::setprecision(1) << (*mp).getArea() << "\n";
   }
 }
 
@@ -90,7 +91,7 @@ void lavrentev::minArea(std::istream &, const std::vector<Polygon> &plgs)
   );
   if (mp != plgs.end())
   {
-    std::cout << (*mp).getArea() << "\n";
+    std::cout << std::fixed << std::setprecision(1) << (*mp).getArea() << "\n";
   }
 }
 

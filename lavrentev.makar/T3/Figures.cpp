@@ -77,7 +77,10 @@ float lavrentev::Triangle::getArea() const
 void lavrentev::maxseq(std::istream &is, const std::vector<Polygon> &plgs)
 {
   Polygon p;
-  is >> p;
+  if (!(is >> p))
+  {
+    throw std::invalid_argument("Invalid data");
+  }
   std::vector<size_t> lengths(plgs.size());
   std::iota(lengths.begin(), lengths.end(), 1);
 
