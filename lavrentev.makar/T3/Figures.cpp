@@ -127,7 +127,7 @@ std::istream &lavrentev::operator>>(std::istream &is, Polygon &plg)
     {
       return is;
     }
-    is.clear(is.rdstate() & ~std::ios_base::failbit); 
+    is.clear(is.rdstate() & ~std::ios_base::failbit);
     is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     plg.points.clear();
     return is;
