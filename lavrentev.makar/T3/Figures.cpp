@@ -88,3 +88,65 @@ bool lavrentev::helpMS(int n, const std::vector< Polygon >& plgs, const Polygon&
 {
   return std::search_n(plgs.begin(), plgs.end(), n, p, std::equal_to<Polygon>{}) != plgs.end();
 }
+
+bool lavrentev::Polygon::operator==(const Polygon& p)
+{
+  return points == p.points;
+}
+
+std::istream& lavrentev::operator>>(std::istream &is, Polygon& plg)
+{
+  std::istream::sentry s(is);
+  if (!s)
+  {
+    return is;
+  }
+  size_t n;
+  is >> n;
+  std::copy_n(std::istream_iterator< Point >(is), n, plg.points.begin());
+
+  if (!is)
+  {
+    is.clear();
+  }
+  return is;
+}
+
+std::istream& lavrentev::operator>>(std::istream &is, Point& p)
+{
+  std::istream::sentry s(is);
+  if (!s)
+  {
+    return is;
+  }
+  using d_t = Delimiter_t;
+  char last = 0;
+  d_t dlmInBracket{'(', last};
+  d_t dlmColon{';', last};
+  d_t dlmOutBracket{')', last};
+  int x, y;
+  is >> dlmInBracket >> x >> dlmColon >> y >> dlmOutBracket;
+  if (!is)
+  {
+    return is;
+  }
+  p = Point{x, y};
+  return is;
+}
+
+char lavrentev::check(std::istream &is, char expected)
+{
+  char c = 0;
+  is >> c;
+  if (c != expected)
+  {
+    is.setstate(std::ios_base::failbit);
+  }
+  return c;
+}
+
+std::istream &lavrentev::operator>>(std::istream &is, Delimiter_t &del)
+{
+  del.last = lavrentev::check(is, del.expected);
+  return is;
+}
