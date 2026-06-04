@@ -4,7 +4,6 @@
 #include <iostream>
 #include <functional>
 #include <iterator>
-#include <limits>
 #include "Figures.hpp"
 
 using namespace std::placeholders;
@@ -33,7 +32,7 @@ float lavrentev::Polygon::getArea() const
 {
   if (getSize() < 3)
   {
-    return 0;
+    return 0.0f;
   }
   std::vector<Triangle> triangles(getSize() - 2);
   size_t index = 1;
@@ -77,14 +76,13 @@ float lavrentev::Triangle::getArea() const
 void lavrentev::maxseq(std::istream &is, const std::vector<Polygon> &plgs)
 {
   Polygon p;
-  if (!(is >> p))
-  {
-    throw std::invalid_argument("Invalid data");
-  }
+  is >> p;
+
   if (p.isEmpty())
   {
     throw std::invalid_argument("Invalid data");
   }
+
   std::vector<size_t> lengths(plgs.size());
   std::iota(lengths.begin(), lengths.end(), 1);
 
@@ -93,6 +91,7 @@ void lavrentev::maxseq(std::istream &is, const std::vector<Polygon> &plgs)
     lengths.end(),
     std::bind(helpMS, _1, std::ref(plgs), std::ref(p))
   );
+
   size_t ms = std::distance(lengths.begin(), it);
   std::cout << ms << "\n";
 }
@@ -112,7 +111,7 @@ bool lavrentev::Polygon::operator==(const Polygon &p) const
   return points == p.points;
 }
 
-std::istream &lavrentev::operator>>(std::istream &is, Polygon &plg)
+std::istream& lavrentev::operator>>(std::istream& is, Polygon& plg)
 {
   std::istream::sentry s(is);
   if (!s)
@@ -123,10 +122,6 @@ std::istream &lavrentev::operator>>(std::istream &is, Polygon &plg)
   size_t n = 0;
   if (!(is >> n) || n < 3)
   {
-    if (is.eof())
-    {
-      return is;
-    }
     is.clear();
     is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     plg.points.clear();
@@ -135,20 +130,31 @@ std::istream &lavrentev::operator>>(std::istream &is, Polygon &plg)
 
   std::vector<Point> temp;
   temp.reserve(n);
-  std::copy_n(std::istream_iterator<Point>(is), n, std::back_inserter(temp));
+
+  std::copy_n(
+    std::istream_iterator<Point>(is),
+    n,
+    std::back_inserter(temp)
+  );
+
+  if (temp.size() != n)
+  {
+    is.clear();
+    is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    plg.points.clear();
+    return is;
+  }
 
   std::string tail;
   std::getline(is, tail);
 
-  if (temp.size() != n || !is || tail.find_first_not_of(" \t\r") != std::string::npos)
+  if (tail.find_first_not_of(" \t\r") != std::string::npos)
   {
-    is.clear();
     plg.points.clear();
+    return is;
   }
-  else
-  {
-    plg.points = std::move(temp);
-  }
+
+  plg.points = std::move(temp);
   return is;
 }
 
