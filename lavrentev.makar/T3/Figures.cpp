@@ -229,6 +229,179 @@ lavrentev::Point lavrentev::readPoint(std::istream* is)
     return p;
   }
 
-void lavrentev::intersections(std::istream &, const std::vector<Polygon> &)
+int orient(const lavrentev::Point& a, const lavrentev::Point& b, const lavrentev::Point& c)
 {
+  long long val = 1 * (b.y - a.y) * (c.x - b.x) - 1 * (b.x - a.x) * (c.y - b.y);
+
+  if (val == 0)
+  {
+    return 0;
+  }
+  return (val > 0) ? 1 : 2;
+}
+
+bool segInter(
+  const lavrentev::Point& p1,
+  const lavrentev::Point& q1,
+  const lavrentev::Point& p2,
+  const lavrentev::Point& q2)
+{
+  int o1 = orient(p1, q1, p2);
+  int o2 = orient(p1, q1, q2);
+  int o3 = orient(p2, q2, p1);
+  int o4 = orient(p2, q2, q1);
+
+  return (o1 != o2 && o3 != o4);
+}
+
+bool checkPair(
+  size_t j,
+  const std::vector<lavrentev::Point>* ptsB,
+  const lavrentev::Point* a1,
+  const lavrentev::Point* a2)
+{
+  const lavrentev::Point& b1 = (*ptsB)[j];
+  const lavrentev::Point& b2 = (*ptsB)[(j + 1) % ptsB->size()];
+
+  return segInter(*a1, *a2, b1, b2);
+}
+
+bool edgeInterAll(
+  size_t idxA,
+  const lavrentev::Polygon* A,
+  const lavrentev::Polygon* B)
+{
+  const auto& ptsA = A->points;
+  const auto& ptsB = B->points;
+
+  const lavrentev::Point& a1 = ptsA[idxA];
+  const lavrentev::Point& a2 = ptsA[(idxA + 1) % ptsA.size()];
+
+  std::vector<size_t> idxB(ptsB.size());
+  std::iota(idxB.begin(), idxB.end(), 0);
+
+  return std::any_of(
+    idxB.begin(),
+    idxB.end(),
+    std::bind(
+      checkPair,
+      std::placeholders::_1,
+      &ptsB,
+      &a1,
+      &a2
+    )
+  );
+}
+
+size_t rayAccum(
+  size_t acc,
+  const lavrentev::Point&,
+  const std::vector<lavrentev::Point>* pts,
+  const lavrentev::Point* pt,
+  size_t* index)
+{
+  const auto& a = (*pts)[*index];
+  const auto& b = (*pts)[(*index + 1) % pts->size()];
+
+  ++(*index);
+
+  if ((a.y > pt->y) != (b.y > pt->y))
+  {
+    double x = a.x + (double)(pt->y - a.y) * (b.x - a.x) / (b.y - a.y);
+
+    if (x > pt->x)
+    {
+      return acc + 1;
+    }
+  }
+
+  return acc;
+}
+
+bool pInside(const lavrentev::Polygon& poly, const lavrentev::Point& pt)
+{
+  if (poly.points.empty())
+  {
+    return false;
+  }
+
+  const auto& pts = poly.points;
+
+  size_t index = 0;
+
+  size_t count = std::accumulate(
+    pts.begin(),
+    pts.end(),
+    size_t(0),
+    std::bind(
+      rayAccum,
+      std::placeholders::_1,
+      std::placeholders::_2,
+      &pts,
+      &pt,
+      &index
+    )
+  );
+
+  return count % 2 == 1;
+}
+
+bool polyInter(const lavrentev::Polygon& A, const lavrentev::Polygon& B)
+{
+  if (A.points.empty() || B.points.empty())
+  {
+    return false;
+  }
+
+  std::vector<size_t> idxA(A.points.size());
+  std::iota(idxA.begin(), idxA.end(), 0);
+
+  bool edges = std::any_of(
+    idxA.begin(),
+    idxA.end(),
+    std::bind(
+      edgeInterAll,
+      std::placeholders::_1,
+      &A,
+      &B
+    )
+  );
+
+  if (edges)
+  {
+    return true;
+  }
+  if (pInside(A, B.points.front()))
+  {
+    return true;
+  }
+  if (pInside(B, A.points.front()))
+  {
+    return true;
+  }
+
+  return false;
+}
+
+void lavrentev::intersections(std::istream& is, const std::vector<Polygon>& plgs)
+{
+  Polygon p;
+  is >> p;
+
+  if (p.isEmpty())
+  {
+    throw std::invalid_argument("Invalid data");
+  }
+
+  size_t count = std::count_if(
+    plgs.begin(),
+    plgs.end(),
+    std::bind(
+      polyInter,
+      std::placeholders::_1,
+      std::cref(p)
+    )
+  );
+
+  std::cout << count << "\n";
 }

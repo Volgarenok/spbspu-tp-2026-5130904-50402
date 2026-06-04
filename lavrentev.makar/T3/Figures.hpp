@@ -48,7 +48,7 @@ namespace lavrentev
   std::istream &operator>>(std::istream &is, Delimiter_t &del);
 
   void maxseq(std::istream &is, const std::vector<Polygon> &plgs);
-  void intersections(std::istream &is, const std::vector<Polygon> &plgs); // TODO
+  void intersections(std::istream &is, const std::vector<Polygon> &plgs);
 
   bool isEven(Polygon p);
   bool isOdd(Polygon p);
