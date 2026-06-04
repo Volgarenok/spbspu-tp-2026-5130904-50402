@@ -81,6 +81,10 @@ void lavrentev::maxseq(std::istream &is, const std::vector<Polygon> &plgs)
   {
     throw std::invalid_argument("Invalid data");
   }
+  if (p.isEmpty())
+  {
+    throw std::invalid_argument("Invalid data");
+  }
   std::vector<size_t> lengths(plgs.size());
   std::iota(lengths.begin(), lengths.end(), 1);
 
