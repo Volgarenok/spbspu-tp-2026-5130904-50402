@@ -127,20 +127,26 @@ std::istream &lavrentev::operator>>(std::istream &is, Polygon &plg)
     {
       return is;
     }
-    is.clear();
+    is.clear(is.rdstate() & ~std::ios_base::failbit); 
     is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     plg.points.clear();
     return is;
   }
 
-  plg.points.resize(n);
-  std::copy_n(std::istream_iterator<Point>(is), n, plg.points.begin());
+  std::vector<Point> temp;
+  temp.reserve(n);
 
-  if (!is)
+  std::copy_n(std::istream_iterator<Point>(is), n, std::back_inserter(temp));
+
+  if (temp.size() != n || !is)
   {
     is.clear();
     is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     plg.points.clear();
+  }
+  else
+  {
+    plg.points = std::move(temp);
   }
   return is;
 }
