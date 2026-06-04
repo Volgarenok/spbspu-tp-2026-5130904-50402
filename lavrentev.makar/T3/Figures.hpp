@@ -28,16 +28,20 @@ namespace lavrentev
     const float getArea() const;
     const size_t getSize() const;
 
+    std::istream& operator>>(std::istream &is);
+    bool operator==(const Polygon& p);
+
     private:
       static Triangle helpArea(const std::vector< Point >& points, size_t& index);
   };
 
-  void maxseq(std::istream& is, const std::vector< Polygon >& plgs); //TODO
+  void maxseq(std::istream& is, const std::vector< Polygon >& plgs);
   void intersections(std::istream& is, const std::vector< Polygon >& plgs); //TODO
 
   bool isEven(Polygon p);
   bool isOdd(Polygon p);
   bool isAmount(Polygon p, size_t n);
+  bool helpMS(int n, const std::vector< Polygon >& plgs, const Polygon& p);
 }
 
 #endif
