@@ -4,7 +4,7 @@
 
 namespace lavrentev
 {
-  void readfile(std::string name, std::vector< Polygon >& plgs);
+  void readfile(std::string name, std::vector<Polygon> &plgs);
 }
 
 #endif
