@@ -127,7 +127,7 @@ std::istream &lavrentev::operator>>(std::istream &is, Polygon &plg)
     {
       return is;
     }
-    is.clear(is.rdstate() & ~std::ios_base::failbit);
+    is.clear();
     is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     plg.points.clear();
     return is;
@@ -138,7 +138,14 @@ std::istream &lavrentev::operator>>(std::istream &is, Polygon &plg)
 
   std::copy_n(std::istream_iterator<Point>(is), n, std::back_inserter(temp));
 
-  if (temp.size() != n || !is)
+  bool hasExtra = false;
+  if (is)
+  {
+    is >> std::ws;
+    if (is.peek() == '(') hasExtra = true;
+  }
+
+  if (temp.size() != n || !is || hasExtra)
   {
     is.clear();
     is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');

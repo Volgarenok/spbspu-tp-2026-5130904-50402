@@ -100,10 +100,6 @@ void lavrentev::areaMean(std::istream &, const std::vector<Polygon> &plgs)
 
 void lavrentev::areaVrtxs(const std::vector<Polygon> &plgs, size_t n)
 {
-  if (plgs.empty())
-  {
-    throw std::logic_error("No figures");
-  }
   std::vector<Polygon> needPlgs;
   std::copy_if(
     plgs.begin(),
@@ -111,8 +107,9 @@ void lavrentev::areaVrtxs(const std::vector<Polygon> &plgs, size_t n)
     std::back_inserter(needPlgs),
     std::bind(isAmount, _1, n)
   );
-  if (!needPlgs.size())
+  if (needPlgs.empty())
   {
+    std::cout << std::fixed << std::setprecision(1) << 0.0f << "\n";
     return;
   }
   std::vector<float> areas(needPlgs.size());
