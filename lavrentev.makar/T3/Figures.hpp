@@ -55,7 +55,7 @@ namespace lavrentev
   bool isAmount(Polygon p, size_t n);
   bool helpMS(int n, const std::vector<Polygon> &plgs, const Polygon &p);
   char check(std::istream &is, char expected);
-  bool lessThanN(const Point&, std::vector<Point>* vec, size_t n);
+  Point readPoint(std::istream* is);
 }
 
 #endif
