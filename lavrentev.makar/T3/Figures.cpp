@@ -135,20 +135,14 @@ std::istream &lavrentev::operator>>(std::istream &is, Polygon &plg)
 
   std::vector<Point> temp;
   temp.reserve(n);
-
   std::copy_n(std::istream_iterator<Point>(is), n, std::back_inserter(temp));
 
-  bool hasExtra = false;
-  if (is)
-  {
-    is >> std::ws;
-    if (is.peek() == '(') hasExtra = true;
-  }
+  std::string tail;
+  std::getline(is, tail);
 
-  if (temp.size() != n || !is || hasExtra)
+  if (temp.size() != n || !is || tail.find_first_not_of(" \t\r") != std::string::npos)
   {
     is.clear();
-    is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     plg.points.clear();
   }
   else
