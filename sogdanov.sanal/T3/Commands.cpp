@@ -7,8 +7,29 @@
 #include <string>
 #include <stdexcept>
 #include <cmath>
+#include <cctype>
 
 namespace sogdanov {
+
+  struct CheckNotSpace {
+    bool operator()(char c) const
+    {
+      return !std::isspace(static_cast< unsigned char >(c));
+    }
+  };
+
+  void checkTrailingGarbage(std::istream& in)
+  {
+    std::string rest;
+    if (std::getline(in, rest)) {
+      if (std::any_of(rest.begin(), rest.end(), CheckNotSpace())) {
+        if (!in.eof()) {
+          in.putback('\n');
+        }
+        throw std::logic_error("Trailing garbage");
+      }
+    }
+  }
 
   struct MultiplyCross {
     double operator()(const Point& a, const Point& b) const
@@ -81,6 +102,7 @@ namespace sogdanov {
   {
     std::string arg;
     in >> arg;
+    checkTrailingGarbage(in);
     std::vector< Polygon > filtered;
     IoGuard guard(out);
     out << std::fixed << std::setprecision(1);
@@ -109,11 +131,13 @@ namespace sogdanov {
 
   void max(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
   {
+    std::string arg;
+    in >> arg;
+    checkTrailingGarbage(in);
     if (polygons.empty()) {
       throw std::logic_error("Empty collection");
     }
-    std::string arg;
-    in >> arg;
+
     if (arg == "AREA") {
       std::vector< double > areas;
       std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), getArea);
@@ -130,11 +154,13 @@ namespace sogdanov {
 
   void min(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
   {
+    std::string arg;
+    in >> arg;
+    checkTrailingGarbage(in);
     if (polygons.empty()) {
       throw std::logic_error("Empty collection");
     }
-    std::string arg;
-    in >> arg;
+
     if (arg == "AREA") {
       std::vector< double > areas;
       std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), getArea);
@@ -153,6 +179,8 @@ namespace sogdanov {
   {
     std::string arg;
     in >> arg;
+    checkTrailingGarbage(in);
+
     if (arg == "EVEN") {
       out << std::count_if(polygons.begin(), polygons.end(), isEven) << '\n';
     } else if (arg == "ODD") {
@@ -173,6 +201,7 @@ namespace sogdanov {
     if (!(in >> target)) {
       throw std::logic_error("Invalid polygon");
     }
+    checkTrailingGarbage(in);
     out << std::count_if(polygons.begin(), polygons.end(),
       std::bind(isPermutation, std::placeholders::_1, target)) << '\n';
   }
@@ -183,6 +212,7 @@ namespace sogdanov {
     if (!(in >> target)) {
       throw std::logic_error("Invalid polygon");
     }
+    checkTrailingGarbage(in);
     out << countMaxSeq(polygons.begin(), polygons.end(), target, 0) << '\n';
   }
 
