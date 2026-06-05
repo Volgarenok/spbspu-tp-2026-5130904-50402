@@ -226,16 +226,15 @@ bool lavrentev::Point::operator<(const Point &other) const
 }
 
 lavrentev::Point lavrentev::readPoint(std::istream* is)
-  {
-    lavrentev::Point p;
-    (*is) >> p;
-    return p;
-  }
+{
+  lavrentev::Point p;
+  (*is) >> p;
+  return p;
+}
 
 int orient(const lavrentev::Point& a, const lavrentev::Point& b, const lavrentev::Point& c)
 {
   long long val = 1LL * (b.x - a.x) * (c.y - a.y) - 1LL * (b.y - a.y) * (c.x - a.x);
-
   if (val == 0)
   {
     return 0;

@@ -49,8 +49,10 @@ namespace lavrentev
     size_t& pos;
     bool& success;
 
-    PointParser(const std::string& l, size_t& p, bool& s)
-      : line(l), pos(p), success(s)
+    PointParser(const std::string& l, size_t& p, bool& s):
+      line(l),
+      pos(p),
+      success(s)
     {}
 
     Point operator()();
