@@ -131,6 +131,7 @@ std::istream& lavrentev::operator>>(std::istream& is, Polygon& plg)
   {
     is.clear();
     is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    is.putback('\n');
     plg.points.clear();
     return is;
   }
@@ -144,6 +145,8 @@ std::istream& lavrentev::operator>>(std::istream& is, Polygon& plg)
 
   if (static_cast<size_t>(std::count(line.begin(), line.end(), '(')) != n)
   {
+    is.clear();
+    is.putback('\n');
     plg.points.clear();
     return is;
   }
@@ -152,69 +155,12 @@ std::istream& lavrentev::operator>>(std::istream& is, Polygon& plg)
   bool success = true;
   size_t pos = 0;
 
-  std::generate_n(temp.begin(), n, [&line, &pos, &success]() {
-    if (!success)
-    {
-      return Point{0, 0};
-    }
-
-    size_t start = line.find('(', pos);
-    if (start == std::string::npos)
-    {
-      success = false;
-      return Point{0, 0};
-    }
-
-    if (line.substr(pos, start - pos).find_first_not_of(" \t\r\n") != std::string::npos)
-    {
-      success = false;
-      return Point{0, 0};
-    }
-
-    size_t colon = line.find(';', start);
-    if (colon == std::string::npos || colon >= line.size())
-    {
-      success = false;
-      return Point{0, 0};
-    }
-
-    size_t end = line.find(')', colon);
-    if (end == std::string::npos || end >= line.size())
-    {
-      success = false;
-      return Point{0, 0};
-    }
-
-    try
-    {
-      std::string x_str = line.substr(start + 1, colon - start - 1);
-      size_t idx1 = 0;
-      int x = std::stoi(x_str, &idx1);
-      if (x_str.find_first_not_of(" \t\r\n", idx1) != std::string::npos)
-      {
-        success = false;
-      }
-
-      std::string y_str = line.substr(colon + 1, end - colon - 1);
-      size_t idx2 = 0;
-      int y = std::stoi(y_str, &idx2);
-      if (y_str.find_first_not_of(" \t\r\n", idx2) != std::string::npos)
-      {
-        success = false;
-      }
-
-      pos = end + 1;
-      return Point{x, y};
-    }
-    catch (...)
-    {
-      success = false;
-      return Point{0, 0};
-    }
-  });
+  std::generate_n(temp.begin(), n, PointParser(line, pos, success));
 
   if (!success || line.find_first_not_of(" \t\r\n", pos) != std::string::npos)
   {
+    is.clear();
+    is.putback('\n');
     plg.points.clear();
     return is;
   }
@@ -461,4 +407,66 @@ void lavrentev::intersections(std::istream& is, const std::vector<Polygon>& plgs
   );
 
   std::cout << count << "\n";
+}
+
+lavrentev::Point lavrentev::PointParser::operator()()
+{
+  if (!success)
+  {
+    return Point{0, 0};
+  }
+
+  size_t start = line.find('(', pos);
+  if (start == std::string::npos)
+  {
+    success = false;
+    return Point{0, 0};
+  }
+
+  if (line.substr(pos, start - pos).find_first_not_of(" \t\r\n") != std::string::npos)
+  {
+    success = false;
+    return Point{0, 0};
+  }
+
+  size_t colon = line.find(';', start);
+  if (colon == std::string::npos || colon >= line.size())
+  {
+    success = false;
+    return Point{0, 0};
+  }
+
+  size_t end = line.find(')', colon);
+  if (end == std::string::npos || end >= line.size())
+  {
+    success = false;
+    return Point{0, 0};
+  }
+
+  try
+  {
+    std::string x_str = line.substr(start + 1, colon - start - 1);
+    size_t idx1 = 0;
+    int x = std::stoi(x_str, &idx1);
+    if (x_str.find_first_not_of(" \t\r\n", idx1) != std::string::npos)
+    {
+      success = false;
+    }
+
+    std::string y_str = line.substr(colon + 1, end - colon - 1);
+    size_t idx2 = 0;
+    int y = std::stoi(y_str, &idx2);
+    if (y_str.find_first_not_of(" \t\r\n", idx2) != std::string::npos)
+    {
+      success = false;
+    }
+
+    pos = end + 1;
+    return Point{x, y};
+  }
+  catch (...)
+  {
+    success = false;
+    return Point{0, 0};
+  }
 }

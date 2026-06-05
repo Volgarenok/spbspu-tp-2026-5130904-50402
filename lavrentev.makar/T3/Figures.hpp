@@ -43,6 +43,19 @@ namespace lavrentev
     char &last;
   };
 
+  struct PointParser
+  {
+    const std::string& line;
+    size_t& pos;
+    bool& success;
+
+    PointParser(const std::string& l, size_t& p, bool& s)
+      : line(l), pos(p), success(s)
+    {}
+
+    Point operator()();
+  };
+
   std::istream &operator>>(std::istream &is, Polygon &plg);
   std::istream &operator>>(std::istream &is, Point &p);
   std::istream &operator>>(std::istream &is, Delimiter_t &del);
