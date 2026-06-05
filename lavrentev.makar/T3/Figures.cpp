@@ -98,8 +98,7 @@ void lavrentev::maxseq(std::istream &is, const std::vector<Polygon> &plgs)
 
   auto it = std::find(checks.rbegin(), checks.rend(), true);
 
-  size_t result = (it == checks.rend()) ? 0 :
-    std::distance(checks.begin(), it.base()) ;
+  size_t result = (it == checks.rend()) ? 0 : checks.size() - std::distance(checks.rbegin(), it);
 
   std::cout << result << "\n";
 }
@@ -233,7 +232,7 @@ lavrentev::Point lavrentev::readPoint(std::istream* is)
 
 int orient(const lavrentev::Point& a, const lavrentev::Point& b, const lavrentev::Point& c)
 {
-  long long val = 1 * (b.y - a.y) * (c.x - b.x) - 1 * (b.x - a.x) * (c.y - b.y);
+  long long val = 1LL * (b.x - a.x) * (c.y - a.y) - 1LL * (b.y - a.y) * (c.x - a.x);
 
   if (val == 0)
   {
