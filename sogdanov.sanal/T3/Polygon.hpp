@@ -12,7 +12,7 @@ namespace sogdanov {
   };
 
   struct Polygon {
-    std::vector<Point> points;
+    std::vector< Point > points;
     bool operator==(const Polygon& other) const;
   };
 

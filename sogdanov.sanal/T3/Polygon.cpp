@@ -52,7 +52,7 @@ namespace sogdanov {
       in.setstate(std::ios::failbit);
       return in;
     }
-    std::vector<Point> temp;
+    std::vector< Point > temp;
     std::generate_n(std::back_inserter(temp), count, PointReader{in});
     if (in) {
       dest.points = temp;
