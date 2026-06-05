@@ -22,10 +22,10 @@ namespace sogdanov {
   {
     std::string rest;
     if (std::getline(in, rest)) {
+      if (!in.eof()) {
+        in.putback('\n');
+      }
       if (std::any_of(rest.begin(), rest.end(), CheckNotSpace())) {
-        if (!in.eof()) {
-          in.putback('\n');
-        }
         throw std::logic_error("Trailing garbage");
       }
     }
