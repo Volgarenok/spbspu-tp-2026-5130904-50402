@@ -135,27 +135,85 @@ std::istream& lavrentev::operator>>(std::istream& is, Polygon& plg)
     return is;
   }
 
-  std::vector<Point> temp;
-  temp.reserve(n);
-
-  std::generate_n(
-    std::back_inserter(temp),
-    n,
-    std::bind(readPoint, &is)
-  );
-
-  if (!is)
+  std::string line;
+  if (!std::getline(is, line))
   {
-    is.clear();
-    is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     plg.points.clear();
     return is;
   }
 
-  std::string tail;
-  std::getline(is, tail);
+  if (static_cast<size_t>(std::count(line.begin(), line.end(), '(')) != n)
+  {
+    plg.points.clear();
+    return is;
+  }
 
-  if (tail.find_first_not_of(" \t\r") != std::string::npos)
+  std::vector<Point> temp(n);
+  bool success = true;
+  size_t pos = 0;
+
+  std::generate_n(temp.begin(), n, [&line, &pos, &success]() {
+    if (!success)
+    {
+      return Point{0, 0};
+    }
+
+    size_t start = line.find('(', pos);
+    if (start == std::string::npos)
+    {
+      success = false;
+      return Point{0, 0};
+    }
+
+    if (line.substr(pos, start - pos).find_first_not_of(" \t\r\n") != std::string::npos)
+    {
+      success = false;
+      return Point{0, 0};
+    }
+
+    size_t colon = line.find(';', start);
+    if (colon == std::string::npos || colon >= line.size())
+    {
+      success = false;
+      return Point{0, 0};
+    }
+
+    size_t end = line.find(')', colon);
+    if (end == std::string::npos || end >= line.size())
+    {
+      success = false;
+      return Point{0, 0};
+    }
+
+    try
+    {
+      std::string x_str = line.substr(start + 1, colon - start - 1);
+      size_t idx1 = 0;
+      int x = std::stoi(x_str, &idx1);
+      if (x_str.find_first_not_of(" \t\r\n", idx1) != std::string::npos)
+      {
+        success = false;
+      }
+
+      std::string y_str = line.substr(colon + 1, end - colon - 1);
+      size_t idx2 = 0;
+      int y = std::stoi(y_str, &idx2);
+      if (y_str.find_first_not_of(" \t\r\n", idx2) != std::string::npos)
+      {
+        success = false;
+      }
+
+      pos = end + 1;
+      return Point{x, y};
+    }
+    catch (...)
+    {
+      success = false;
+      return Point{0, 0};
+    }
+  });
+
+  if (!success || line.find_first_not_of(" \t\r\n", pos) != std::string::npos)
   {
     plg.points.clear();
     return is;
