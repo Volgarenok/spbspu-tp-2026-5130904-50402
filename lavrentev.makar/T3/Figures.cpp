@@ -155,10 +155,9 @@ std::istream& lavrentev::operator>>(std::istream& is, Polygon& plg)
   std::string tail;
   std::getline(is, tail);
 
-  if (tail.find_first_not_of(" \t\r") != std::string::npos)
+  if (tail.find_first_not_of(" \t\r\n") != std::string::npos)
   {
-    is.clear();
-    is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    is.setstate(std::ios_base::failbit);
     plg.points.clear();
     return is;
   }
