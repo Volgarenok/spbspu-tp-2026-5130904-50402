@@ -30,13 +30,13 @@ int main(int argc, char *argv[])
       {"MIN", std::bind(pozdnyakov::processMin, std::placeholders::_1, std::placeholders::_2, std::cref(polygons))},
       {"COUNT", std::bind(pozdnyakov::processCount, std::placeholders::_1, std::placeholders::_2, std::cref(polygons))},
       {"PERMS", std::bind(pozdnyakov::processPerms, std::placeholders::_1, std::placeholders::_2, std::cref(polygons))},
-      {"INTERSECTIONS", std::bind(pozdnyakov::processIntersections, std::placeholders::_1, std::placeholders::_2, 
+      {"INTERSECTIONS", std::bind(pozdnyakov::processIntersections, std::placeholders::_1, std::placeholders::_2,
         std::cref(polygons))}};
 
   std::cout << std::fixed << std::setprecision(1);
 
   std::any_of(std::istream_iterator< std::string >(std::cin), std::istream_iterator< std::string >(),
-              pozdnyakov::CommandExecutor{commands});
+    pozdnyakov::CommandExecutor{commands});
 
   return 0;
 }
