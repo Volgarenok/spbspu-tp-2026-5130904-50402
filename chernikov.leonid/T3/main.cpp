@@ -25,6 +25,41 @@ namespace chernikov {
     std::vector< Point > points;
   };
 
+  bool operator==(const Point &a, const Point &b)
+  {
+    return a.x == b.x && a.y == b.y;
+  }
+
+  bool operator<(const Point &a, const Point &b)
+  {
+    if (a.x != b.x)
+      return a.x < b.x;
+    return a.y < b.y;
+  }
+
+  bool operator==(const Polygon &a, const Polygon &b)
+  {
+    if (a.points.size() != b.points.size())
+      return false;
+
+    for (size_t shift = 0; shift < a.points.size(); ++shift)
+    {
+      bool match = true;
+      for (size_t i = 0; i < a.points.size(); ++i)
+      {
+        size_t idx = (i + shift) % a.points.size();
+        if (!(a.points[idx] == b.points[i]))
+        {
+          match = false;
+          break;
+        }
+      }
+      if (match)
+        return true;
+    }
+    return false;
+  }
+
   int cross_product(const Point &a, const Point &b)
   {
     return a.x * b.y - a.y * b.x;
@@ -229,6 +264,66 @@ namespace chernikov {
     return true;
   }
 
+  std::istream &operator>>(std::istream &in, Polygon &poly)
+  {
+    std::string line;
+    if (!std::getline(in, line))
+    {
+      return in;
+    }
+
+    line = trim(line);
+    if (line.empty())
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+
+    SplitResult tokens = split(line);
+    if (tokens.count < 4)
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+
+    int num_vertices = string_to_int(tokens.parts[0]);
+    if (num_vertices < 3 || static_cast< size_t >(num_vertices) != tokens.count - 1)
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+
+    poly.points.clear();
+    for (int i = 0; i < num_vertices; ++i)
+    {
+      Point p;
+      if (!parse_point(tokens.parts[i + 1], p))
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      poly.points.push_back(p);
+    }
+
+    return in;
+  }
+
+  std::ostream &operator<<(std::ostream &out, const Point &p)
+  {
+    out << "(" << p.x << ";" << p.y << ")";
+    return out;
+  }
+
+  std::ostream &operator<<(std::ostream &out, const Polygon &poly)
+  {
+    out << poly.points.size();
+    for (size_t i = 0; i < poly.points.size(); ++i)
+    {
+      out << " " << poly.points[i];
+    }
+    return out;
+  }
+
   Polygon parse_polygon_from_tokens(const SplitResult &tokens, size_t start)
   {
     Polygon poly;
@@ -245,7 +340,7 @@ namespace chernikov {
   }
 }
 
-int main()
+int main(int argc, char *argv[])
 {
   return 0;
 }
