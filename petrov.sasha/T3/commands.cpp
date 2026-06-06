@@ -209,4 +209,38 @@ namespace petrov
                           std::bind(isPermutationOf, _1, std::cref(swappedTarget)));
     out << std::count_if(polygons.begin(), polygons.end(), pred) << '\n';
   }
+
+  void inframe(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons) {
+    Polygon target;
+    in >> target;
+
+    if (!in || target.points.empty()) {
+      in.clear();
+      in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      throw std::invalid_argument("invalid");
+    }
+
+    std::string rest;
+    std::getline(in, rest);
+    if (!std::all_of(rest.begin(), rest.end(), isSpaceChar)) {
+      throw std::invalid_argument("invalid");
+    }
+
+    if (polygons.empty()) {
+      out << "<FALSE>\n";
+      return;
+    }
+
+    std::vector< Bounds > bounds(polygons.size());
+    std::transform(polygons.begin(), polygons.end(), bounds.begin(), getPolygonBounds);
+
+    int globalMinX = std::min_element(bounds.begin(), bounds.end(), compareByMinX)->minX;
+    int globalMinY = std::min_element(bounds.begin(), bounds.end(), compareByMinY)->minY;
+    int globalMaxX = std::max_element(bounds.begin(), bounds.end(), compareByMaxX)->maxX;
+    int globalMaxY = std::max_element(bounds.begin(), bounds.end(), compareByMaxY)->maxY;
+
+    auto pred = std::bind(isPointInsideFrame, _1, globalMinX, globalMinY, globalMaxX, globalMaxY);
+    bool inside = std::all_of(target.points.begin(), target.points.end(), pred);
+    out << (inside ? "<TRUE>\n" : "<FALSE>\n");
+  }
 }
