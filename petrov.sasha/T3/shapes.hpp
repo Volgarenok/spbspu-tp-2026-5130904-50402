@@ -36,4 +36,12 @@ namespace petrov
 
   std::istream& operator>>(std::istream& in, Point& point);
   std::istream& operator>>(std::istream& in, Polygon& polygon);
+
+  bool compareByX(const Point& a, const Point& b);
+  bool compareByY(const Point& a, const Point& b);
+  bool comparePoints(const Point& a, const Point& b);
+  Point translatePoint(const Point& p, int dx, int dy);
+  Point translatePoint(const Point& p, int dx, int dy);
+  double crossTerm(const std::vector< Point >& pts, size_t i, size_t n);
 }
+
