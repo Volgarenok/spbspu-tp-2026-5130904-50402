@@ -140,3 +140,4 @@ namespace petrov
     return normalize(a) == normalize(b);
   }
 }
+
