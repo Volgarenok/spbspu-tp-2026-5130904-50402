@@ -78,4 +78,8 @@ namespace petrov
   bool compareByMaxY(const Bounds& a, const Bounds& b) {
     return a.maxY < b.maxY;
   }
+
+  bool isPointInsideFrame(const Point& p, int minX, int minY, int maxX, int maxY) {
+    return p.x >= minX && p.x <= maxX && p.y >= minY && p.y <= maxY;
+  }
 }
