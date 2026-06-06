@@ -648,5 +648,73 @@ namespace chernikov {
 
 int main(int argc, char *argv[])
 {
+  using namespace chernikov;
+
+  if (argc < 2)
+  {
+    std::cerr << "Error: No input file specified\n";
+    std::cerr << "Usage: " << argv[0] << " <filename>\n";
+    return 1;
+  }
+
+  std::ifstream file(argv[1]);
+  if (!file.is_open())
+  {
+    std::cerr << "Error: Cannot open file '" << argv[1] << "'\n";
+    return 1;
+  }
+
+  std::vector< Polygon > polygons;
+
+  std::copy(std::istream_iterator< Polygon >(file), std::istream_iterator< Polygon >(), std::back_inserter(polygons));
+
+  file.close();
+
+  std::string line;
+  while (std::getline(std::cin, line))
+  {
+    line = trim(line);
+    if (line.empty())
+      continue;
+
+    SplitResult tokens = split(line);
+    if (tokens.count == 0)
+      continue;
+
+    std::string cmd = tokens.parts[0];
+
+    if (cmd == "AREA")
+    {
+      cmd_area(polygons, tokens);
+    } else if (cmd == "MAX")
+    {
+      cmd_max(polygons, tokens);
+    } else if (cmd == "MIN")
+    {
+      cmd_min(polygons, tokens);
+    } else if (cmd == "COUNT")
+    {
+      cmd_count(polygons, tokens);
+    } else if (cmd == "PERMS")
+    {
+      cmd_perms(polygons, tokens);
+    } else if (cmd == "MAXSEQ")
+    {
+      cmd_maxseq(polygons, tokens);
+    } else if (cmd == "RMECHO")
+    {
+      cmd_rmecho(polygons, tokens);
+    } else if (cmd == "RECTS")
+    {
+      cmd_rects(polygons);
+    } else if (cmd == "RIGHTSHAPES")
+    {
+      cmd_rightshapes(polygons);
+    } else
+    {
+      std::cout << "<INVALID COMMAND>\n";
+    }
+  }
+
   return 0;
 }
