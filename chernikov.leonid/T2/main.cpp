@@ -75,6 +75,121 @@ namespace chernikov {
     in.setstate(std::ios::failbit);
     return "";
   }
+  bool parse_complex(const std::string &s, std::complex< double > &result)
+  {
+    if (s.length() < 4 || s[0] != '#' || s[1] != 'c' || s[2] != '(')
+    {
+      return false;
+    }
+
+    size_t pos = 3;
+    while (pos < s.length() && s[pos] == ' ')
+      ++pos;
+
+    std::string real_str;
+    while (pos < s.length() && s[pos] != ' ')
+    {
+      real_str += s[pos];
+      ++pos;
+    }
+
+    while (pos < s.length() && s[pos] == ' ')
+      ++pos;
+
+    std::string imag_str;
+    while (pos < s.length() && s[pos] != ')')
+    {
+      imag_str += s[pos];
+      ++pos;
+    }
+
+    if (pos >= s.length() || s[pos] != ')')
+    {
+      return false;
+    }
+
+    char *end;
+    double real = std::strtod(real_str.c_str(), &end);
+    if (*end != '\0')
+      return false;
+
+    double imag = std::strtod(imag_str.c_str(), &end);
+    if (*end != '\0')
+      return false;
+
+    result = std::complex< double >(real, imag);
+    return true;
+  }
+
+  bool parse_rational(const std::string &s, std::pair< long long, unsigned long long > &result)
+  {
+    if (s.length() < 2 || s[0] != '(')
+    {
+      return false;
+    }
+
+    size_t pos = 1;
+
+    if (pos + 1 >= s.length() || s[pos] != ':' || s[pos + 1] != 'N')
+    {
+      return false;
+    }
+    pos += 2;
+    while (pos < s.length() && s[pos] == ' ')
+      ++pos;
+
+    std::string num_str;
+    bool negative = false;
+    if (pos < s.length() && s[pos] == '-')
+    {
+      negative = true;
+      ++pos;
+    }
+    while (pos < s.length() && std::isdigit(s[pos]))
+    {
+      num_str += s[pos];
+      ++pos;
+    }
+
+    while (pos < s.length() && s[pos] == ' ')
+      ++pos;
+
+    if (pos + 1 >= s.length() || s[pos] != ':' || s[pos + 1] != 'D')
+    {
+      return false;
+    }
+    pos += 2;
+    while (pos < s.length() && s[pos] == ' ')
+      ++pos;
+
+    std::string den_str;
+    while (pos < s.length() && std::isdigit(s[pos]))
+    {
+      den_str += s[pos];
+      ++pos;
+    }
+
+    if (pos >= s.length() || s[pos] != ':' || pos + 1 >= s.length() || s[pos + 1] != ')')
+    {
+      return false;
+    }
+
+    char *end;
+    long long num = std::strtoll(num_str.c_str(), &end, 10);
+    if (*end != '\0')
+      return false;
+    if (negative)
+      num = -num;
+
+    unsigned long long den = std::strtoull(den_str.c_str(), &end, 10);
+    if (*end != '\0')
+      return false;
+    if (den == 0)
+      return false;
+
+    result = std::make_pair(num, den);
+    return true;
+  }
 }
 
 int main()
