@@ -43,5 +43,10 @@ namespace petrov
   Point translatePoint(const Point& p, int dx, int dy);
   Point translatePoint(const Point& p, int dx, int dy);
   double crossTerm(const std::vector< Point >& pts, size_t i, size_t n);
+
+  double calculateArea(const Polygon& poly);
+  Polygon swapCoordinates(const Polygon& poly);
+  std::vector< Point > normalize(const Polygon& poly);
+  bool isPermutationOf(const Polygon& a, const Polygon& b);
 }
 
