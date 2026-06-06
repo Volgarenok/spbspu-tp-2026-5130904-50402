@@ -9,6 +9,8 @@
 namespace petrov
 {
   using namespace std::placeholders;
+
+
   bool operator==(const Point& lhs, const Point& rhs) {
     return lhs.x == rhs.x && lhs.y == rhs.y;
   }
@@ -117,5 +119,24 @@ namespace petrov
     res.points.reserve(poly.points.size());
     std::transform(poly.points.begin(), poly.points.end(), std::back_inserter(res.points), swapPointXY);
     return res;
+  }
+
+  std::vector< Point > normalize(const Polygon& poly) {
+    std::vector< Point > pts = poly.points;
+    if (pts.empty()) {
+      return pts;
+    }
+    int minX = std::min_element(pts.begin(), pts.end(), compareByX)->x;
+    int minY = std::min_element(pts.begin(), pts.end(), compareByY)->y;
+    std::transform(pts.begin(), pts.end(), pts.begin(), std::bind(translatePoint, _1, minX, minY));
+    std::sort(pts.begin(), pts.end(), comparePoints);
+    return pts;
+  }
+
+  bool petrov::isPermutationOf(const Polygon& a, const Polygon& b) {
+    if (a.points.size() != b.points.size()) {
+      return false;
+    }
+    return normalize(a) == normalize(b);
   }
 }
