@@ -12,4 +12,15 @@ namespace petrov
   {
     return lhs.x == rhs.x && lhs.y == rhs.y;
   }
+  
+  IOguard::IOguard(std::istream& stream):
+    stream_(stream),
+    flags_(stream.flags())
+  {}
+
+  IOguard::~IOguard()
+  {
+    stream_.flags(flags_);
+  }
+
 }
