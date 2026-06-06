@@ -110,7 +110,7 @@ namespace petrov
 
       std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), getArea);
       double sum = std::accumulate(areas.begin(), areas.end(), 0.0);
-      out << sum / polygons.size() << "\n";
+      out << sum / polygons.size() << '\n';
     } else if (param == "EVEN") {
       printFilteredSum(out, polygons, isEven);
     } else if (param == "ODD") {
@@ -140,6 +140,27 @@ namespace petrov
       out << std::fixed << std::setprecision(1) << calculateArea(*it) << '\n';
     } else if (param == "VERTEXES") {
       auto it = std::max_element(polygons.begin(), polygons.end(), vertexLess);
+      out << it->points.size() << '\n';
+    } else {
+      throw std::invalid_argument("invalid");
+    }
+  }
+
+  void min(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+  {
+    std::string param;
+    if (!(in >> param)) {
+      throw std::invalid_argument("invalid");
+    }
+    if (polygons.empty()) {
+      throw std::invalid_argument("invalid");
+    }
+
+    if (param == "AREA") {
+      auto it = std::min_element(polygons.begin(), polygons.end(), areaLess);
+      out << std::fixed << std::setprecision(1) << calculateArea(*it) << '\n';
+    } else if (param == "VERTEXES") {
+      auto it = std::min_element(polygons.begin(), polygons.end(), vertexLess);
       out << it->points.size() << '\n';
     } else {
       throw std::invalid_argument("invalid");
