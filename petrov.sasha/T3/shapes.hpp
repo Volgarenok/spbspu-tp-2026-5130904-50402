@@ -15,4 +15,25 @@ namespace petrov
   {
     std::vector< Point > points;
   };
+
+  struct DelimIO
+  {
+    char expected;
+  };
+
+  std::istream& operator>>(std::istream& in, DelimIO&& delim);
+
+  class IOguard
+  {
+  public:
+    explicit IOguard(std::istream& stream);
+    ~IOguard();
+
+  private:
+    std::istream& stream_;
+    std::ios::fmtflags flags_;
+  };
+
+  std::istream& operator>>(std::istream& in, Point& point);
+  std::istream& operator>>(std::istream& in, Polygon& polygon);
 }
