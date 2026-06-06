@@ -126,18 +126,12 @@ namespace pozdnyakov
   {
     Polygon target{};
 
-    if (!(in >> target)) {
+    if (in >> target) {
+      const size_t result = countIntersections(polygons, target);
+      out << result << '\n';
+    } else {
       throw std::invalid_argument("invalid");
     }
-
-    in >> std::ws;
-
-    if (in.peek() != '\n' && in.peek() != EOF) {
-      throw std::invalid_argument("invalid");
-    }
-
-    const size_t result = countIntersections(polygons, target);
-    out << result << '\n';
   }
 
   void readPolygons(std::istream &in, std::vector< Polygon > &polygons)
