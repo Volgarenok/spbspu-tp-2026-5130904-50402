@@ -23,9 +23,9 @@ namespace saldaev
   IOguard::IOguard(std::basic_ios< char > &s):
     s_(s),
     width_(s.width()),
-    fill_(s.fill()),
     precision_(s.precision()),
-    fmt_(s.flags())
+    fmt_(s.flags()),
+    fill_(s.fill())
   {}
 
   IOguard::~IOguard()
@@ -73,7 +73,7 @@ namespace saldaev
   std::istream &operator>>(std::istream &in, LabelIO &&dest);
   std::istream &operator>>(std::istream &in, ULL_bin &&dest);
   std::istream &operator>>(std::istream &in, CMP &&dest);
-  std::istream &operator>>(std::istream &in, Data &&dest);
+  std::istream &operator>>(std::istream &in, Data &dest);
   std::ostream &operator<<(std::ostream &out, const Data &dest);
 
   bool operator<(const Data &lhs, const Data &rhs);
@@ -211,7 +211,7 @@ std::ostream &saldaev::operator<<(std::ostream &out, const Data &src)
     return out;
   }
   IOguard guard(out);
-  out << "(:" << "key1 " << '0b' << src.key1 << "':";
+  out << "(:" << "key1 " << "0b" << src.key1 << "':";
   out << "key2 " << "#c(" << std::fixed << std::setprecision(1) << src.key2.real() << ' ' << src.key2.imag() << "):";
   out << "key3 " << std::quoted(src.key3) << ":)";
   return out;
