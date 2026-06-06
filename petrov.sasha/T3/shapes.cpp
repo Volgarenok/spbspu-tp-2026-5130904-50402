@@ -14,7 +14,7 @@ namespace petrov
   bool operator==(const Point& lhs, const Point& rhs) {
     return lhs.x == rhs.x && lhs.y == rhs.y;
   }
-  
+
   IOguard::IOguard(std::istream& stream):
     stream_(stream),
     flags_(stream.flags())
