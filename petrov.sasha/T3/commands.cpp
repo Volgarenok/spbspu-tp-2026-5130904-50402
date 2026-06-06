@@ -48,4 +48,34 @@ namespace petrov
   bool vertexLess(const Polygon& a, const Polygon& b) {
     return a.points.size() < b.points.size();
   }
+
+  struct Bounds
+  {
+    int minX, minY, maxX, maxY;
+  };
+
+  Bounds getPolygonBounds(const Polygon& poly) {
+    const std::vector< Point >& pts = poly.points;
+    int minX = std::min_element(pts.begin(), pts.end(), compareByX)->x;
+    int maxX = std::max_element(pts.begin(), pts.end(), compareByX)->x;
+    int minY = std::min_element(pts.begin(), pts.end(), compareByY)->y;
+    int maxY = std::max_element(pts.begin(), pts.end(), compareByY)->y;
+    return {minX, minY, maxX, maxY};
+  }
+
+  bool compareByMinX(const Bounds& a, const Bounds& b) {
+    return a.minX < b.minX;
+  }
+
+  bool compareByMinY(const Bounds& a, const Bounds& b) {
+    return a.minY < b.minY;
+  }
+
+  bool compareByMaxX(const Bounds& a, const Bounds& b) {
+    return a.maxX < b.maxX;
+  }
+
+  bool compareByMaxY(const Bounds& a, const Bounds& b) {
+    return a.maxY < b.maxY;
+  }
 }
