@@ -194,13 +194,15 @@ namespace petrov
     if (!in || target.points.empty()) {
       in.clear();
       in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      throw std::invalid_argument("invalid");
+      out << "<INVALID COMMAND>\n";
+      return;
     }
 
     std::string rest;
     std::getline(in, rest);
     if (!std::all_of(rest.begin(), rest.end(), isSpaceChar)) {
-      throw std::invalid_argument("invalid");
+      out << "<INVALID COMMAND>\n";
+      return;
     }
 
     Polygon swappedTarget = swapCoordinates(target);
@@ -217,13 +219,15 @@ namespace petrov
     if (!in || target.points.empty()) {
       in.clear();
       in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      throw std::invalid_argument("invalid");
+      out << "<INVALID COMMAND>\n";
+      return;
     }
 
     std::string rest;
     std::getline(in, rest);
     if (!std::all_of(rest.begin(), rest.end(), isSpaceChar)) {
-      throw std::invalid_argument("invalid");
+      out << "<INVALID COMMAND>\n";
+      return;
     }
 
     if (polygons.empty()) {
