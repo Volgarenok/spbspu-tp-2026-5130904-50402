@@ -187,4 +187,26 @@ namespace petrov
       throw std::invalid_argument("invalid");
     }
   }
+
+  void perms(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons) {
+    Polygon target;
+    in >> target;
+    if (!in || target.points.empty()) {
+      in.clear();
+      in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      throw std::invalid_argument("invalid");
+    }
+
+    std::string rest;
+    std::getline(in, rest);
+    if (!std::all_of(rest.begin(), rest.end(), isSpaceChar)) {
+      throw std::invalid_argument("invalid");
+    }
+
+    Polygon swappedTarget = swapCoordinates(target);
+    auto pred = std::bind(std::logical_or< bool >(),
+                          std::bind(isPermutationOf, _1, std::cref(target)),
+                          std::bind(isPermutationOf, _1, std::cref(swappedTarget)));
+    out << std::count_if(polygons.begin(), polygons.end(), pred) << '\n';
+  }
 }
