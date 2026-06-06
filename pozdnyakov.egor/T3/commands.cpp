@@ -131,14 +131,11 @@ namespace pozdnyakov
       throw std::invalid_argument("invalid");
     }
 
-    std::string tail;
-    std::getline(in, tail);
+    while (std::isspace(in.peek()) && in.peek() != '\n') {
+      in.get();
+    }
 
-    const bool hasGarbage = std::any_of(tail.begin(), tail.end(), [](char c) {
-      return !std::isspace(static_cast< unsigned char >(c));
-    });
-
-    if (hasGarbage) {
+    if (in.peek() != '\n' && in.peek() != EOF) {
       throw std::invalid_argument("invalid");
     }
 
