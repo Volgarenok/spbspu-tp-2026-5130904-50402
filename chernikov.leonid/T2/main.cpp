@@ -190,6 +190,145 @@ namespace chernikov {
     result = std::make_pair(num, den);
     return true;
   }
+
+  std::istream &operator>>(std::istream &in, DataStruct &data)
+  {
+    std::string line;
+    if (!std::getline(in, line))
+    {
+      return in;
+    }
+
+    if (line.empty() || line[0] != '(' || line[line.length() - 1] != ':')
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+
+    bool has_key1 = false;
+    bool has_key2 = false;
+    bool has_key3 = false;
+
+    size_t pos = 1;
+
+    while (pos < line.length())
+    {
+      while (pos < line.length() && line[pos] == ' ')
+        ++pos;
+
+      if (pos >= line.length() || line[pos] != ':')
+      {
+        break;
+      }
+      ++pos;
+
+      std::string key;
+      while (pos < line.length() && line[pos] != ' ')
+      {
+        key += line[pos];
+        ++pos;
+      }
+
+      if (pos >= line.length())
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      ++pos;
+
+      if (key == "key1")
+      {
+        std::string value;
+        while (pos < line.length() && line[pos] != ':')
+        {
+          value += line[pos];
+          ++pos;
+        }
+
+        if (!parse_complex(value, data.key1))
+        {
+          in.setstate(std::ios::failbit);
+          return in;
+        }
+        has_key1 = true;
+      } else if (key == "key2")
+      {
+        std::string value;
+        while (pos < line.length() && line[pos] != ':')
+        {
+          value += line[pos];
+          ++pos;
+        }
+
+        if (!parse_rational(value, data.key2))
+        {
+          in.setstate(std::ios::failbit);
+          return in;
+        }
+        has_key2 = true;
+      } else if (key == "key3")
+      {
+        if (pos >= line.length() || line[pos] != '"')
+        {
+          in.setstate(std::ios::failbit);
+          return in;
+        }
+        ++pos;
+
+        data.key3.clear();
+        while (pos < line.length() && line[pos] != '"')
+        {
+          if (line[pos] == '\\' && pos + 1 < line.length())
+          {
+            ++pos;
+          }
+          data.key3 += line[pos];
+          ++pos;
+        }
+
+        if (pos >= line.length() || line[pos] != '"')
+        {
+          in.setstate(std::ios::failbit);
+          return in;
+        }
+        ++pos;
+
+        if (pos >= line.length() || line[pos] != ':')
+        {
+          in.setstate(std::ios::failbit);
+          return in;
+        }
+        has_key3 = true;
+      } else
+      {
+        while (pos < line.length() && line[pos] != ':')
+        {
+          ++pos;
+        }
+      }
+
+      if (pos < line.length() && line[pos] == ':')
+      {
+        ++pos;
+      }
+    }
+
+    if (!has_key1 || !has_key2 || !has_key3)
+    {
+      in.setstate(std::ios::failbit);
+    }
+
+    return in;
+  }
+
+  std::ostream &operator<<(std::ostream &out, const DataStruct &data)
+  {
+    out << "(:key1 #c(" << data.key1.real() << " " << data.key1.imag() << "):"
+        << "key2 (:N " << data.key2.first << ":D " << data.key2.second << ":):"
+        << "key3 \"" << data.key3 << "\":)";
+    return out;
+  }
+
 }
 
 int main()
