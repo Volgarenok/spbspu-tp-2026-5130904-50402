@@ -338,6 +338,312 @@ namespace chernikov {
 
     return poly;
   }
+  void cmd_area(const std::vector< Polygon > &polygons, const SplitResult &tokens)
+  {
+    if (tokens.count < 2)
+    {
+      std::cout << "<INVALID COMMAND>\n";
+      return;
+    }
+
+    std::string param = tokens.parts[1];
+
+    if (param == "EVEN")
+    {
+      auto count = std::count_if(polygons.begin(), polygons.end(), [](const Polygon &p) {
+        return p.points.size() % 2 == 0;
+      });
+      if (count == 0)
+      {
+        std::cout << "<INVALID COMMAND>\n";
+        return;
+      }
+
+      std::vector< double > areas;
+      std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), [](const Polygon &p) {
+        return p.points.size() % 2 == 0 ? area(p) : 0.0;
+      });
+
+      double total = std::accumulate(areas.begin(), areas.end(), 0.0);
+      std::cout << std::fixed;
+      std::cout.precision(1);
+      std::cout << total << "\n";
+    } else if (param == "ODD")
+    {
+      auto count = std::count_if(polygons.begin(), polygons.end(), [](const Polygon &p) {
+        return p.points.size() % 2 != 0;
+      });
+      if (count == 0)
+      {
+        std::cout << "<INVALID COMMAND>\n";
+        return;
+      }
+
+      std::vector< double > areas;
+      std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), [](const Polygon &p) {
+        return p.points.size() % 2 != 0 ? area(p) : 0.0;
+      });
+
+      double total = std::accumulate(areas.begin(), areas.end(), 0.0);
+      std::cout << std::fixed;
+      std::cout.precision(1);
+      std::cout << total << "\n";
+    } else if (param == "MEAN")
+    {
+      if (polygons.empty())
+      {
+        std::cout << "<INVALID COMMAND>\n";
+        return;
+      }
+
+      std::vector< double > areas;
+      std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), [](const Polygon &p) {
+        return area(p);
+      });
+
+      double total = std::accumulate(areas.begin(), areas.end(), 0.0);
+      double mean = total / polygons.size();
+      std::cout << std::fixed;
+      std::cout.precision(1);
+      std::cout << mean << "\n";
+    } else
+    {
+      int num = string_to_int(param);
+      if (num < 3)
+      {
+        std::cout << "<INVALID COMMAND>\n";
+        return;
+      }
+
+      std::vector< double > areas;
+      std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), [num](const Polygon &p) {
+        return static_cast< int >(p.points.size()) == num ? area(p) : 0.0;
+      });
+
+      double total = std::accumulate(areas.begin(), areas.end(), 0.0);
+      std::cout << std::fixed;
+      std::cout.precision(1);
+      std::cout << total << "\n";
+    }
+  }
+
+  void cmd_max(const std::vector< Polygon > &polygons, const SplitResult &tokens)
+  {
+    if (tokens.count < 2 || polygons.empty())
+    {
+      std::cout << "<INVALID COMMAND>\n";
+      return;
+    }
+
+    std::string param = tokens.parts[1];
+
+    if (param == "AREA")
+    {
+      auto max_it = std::max_element(polygons.begin(), polygons.end(), [](const Polygon &a, const Polygon &b) {
+        return area(a) < area(b);
+      });
+
+      std::cout << std::fixed;
+      std::cout.precision(1);
+      std::cout << area(*max_it) << "\n";
+    } else if (param == "VERTEXES")
+    {
+      auto max_it = std::max_element(polygons.begin(), polygons.end(), [](const Polygon &a, const Polygon &b) {
+        return a.points.size() < b.points.size();
+      });
+
+      std::cout << (*max_it).points.size() << "\n";
+    } else
+    {
+      std::cout << "<INVALID COMMAND>\n";
+    }
+  }
+
+  void cmd_min(const std::vector< Polygon > &polygons, const SplitResult &tokens)
+  {
+    if (tokens.count < 2 || polygons.empty())
+    {
+      std::cout << "<INVALID COMMAND>\n";
+      return;
+    }
+
+    std::string param = tokens.parts[1];
+
+    if (param == "AREA")
+    {
+      auto min_it = std::min_element(polygons.begin(), polygons.end(), [](const Polygon &a, const Polygon &b) {
+        return area(a) < area(b);
+      });
+
+      std::cout << std::fixed;
+      std::cout.precision(1);
+      std::cout << area(*min_it) << "\n";
+    } else if (param == "VERTEXES")
+    {
+      auto min_it = std::min_element(polygons.begin(), polygons.end(), [](const Polygon &a, const Polygon &b) {
+        return a.points.size() < b.points.size();
+      });
+
+      std::cout << (*min_it).points.size() << "\n";
+    } else
+    {
+      std::cout << "<INVALID COMMAND>\n";
+    }
+  }
+
+  void cmd_count(const std::vector< Polygon > &polygons, const SplitResult &tokens)
+  {
+    if (tokens.count < 2)
+    {
+      std::cout << "<INVALID COMMAND>\n";
+      return;
+    }
+
+    std::string param = tokens.parts[1];
+
+    if (param == "EVEN")
+    {
+      auto count = std::count_if(polygons.begin(), polygons.end(), [](const Polygon &p) {
+        return p.points.size() % 2 == 0;
+      });
+      std::cout << count << "\n";
+    } else if (param == "ODD")
+    {
+      auto count = std::count_if(polygons.begin(), polygons.end(), [](const Polygon &p) {
+        return p.points.size() % 2 != 0;
+      });
+      std::cout << count << "\n";
+    } else
+    {
+      int num = string_to_int(param);
+      if (num < 3)
+      {
+        std::cout << "<INVALID COMMAND>\n";
+        return;
+      }
+
+      auto count = std::count_if(polygons.begin(), polygons.end(), [num](const Polygon &p) {
+        return static_cast< int >(p.points.size()) == num;
+      });
+      std::cout << count << "\n";
+    }
+  }
+
+  void cmd_perms(const std::vector< Polygon > &polygons, const SplitResult &tokens)
+  {
+    if (tokens.count < 2)
+    {
+      std::cout << "<INVALID COMMAND>\n";
+      return;
+    }
+
+    Polygon target = parse_polygon_from_tokens(tokens, 1);
+    if (target.points.empty())
+    {
+      std::cout << "<INVALID COMMAND>\n";
+      return;
+    }
+
+    auto count = std::count_if(polygons.begin(), polygons.end(), [&target](const Polygon &p) {
+      return is_permutation_of(p, target);
+    });
+
+    std::cout << count << "\n";
+  }
+
+  void cmd_maxseq(const std::vector< Polygon > &polygons, const SplitResult &tokens)
+  {
+    if (tokens.count < 2)
+    {
+      std::cout << "<INVALID COMMAND>\n";
+      return;
+    }
+
+    Polygon target = parse_polygon_from_tokens(tokens, 1);
+    if (target.points.empty())
+    {
+      std::cout << "<INVALID COMMAND>\n";
+      return;
+    }
+
+    size_t max_seq = 0;
+    size_t current_seq = 0;
+
+    for (size_t i = 0; i < polygons.size(); ++i)
+    {
+      if (polygons[i] == target)
+      {
+        ++current_seq;
+        if (current_seq > max_seq)
+        {
+          max_seq = current_seq;
+        }
+      } else
+      {
+        current_seq = 0;
+      }
+    }
+
+    std::cout << max_seq << "\n";
+  }
+
+  void cmd_rmecho(std::vector< Polygon > &polygons, const SplitResult &tokens)
+  {
+    if (tokens.count < 2)
+    {
+      std::cout << "<INVALID COMMAND>\n";
+      return;
+    }
+
+    Polygon target = parse_polygon_from_tokens(tokens, 1);
+    if (target.points.empty())
+    {
+      std::cout << "<INVALID COMMAND>\n";
+      return;
+    }
+
+    std::vector< Polygon > result;
+    int removed = 0;
+
+    for (size_t i = 0; i < polygons.size(); ++i)
+    {
+      if (polygons[i] == target)
+      {
+        if (result.empty() || !(result.back() == target))
+        {
+          result.push_back(polygons[i]);
+        } else
+        {
+          ++removed;
+        }
+      } else
+      {
+        result.push_back(polygons[i]);
+      }
+    }
+
+    polygons = std::move(result);
+    std::cout << removed << "\n";
+  }
+
+  void cmd_rects(const std::vector< Polygon > &polygons)
+  {
+    auto count = std::count_if(polygons.begin(), polygons.end(), [](const Polygon &p) {
+      return is_rectangle(p);
+    });
+
+    std::cout << count << "\n";
+  }
+
+  void cmd_rightshapes(const std::vector< Polygon > &polygons)
+  {
+    auto count = std::count_if(polygons.begin(), polygons.end(), [](const Polygon &p) {
+      return has_right_angle(p);
+    });
+
+    std::cout << count << "\n";
+  }
+
 }
 
 int main(int argc, char *argv[])
