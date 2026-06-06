@@ -86,10 +86,6 @@ namespace petrov
     return {p.x - dx, p.y - dy};
   }
 
-  Point translatePoint(const Point& p, int dx, int dy) {
-    return {p.y, p.x};
-  }
-
   Point swapPointXY(const Point& p) {
     return {p.y, p.x};
   }
@@ -133,7 +129,7 @@ namespace petrov
     return pts;
   }
 
-  bool petrov::isPermutationOf(const Polygon& a, const Polygon& b) {
+  bool isPermutationOf(const Polygon& a, const Polygon& b) {
     if (a.points.size() != b.points.size()) {
       return false;
     }
