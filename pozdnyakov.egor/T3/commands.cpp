@@ -3,7 +3,7 @@
 #include <iterator>
 #include <limits>
 #include <stdexcept>
-#include <sstream>
+#include <cctype>
 
 namespace pozdnyakov
 {
@@ -125,20 +125,20 @@ namespace pozdnyakov
 
   void processIntersections(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
   {
-    std::string line;
-    std::getline(in >> std::ws, line);
-
-    std::istringstream iss(line);
-
     Polygon target{};
 
-    if (!(iss >> target)) {
+    if (!(in >> target)) {
       throw std::invalid_argument("invalid");
     }
 
-    iss >> std::ws;
+    std::string tail;
+    std::getline(in, tail);
 
-    if (!iss.eof()) {
+    const bool hasGarbage = std::any_of(tail.begin(), tail.end(), [](char c) {
+      return !std::isspace(static_cast< unsigned char >(c));
+    });
+
+    if (hasGarbage) {
       throw std::invalid_argument("invalid");
     }
 
