@@ -17,12 +17,15 @@ namespace pozdnyakov
 
   struct Point
   {
-    int x, y;
+    int x = 0;
+    int y = 0;
   };
 
   bool operator==(const Point &lhs, const Point &rhs)
   {
-    return lhs.x == rhs.x && lhs.y == rhs.y;
+    const bool isXEqual = (lhs.x == rhs.x);
+    const bool isYEqual = (lhs.y == rhs.y);
+    return isXEqual && isYEqual;
   }
 
   bool operator!=(const Point &lhs, const Point &rhs)
@@ -32,7 +35,7 @@ namespace pozdnyakov
 
   struct Polygon
   {
-    std::vector< Point > points;
+    std::vector< Point > points{};
   };
 
   bool operator==(const Polygon &lhs, const Polygon &rhs)
@@ -42,7 +45,7 @@ namespace pozdnyakov
 
   struct DelimiterIO
   {
-    char expected;
+    char expected = '\0';
   };
 
   std::istream &operator>>(std::istream &in, DelimiterIO &&dest)
@@ -51,7 +54,7 @@ namespace pozdnyakov
     if (!sentry) {
       return in;
     }
-    char c = '0';
+    char c = '\0';
     in >> c;
     if (in && (c != dest.expected)) {
       in.setstate(std::ios::failbit);
@@ -76,6 +79,7 @@ namespace pozdnyakov
   struct PointReader
   {
     std::istream &in;
+
     Point operator()() const
     {
       Point p{0, 0};
@@ -96,7 +100,7 @@ namespace pozdnyakov
       return in;
     }
 
-    Polygon temp;
+    Polygon temp{};
     std::generate_n(std::back_inserter(temp.points), size, PointReader{in});
     if (in) {
       dest = temp;
@@ -108,7 +112,9 @@ namespace pozdnyakov
   {
     double operator()(const Point &p1, const Point &p2) const
     {
-      return static_cast< double >(p1.x) * p2.y - static_cast< double >(p1.y) * p2.x;
+      const double term1 = static_cast< double >(p1.x) * p2.y;
+      const double term2 = static_cast< double >(p1.y) * p2.x;
+      return term1 - term2;
     }
   };
 
@@ -117,15 +123,17 @@ namespace pozdnyakov
     if (poly.points.size() < 3) {
       return 0.0;
     }
-    double sum = std::inner_product(poly.points.begin(), poly.points.end() - 1, poly.points.begin() + 1, 0.0,
-                                    std::plus< double >(), ShoelaceTerm{});
-    sum += ShoelaceTerm{}(poly.points.back(), poly.points.front());
-    return std::abs(sum) / 2.0;
+    const double innerSum = std::inner_product(poly.points.begin(), poly.points.end() - 1, poly.points.begin() + 1, 0.0,
+                                               std::plus< double >(), ShoelaceTerm{});
+    const double lastTerm = ShoelaceTerm{}(poly.points.back(), poly.points.front());
+    const double totalSum = innerSum + lastTerm;
+    return std::abs(totalSum) / 2.0;
   }
 
   struct Segment
   {
-    Point a, b;
+    Point a{};
+    Point b{};
   };
 
   struct MakeSegment
@@ -138,7 +146,7 @@ namespace pozdnyakov
 
   inline std::vector< Segment > getSegments(const Polygon &p)
   {
-    std::vector< Segment > segs;
+    std::vector< Segment > segs{};
     if (p.points.size() < 2) {
       return segs;
     }
@@ -149,28 +157,32 @@ namespace pozdnyakov
 
   inline int getOrientation(const Point &p, const Point &q, const Point &r)
   {
-    int val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
-    if (val == 0) {
+    const int val1 = (q.y - p.y) * (r.x - q.x);
+    const int val2 = (q.x - p.x) * (r.y - q.y);
+    const int diff = val1 - val2;
+    if (diff == 0) {
       return 0;
     }
-    return (val > 0) ? 1 : 2;
+    return (diff > 0) ? 1 : 2;
   }
 
   inline bool checkOnSegment(const Point &p, const Point &q, const Point &r)
   {
-    return q.x <= std::max(p.x, r.x) && q.x >= std::min(p.x, r.x) && q.y <= std::max(p.y, r.y)
-           && q.y >= std::min(p.y, r.y);
+    const bool inXBounds = (q.x <= std::max(p.x, r.x) && q.x >= std::min(p.x, r.x));
+    const bool inYBounds = (q.y <= std::max(p.y, r.y) && q.y >= std::min(p.y, r.y));
+    return inXBounds && inYBounds;
   }
 
   struct CheckSegmentIntersect
   {
     Segment s1;
+
     bool operator()(const Segment &s2) const
     {
-      int o1 = getOrientation(s1.a, s1.b, s2.a);
-      int o2 = getOrientation(s1.a, s1.b, s2.b);
-      int o3 = getOrientation(s2.a, s2.b, s1.a);
-      int o4 = getOrientation(s2.a, s2.b, s1.b);
+      const int o1 = getOrientation(s1.a, s1.b, s2.a);
+      const int o2 = getOrientation(s1.a, s1.b, s2.b);
+      const int o3 = getOrientation(s2.a, s2.b, s1.a);
+      const int o4 = getOrientation(s2.a, s2.b, s1.b);
 
       if (o1 != o2 && o3 != o4) {
         return true;
@@ -194,6 +206,7 @@ namespace pozdnyakov
   struct CheckAnySegmentIntersect
   {
     const std::vector< Segment > &segs2;
+
     bool operator()(const Segment &s1) const
     {
       return std::any_of(segs2.begin(), segs2.end(), CheckSegmentIntersect{s1});
@@ -203,12 +216,18 @@ namespace pozdnyakov
   struct RayIntersectCheck
   {
     Point p;
+
     bool operator()(const Segment &seg) const
     {
-      if ((seg.a.y > p.y) != (seg.b.y > p.y)) {
-        double intersectX =
-            seg.a.x
-            + static_cast< double >(p.y - seg.a.y) * (seg.b.x - seg.a.x) / static_cast< double >(seg.b.y - seg.a.y);
+      const bool cond1 = (seg.a.y > p.y);
+      const bool cond2 = (seg.b.y > p.y);
+
+      if (cond1 != cond2) {
+        const double diffY = static_cast< double >(seg.b.y - seg.a.y);
+        const double diffX = static_cast< double >(seg.b.x - seg.a.x);
+        const double diffPy = static_cast< double >(p.y - seg.a.y);
+        const double intersectX = seg.a.x + diffPy * diffX / diffY;
+
         if (static_cast< double >(p.x) < intersectX) {
           return true;
         }
@@ -220,9 +239,10 @@ namespace pozdnyakov
   struct CheckPointInsidePolygon
   {
     const std::vector< Segment > &polySegs;
+
     bool operator()(const Point &pt) const
     {
-      size_t intersections = std::count_if(polySegs.begin(), polySegs.end(), RayIntersectCheck{pt});
+      const size_t intersections = std::count_if(polySegs.begin(), polySegs.end(), RayIntersectCheck{pt});
       return (intersections % 2) == 1;
     }
   };
@@ -230,6 +250,7 @@ namespace pozdnyakov
   struct CheckPermutation
   {
     const Polygon &target;
+
     bool operator()(const Polygon &p) const
     {
       if (p.points.size() != target.points.size()) {
@@ -242,10 +263,12 @@ namespace pozdnyakov
   struct CheckPolygonsIntersect
   {
     const Polygon &p1;
+
     bool operator()(const Polygon &p2) const
     {
-      auto segs1 = getSegments(p1);
-      auto segs2 = getSegments(p2);
+      const auto segs1 = getSegments(p1);
+      const auto segs2 = getSegments(p2);
+
       if (std::any_of(segs1.begin(), segs1.end(), CheckAnySegmentIntersect{segs2})) {
         return true;
       }
@@ -263,7 +286,10 @@ namespace pozdnyakov
   {
     double operator()(const Polygon &p) const
     {
-      return (p.points.size() % 2 == 0) ? getArea(p) : 0.0;
+      if (p.points.size() % 2 == 0) {
+        return getArea(p);
+      }
+      return 0.0;
     }
   };
 
@@ -271,16 +297,23 @@ namespace pozdnyakov
   {
     double operator()(const Polygon &p) const
     {
-      return (p.points.size() % 2 != 0) ? getArea(p) : 0.0;
+      if (p.points.size() % 2 != 0) {
+        return getArea(p);
+      }
+      return 0.0;
     }
   };
 
   struct AreaIfNum
   {
     size_t num;
+
     double operator()(const Polygon &p) const
     {
-      return (p.points.size() == num) ? getArea(p) : 0.0;
+      if (p.points.size() == num) {
+        return getArea(p);
+      }
+      return 0.0;
     }
   };
 
@@ -311,6 +344,7 @@ namespace pozdnyakov
   struct IsNumVertices
   {
     size_t num;
+
     bool operator()(const Polygon &p) const
     {
       return p.points.size() == num;
@@ -370,11 +404,11 @@ namespace pozdnyakov
     }
     std::vector< double > areas(polygons.size());
     std::transform(polygons.begin(), polygons.end(), areas.begin(), GetArea{});
-    double sum = std::accumulate(areas.begin(), areas.end(), 0.0);
-    return sum / polygons.size();
+    const double sum = std::accumulate(areas.begin(), areas.end(), 0.0);
+    return sum / static_cast< double >(polygons.size());
   }
 
-  inline double calculateAreaNum(const std::vector< Polygon > &polygons, size_t num)
+  inline double calculateAreaNum(const std::vector< Polygon > &polygons, const size_t num)
   {
     std::vector< double > areas(polygons.size());
     std::transform(polygons.begin(), polygons.end(), areas.begin(), AreaIfNum{num});
@@ -383,7 +417,7 @@ namespace pozdnyakov
 
   inline double getMinArea(const std::vector< Polygon > &polygons)
   {
-    auto it = std::min_element(polygons.begin(), polygons.end(), CompareArea{});
+    const auto it = std::min_element(polygons.begin(), polygons.end(), CompareArea{});
     if (it != polygons.end()) {
       return getArea(*it);
     }
@@ -392,7 +426,7 @@ namespace pozdnyakov
 
   inline size_t getMinVertexes(const std::vector< Polygon > &polygons)
   {
-    auto it = std::min_element(polygons.begin(), polygons.end(), CompareVertices{});
+    const auto it = std::min_element(polygons.begin(), polygons.end(), CompareVertices{});
     if (it != polygons.end()) {
       return it->points.size();
     }
@@ -401,7 +435,7 @@ namespace pozdnyakov
 
   inline double getMaxArea(const std::vector< Polygon > &polygons)
   {
-    auto it = std::max_element(polygons.begin(), polygons.end(), CompareArea{});
+    const auto it = std::max_element(polygons.begin(), polygons.end(), CompareArea{});
     if (it != polygons.end()) {
       return getArea(*it);
     }
@@ -410,7 +444,7 @@ namespace pozdnyakov
 
   inline size_t getMaxVertexes(const std::vector< Polygon > &polygons)
   {
-    auto it = std::max_element(polygons.begin(), polygons.end(), CompareVertices{});
+    const auto it = std::max_element(polygons.begin(), polygons.end(), CompareVertices{});
     if (it != polygons.end()) {
       return it->points.size();
     }
@@ -427,7 +461,7 @@ namespace pozdnyakov
     return std::count_if(polygons.begin(), polygons.end(), IsOddVertices{});
   }
 
-  inline size_t countNumVertices(const std::vector< Polygon > &polygons, size_t num)
+  inline size_t countNumVertices(const std::vector< Polygon > &polygons, const size_t num)
   {
     return std::count_if(polygons.begin(), polygons.end(), IsNumVertices{num});
   }
@@ -444,16 +478,22 @@ namespace pozdnyakov
 
   inline void processArea(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
   {
-    std::string arg;
+    std::string arg = "";
     in >> arg;
+
     if (arg == "EVEN") {
-      out << calculateAreaEven(polygons) << '\n';
+      const double result = calculateAreaEven(polygons);
+      out << result << '\n';
     } else if (arg == "ODD") {
-      out << calculateAreaOdd(polygons) << '\n';
+      const double result = calculateAreaOdd(polygons);
+      out << result << '\n';
     } else if (arg == "MEAN") {
-      out << calculateAreaMean(polygons) << '\n';
+      const double result = calculateAreaMean(polygons);
+      out << result << '\n';
     } else if (isNumericString(arg)) {
-      out << calculateAreaNum(polygons, std::stoull(arg)) << '\n';
+      const size_t num = std::stoull(arg);
+      const double result = calculateAreaNum(polygons, num);
+      out << result << '\n';
     } else {
       throw std::invalid_argument("invalid");
     }
@@ -461,12 +501,15 @@ namespace pozdnyakov
 
   inline void processMin(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
   {
-    std::string arg;
+    std::string arg = "";
     in >> arg;
+
     if (arg == "AREA") {
-      out << getMinArea(polygons) << '\n';
+      const double result = getMinArea(polygons);
+      out << result << '\n';
     } else if (arg == "VERTEXES") {
-      out << getMinVertexes(polygons) << '\n';
+      const size_t result = getMinVertexes(polygons);
+      out << result << '\n';
     } else {
       throw std::invalid_argument("invalid");
     }
@@ -474,12 +517,15 @@ namespace pozdnyakov
 
   inline void processMax(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
   {
-    std::string arg;
+    std::string arg = "";
     in >> arg;
+
     if (arg == "AREA") {
-      out << getMaxArea(polygons) << '\n';
+      const double result = getMaxArea(polygons);
+      out << result << '\n';
     } else if (arg == "VERTEXES") {
-      out << getMaxVertexes(polygons) << '\n';
+      const size_t result = getMaxVertexes(polygons);
+      out << result << '\n';
     } else {
       throw std::invalid_argument("invalid");
     }
@@ -487,14 +533,19 @@ namespace pozdnyakov
 
   inline void processCount(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
   {
-    std::string arg;
+    std::string arg = "";
     in >> arg;
+
     if (arg == "EVEN") {
-      out << countEvenVertices(polygons) << '\n';
+      const size_t result = countEvenVertices(polygons);
+      out << result << '\n';
     } else if (arg == "ODD") {
-      out << countOddVertices(polygons) << '\n';
+      const size_t result = countOddVertices(polygons);
+      out << result << '\n';
     } else if (isNumericString(arg)) {
-      out << countNumVertices(polygons, std::stoull(arg)) << '\n';
+      const size_t num = std::stoull(arg);
+      const size_t result = countNumVertices(polygons, num);
+      out << result << '\n';
     } else {
       throw std::invalid_argument("invalid");
     }
@@ -502,9 +553,10 @@ namespace pozdnyakov
 
   inline void processPerms(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
   {
-    Polygon target;
+    Polygon target{};
     if (in >> target) {
-      out << countPermutations(polygons, target) << '\n';
+      const size_t result = countPermutations(polygons, target);
+      out << result << '\n';
     } else {
       throw std::invalid_argument("invalid");
     }
@@ -512,9 +564,10 @@ namespace pozdnyakov
 
   inline void processIntersections(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
   {
-    Polygon target;
+    Polygon target{};
     if (in >> target) {
-      out << countIntersections(polygons, target) << '\n';
+      const size_t result = countIntersections(polygons, target);
+      out << result << '\n';
     } else {
       throw std::invalid_argument("invalid");
     }
@@ -564,17 +617,17 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  std::vector< pozdnyakov::Polygon > polygons;
+  std::vector< pozdnyakov::Polygon > polygons{};
   pozdnyakov::readPolygons(file, polygons);
 
-  std::map< std::string, std::function< void() > > commands;
-  commands["AREA"] = std::bind(pozdnyakov::processArea, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["MAX"] = std::bind(pozdnyakov::processMax, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["MIN"] = std::bind(pozdnyakov::processMin, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["COUNT"] = std::bind(pozdnyakov::processCount, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["PERMS"] = std::bind(pozdnyakov::processPerms, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["INTERSECTIONS"] =
-      std::bind(pozdnyakov::processIntersections, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  const std::map< std::string, std::function< void() > > commands = {
+      {"AREA", std::bind(pozdnyakov::processArea, std::ref(std::cin), std::ref(std::cout), std::cref(polygons))},
+      {"MAX", std::bind(pozdnyakov::processMax, std::ref(std::cin), std::ref(std::cout), std::cref(polygons))},
+      {"MIN", std::bind(pozdnyakov::processMin, std::ref(std::cin), std::ref(std::cout), std::cref(polygons))},
+      {"COUNT", std::bind(pozdnyakov::processCount, std::ref(std::cin), std::ref(std::cout), std::cref(polygons))},
+      {"PERMS", std::bind(pozdnyakov::processPerms, std::ref(std::cin), std::ref(std::cout), std::cref(polygons))},
+      {"INTERSECTIONS", std::bind(pozdnyakov::processIntersections, std::ref(std::cin), std::ref(std::cout), 
+        std::cref(polygons))}};
 
   std::cout << std::fixed << std::setprecision(1);
 
