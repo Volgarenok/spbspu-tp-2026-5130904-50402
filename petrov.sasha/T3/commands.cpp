@@ -93,4 +93,36 @@ namespace petrov
     double sum = std::accumulate(areas.begin(), areas.end(), 0.0);
     out << std::fixed << std::setprecision(1) << sum << '\n';
   }
+
+  void area(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons) {
+    std::string param;
+    if (!(in >> param)) {
+      throw std::invalid_argument("invalid");
+    }
+    out << std::fixed << std::setprecision(1);
+
+    if (param == "MEAN") {
+      if (polygons.empty()) {
+        throw std::invalid_argument("invalid");
+      }
+      std::vector< double > areas;
+      areas.reserve(polygons.size());
+
+      std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), getArea);
+      double sum = std::accumulate(areas.begin(), areas.end(), 0.0);
+      out << sum / polygons.size() << "\n";
+    } else if (param == "EVEN") {
+      printFilteredSum(out, polygons, isEven);
+    } else if (param == "ODD") {
+      printFilteredSum(out, polygons, isOdd);
+    } else if (isNumber(param)) {
+      size_t n = std::stoul(param);
+      if (n < 3) {
+        throw std::invalid_argument("invalid");
+      }
+      printFilteredSum(out, polygons, std::bind(hasVertexCount, _1, n));
+    } else {
+      throw std::invalid_argument("invalid");
+    }
+  }
 }
