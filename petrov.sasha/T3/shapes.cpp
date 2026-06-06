@@ -78,4 +78,35 @@ namespace petrov
     }
     return in;
   }
+
+  bool compareByX(const Point& a, const Point& b)
+  {
+    return a.x < b.x;
+  }
+
+  bool compareByY(const Point& a, const Point& b)
+  {
+    return a.y < b.y;
+  }
+
+  bool comparePoints(const Point& a, const Point& b)
+  {
+    return a.x < b.x || (a.x == b.x && a.y < b.y);
+  }
+
+  Point translatePoint(const Point& p, int dx, int dy)
+  {
+    return {p.x - dx, p.y - dy};
+  }
+
+  Point translatePoint(const Point& p, int dx, int dy)
+  {
+    return {p.y, p.x};
+  }
+
+  double crossTerm(const std::vector< Point >& pts, size_t i, size_t n)
+  {
+    size_t j = (i + 1) % n;
+    return static_cast< double >(pts[i].x) * static_cast< double >(pts[j].y) - static_cast< double >(pts[j].x) * static_cast< double >(pts[i].y);
+  }
 }
