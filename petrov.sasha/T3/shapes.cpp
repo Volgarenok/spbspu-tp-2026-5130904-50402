@@ -88,6 +88,10 @@ namespace petrov
     return {p.y, p.x};
   }
 
+  Point swapPointXY(const Point& p) {
+    return {p.y, p.x};
+  }
+
   double crossTerm(const std::vector< Point >& pts, size_t i, size_t n) {
     size_t j = (i + 1) % n;
     return static_cast< double >(pts[i].x) * static_cast< double >(pts[j].y)
@@ -106,5 +110,12 @@ namespace petrov
     std::transform(indices.begin(), indices.end(), terms.begin(), std::bind(crossTerm, std::cref(pts), _1, n));
     double sum = std::accumulate(terms.begin(), terms.end(), 0.0);
     return std::abs(sum) / 2.0;
+  }
+
+  Polygon swapCoordinates(const Polygon& poly) {
+    Polygon res;
+    res.points.reserve(poly.points.size());
+    std::transform(poly.points.begin(), poly.points.end(), std::back_inserter(res.points), swapPointXY);
+    return res;
   }
 }
