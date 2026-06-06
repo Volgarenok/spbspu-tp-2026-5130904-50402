@@ -3,12 +3,14 @@
 
 #include <istream>
 #include <vector>
+
 namespace petrov
 {
   struct Point
   {
     int x, y;
   };
+
   bool operator==(const Point& lhs, const Point& rhs);
 
   struct Polygon
@@ -41,7 +43,6 @@ namespace petrov
   bool compareByY(const Point& a, const Point& b);
   bool comparePoints(const Point& a, const Point& b);
   Point translatePoint(const Point& p, int dx, int dy);
-  Point translatePoint(const Point& p, int dx, int dy);
   Point swapPointXY(const Point& p);
   double crossTerm(const std::vector< Point >& pts, size_t i, size_t n);
 
@@ -52,5 +53,4 @@ namespace petrov
 }
 
 #endif
-
 
