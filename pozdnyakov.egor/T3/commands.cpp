@@ -42,6 +42,11 @@ namespace pozdnyakov
       out << result << '\n';
     } else if (isNumericString(arg)) {
       const size_t num = std::stoull(arg);
+
+      if (num < 3) {
+        throw std::invalid_argument("invalid");
+      }
+
       const double result = calculateAreaNum(polygons, num);
       out << result << '\n';
     } else {
@@ -94,6 +99,11 @@ namespace pozdnyakov
       out << result << '\n';
     } else if (isNumericString(arg)) {
       const size_t num = std::stoull(arg);
+
+      if (num < 3) {
+        throw std::invalid_argument("invalid");
+      }
+
       const size_t result = countNumVertices(polygons, num);
       out << result << '\n';
     } else {

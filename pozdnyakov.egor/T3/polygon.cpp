@@ -362,8 +362,9 @@ namespace pozdnyakov
   double calculateAreaMean(const std::vector< Polygon > &polygons)
   {
     if (polygons.empty()) {
-      return 0.0;
+      throw std::logic_error("empty");
     }
+
     std::vector< double > areas(polygons.size());
     std::transform(polygons.begin(), polygons.end(), areas.begin(), GetArea{});
     const double sum = std::accumulate(areas.begin(), areas.end(), 0.0);
@@ -379,38 +380,42 @@ namespace pozdnyakov
 
   double getMinArea(const std::vector< Polygon > &polygons)
   {
-    const auto it = std::min_element(polygons.begin(), polygons.end(), CompareArea{});
-    if (it != polygons.end()) {
-      return getArea(*it);
+    if (polygons.empty()) {
+      throw std::logic_error("empty");
     }
-    return 0.0;
+
+    const auto it = std::min_element(polygons.begin(), polygons.end(), CompareArea{});
+    return getArea(*it);
   }
 
   size_t getMinVertexes(const std::vector< Polygon > &polygons)
   {
-    const auto it = std::min_element(polygons.begin(), polygons.end(), CompareVertices{});
-    if (it != polygons.end()) {
-      return it->points.size();
+    if (polygons.empty()) {
+      throw std::logic_error("empty");
     }
-    return 0;
+
+    const auto it = std::min_element(polygons.begin(), polygons.end(), CompareVertices{});
+    return it->points.size();
   }
 
   double getMaxArea(const std::vector< Polygon > &polygons)
   {
-    const auto it = std::max_element(polygons.begin(), polygons.end(), CompareArea{});
-    if (it != polygons.end()) {
-      return getArea(*it);
+    if (polygons.empty()) {
+      throw std::logic_error("empty");
     }
-    return 0.0;
+
+    const auto it = std::max_element(polygons.begin(), polygons.end(), CompareArea{});
+    return getArea(*it);
   }
 
   size_t getMaxVertexes(const std::vector< Polygon > &polygons)
   {
-    const auto it = std::max_element(polygons.begin(), polygons.end(), CompareVertices{});
-    if (it != polygons.end()) {
-      return it->points.size();
+    if (polygons.empty()) {
+      throw std::logic_error("empty");
     }
-    return 0;
+
+    const auto it = std::max_element(polygons.begin(), polygons.end(), CompareVertices{});
+    return it->points.size();
   }
 
   size_t countEvenVertices(const std::vector< Polygon > &polygons)
