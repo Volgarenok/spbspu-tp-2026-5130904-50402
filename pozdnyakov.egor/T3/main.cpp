@@ -35,8 +35,10 @@ int main(int argc, char *argv[])
 
   std::cout << std::fixed << std::setprecision(1);
 
-  std::any_of(std::istream_iterator< std::string >(std::cin), std::istream_iterator< std::string >(),
-    pozdnyakov::CommandExecutor{commands});
+  const bool result = std::any_of(std::istream_iterator< std::string >(std::cin),
+                                  std::istream_iterator< std::string >(), pozdnyakov::CommandExecutor{commands});
+  static_cast< void >(result);
 
   return 0;
+
 }

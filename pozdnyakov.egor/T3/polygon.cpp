@@ -69,16 +69,25 @@ namespace pozdnyakov
     if (!sentry) {
       return in;
     }
+
     size_t size = 0;
     in >> size;
     if (!in) {
       return in;
     }
+
+    if (size < 3) {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+
     Polygon temp{};
     std::generate_n(std::back_inserter(temp.points), size, PointReader{in});
+
     if (in) {
       dest = temp;
     }
+
     return in;
   }
 
