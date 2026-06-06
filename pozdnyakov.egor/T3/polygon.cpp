@@ -89,9 +89,9 @@ namespace pozdnyakov
     }
 
     const bool hasDuplicate = std::any_of(
-      temp.points.begin(), 
-      temp.points.end(), 
-      [&temp](const Point &point) 
+      temp.points.begin(),
+      temp.points.end(),
+      [&temp](const Point &point)
       {
         return std::count(temp.points.begin(), temp.points.end(), point) > 1;
       }
