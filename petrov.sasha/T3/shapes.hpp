@@ -51,3 +51,6 @@ namespace petrov
   bool isPermutationOf(const Polygon& a, const Polygon& b);
 }
 
+#endif
+
+
