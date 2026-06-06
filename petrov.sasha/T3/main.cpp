@@ -37,4 +37,13 @@ int main(int argc, char** argv)
       file.ignore(streamMax, '\n');
     }
   }
+
+  std::map< std::string, std::function< void() > > commands;
+  commands["AREA"] = std::bind(petrov::area, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["MAX"] = std::bind(petrov::max, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["MIN"] = std::bind(petrov::min, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["COUNT"] = std::bind(petrov::count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["PERMS"] = std::bind(petrov::perms, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["INFRAME"] = std::bind(petrov::inframe, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+
 }
