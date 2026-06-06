@@ -82,4 +82,15 @@ namespace petrov
   bool isPointInsideFrame(const Point& p, int minX, int minY, int maxX, int maxY) {
     return p.x >= minX && p.x <= maxX && p.y >= minY && p.y <= maxY;
   }
+
+  template< class Pred >
+  void printFilteredSum(std::ostream& out, const std::vector< Polygon >& polygons, Pred pred) {
+    std::vector< Polygon > filtered;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), pred);
+    std::vector< double > areas;
+    areas.reserve(filtered.size());
+    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), getArea);
+    double sum = std::accumulate(areas.begin(), areas.end(), 0.0);
+    out << std::fixed << std::setprecision(1) << sum << '\n';
+  }
 }
