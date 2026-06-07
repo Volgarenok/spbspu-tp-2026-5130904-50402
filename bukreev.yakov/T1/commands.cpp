@@ -133,8 +133,8 @@ void bukreev::haltCommand(std::istream& in)
     throw std::logic_error("Invalid input");
   }
 
-  std::shared_ptr< Note > f = notesMap.at(from);
-  f->removeLink(to);
+  std::shared_ptr< Note > note = notesMap.at(from);
+  note->removeLink(to);
 }
 
 void bukreev::mindCommand(std::istream& in, std::ostream& out)
