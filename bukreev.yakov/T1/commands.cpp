@@ -64,7 +64,7 @@ void bukreev::noteCommand(std::istream& in)
     throw std::logic_error("Note already exists");
   }
 
-  notesMap[name] = std::make_shared< Note >(name);
+  notesMap.insert({name, std::make_shared< Note >(name)});
 }
 
 void bukreev::lineCommand(std::istream& in)
@@ -75,12 +75,8 @@ void bukreev::lineCommand(std::istream& in)
     throw std::logic_error("Invalid input");
   }
 
-  if (!notesMap.count(name))
-  {
-    throw std::logic_error("Note does not exist");
-  }
-
-  notesMap[name]->appendLine(line);
+  std::shared_ptr< Note > note = notesMap.at(name);
+  note->appendLine(line);
 }
 
 void bukreev::showCommand(std::istream& in, std::ostream& out)
@@ -91,12 +87,8 @@ void bukreev::showCommand(std::istream& in, std::ostream& out)
     throw std::logic_error("Invalid input");
   }
 
-  if (!notesMap.count(name))
-  {
-    throw std::logic_error("Note does not exist");
-  }
-
-  notesMap[name]->show(out);
+  std::shared_ptr< Note > note = notesMap.at(name);
+  note->show(out);
 }
 
 void bukreev::dropCommand(std::istream& in)
@@ -124,12 +116,9 @@ void bukreev::linkCommand(std::istream& in)
     throw std::logic_error("Invalid input");
   }
 
-  if (!notesMap.count(from) || !notesMap.count(to))
-  {
-    throw std::logic_error("Note does not exist");
-  }
-
-  notesMap[from]->addLink(notesMap[to]);
+  std::shared_ptr< Note > f = notesMap.at(from);
+  std::shared_ptr< Note > t = notesMap.at(to);
+  f->addLink(t);
 }
 
 void bukreev::haltCommand(std::istream& in)
@@ -141,12 +130,8 @@ void bukreev::haltCommand(std::istream& in)
     throw std::logic_error("Invalid input");
   }
 
-  if (!notesMap.count(from) || !notesMap.count(to))
-  {
-    throw std::logic_error("Note does not exist");
-  }
-
-  notesMap[from]->removeLink(to);
+  std::shared_ptr< Note > f = notesMap.at(from);
+  f->removeLink(to);
 }
 
 void bukreev::mindCommand(std::istream& in, std::ostream& out)
@@ -158,12 +143,8 @@ void bukreev::mindCommand(std::istream& in, std::ostream& out)
     throw std::logic_error("Invalid input");
   }
 
-  if (!notesMap.count(name))
-  {
-    throw std::logic_error("Note does not exist");
-  }
-
-  notesMap[name]->showLinks(out);
+  std::shared_ptr< Note > note = notesMap.at(name);
+  note->showLinks(out);
 }
 
 void bukreev::expiredCommand(std::istream& in, std::ostream& out)
@@ -175,12 +156,8 @@ void bukreev::expiredCommand(std::istream& in, std::ostream& out)
     throw std::logic_error("Invalid input");
   }
 
-  if (!notesMap.count(name))
-  {
-    throw std::logic_error("Note does not exist");
-  }
-
-  out << notesMap[name]->countExpired() << '\n';
+  std::shared_ptr< Note > note = notesMap.at(name);
+  out << note->countExpired();
 }
 
 void bukreev::refreshCommand(std::istream& in)
@@ -192,10 +169,6 @@ void bukreev::refreshCommand(std::istream& in)
     throw std::logic_error("Invalid input");
   }
 
-  if (!notesMap.count(name))
-  {
-    throw std::logic_error("Note does not exist");
-  }
-
-  notesMap[name]->removeExpired();
+  std::shared_ptr< Note > note = notesMap.at(name);
+  note->removeExpired();
 }

@@ -10,8 +10,7 @@ namespace bukreev
   class Note
   {
   public:
-    Note(std::string name) :
-      mName(name) {}
+    Note(std::string name);
     std::string getName();
     void appendLine(std::string line);
     void addLink(std::shared_ptr< Note > to);

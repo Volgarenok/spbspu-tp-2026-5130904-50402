@@ -1,6 +1,10 @@
 #include "note.hpp"
 #include <iostream>
 
+bukreev::Note::Note(std::string name):
+  mName(name)
+{}
+
 std::string bukreev::Note::getName()
 {
   return mName;
@@ -19,9 +23,11 @@ void bukreev::Note::show(std::ostream& out)
   }
   else
   {
-    for (const std::string& str : mLines)
+    out << mLines[0];
+
+    for (size_t i = 1; i < mLines.size(); i++)
     {
-      out << str << '\n';
+      out << '\n' << mLines[i];
     }
   }
 }
@@ -52,25 +58,20 @@ void bukreev::Note::removeLink(std::string to)
 
 void bukreev::Note::showLinks(std::ostream& out)
 {
-  if (mLinks.size() == 0)
+  bool shown = false;
+  for (const NoteLink& link : mLinks)
   {
-    out << '\n';
-  }
-  else
-  {
-    bool shown = false;
-    for (const NoteLink& link : mLinks)
+    if (!link.second.expired())
     {
-      if (!link.second.expired())
+      if (shown)
       {
-        out << link.first << '\n';
+        out << '\n' << link.first;
+      }
+      else
+      {
+        out << link.first;
         shown = true;
       }
-    }
-
-    if (!shown)
-    {
-      out << '\n';
     }
   }
 }

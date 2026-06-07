@@ -9,8 +9,9 @@ int main()
     try
     {
       bukreev::executeCommand(cmd, std::cin, std::cout);
+      std::cout << '\n';
     }
-    catch(const std::logic_error& e)
+    catch (...)
     {
       std::cout << "<INVALID COMMAND>\n";
     }
