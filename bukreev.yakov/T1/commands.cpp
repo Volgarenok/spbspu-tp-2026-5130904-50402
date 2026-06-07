@@ -20,6 +20,7 @@ void bukreev::executeCommand(std::string cmd, std::istream& in, std::ostream& ou
   else if (cmd == "show")
   {
     bukreev::showCommand(in, out);
+    std::cout << '\n';
   }
   else if (cmd == "drop")
   {
@@ -36,10 +37,12 @@ void bukreev::executeCommand(std::string cmd, std::istream& in, std::ostream& ou
   else if (cmd == "mind")
   {
     bukreev::mindCommand(in, out);
+    std::cout << '\n';
   }
   else if (cmd == "expired")
   {
     bukreev::expiredCommand(in, out);
+    std::cout << '\n';
   }
   else if (cmd == "refresh")
   {

@@ -9,7 +9,6 @@ int main()
     try
     {
       bukreev::executeCommand(cmd, std::cin, std::cout);
-      std::cout << '\n';
     }
     catch (...)
     {
