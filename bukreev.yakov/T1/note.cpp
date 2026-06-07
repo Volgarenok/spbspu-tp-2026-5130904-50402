@@ -17,18 +17,11 @@ void bukreev::Note::appendLine(std::string line)
 
 void bukreev::Note::show(std::ostream& out)
 {
-  if (mLines.size() == 0)
-  {
-    out << '\n';
-  }
-  else
-  {
-    out << mLines[0];
+  out << mLines[0];
 
-    for (size_t i = 1; i < mLines.size(); i++)
-    {
-      out << '\n' << mLines[i];
-    }
+  for (size_t i = 1; i < mLines.size(); i++)
+  {
+    out << '\n' << mLines[i];
   }
 }
 

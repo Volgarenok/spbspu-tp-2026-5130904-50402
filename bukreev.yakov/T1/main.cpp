@@ -1,4 +1,5 @@
 #include <iostream>
+#include <limits>
 #include "commands.hpp"
 
 int main()
@@ -13,6 +14,7 @@ int main()
     catch (...)
     {
       std::cout << "<INVALID COMMAND>\n";
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
 }

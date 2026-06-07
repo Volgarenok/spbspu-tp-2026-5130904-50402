@@ -134,6 +134,11 @@ void bukreev::haltCommand(std::istream& in)
   }
 
   std::shared_ptr< Note > note = notesMap.at(from);
+  if (!notesMap.count(to))
+  {
+    throw std::logic_error("Note does not exist");
+  }
+
   note->removeLink(to);
 }
 
