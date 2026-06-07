@@ -11,16 +11,15 @@ namespace bukreev
 
   void executeCommand(std::string cmd, std::istream& in, std::ostream& out);
 
-  void noteCommand(std::istream& in, std::ostream& out);
-  void lineCommand(std::istream& in, std::ostream& out);
+  void noteCommand(std::istream& in);
+  void lineCommand(std::istream& in);
   void showCommand(std::istream& in, std::ostream& out);
-  void dropCommand(std::istream& in, std::ostream& out);
-  void linkCommand(std::istream& in, std::ostream& out);
-  void haltCommand(std::istream& in, std::ostream& out);
+  void dropCommand(std::istream& in);
+  void linkCommand(std::istream& in);
+  void haltCommand(std::istream& in);
   void mindCommand(std::istream& in, std::ostream& out);
   void expiredCommand(std::istream& in, std::ostream& out);
-  void refreshCommand(std::istream& in, std::ostream& out);
-  void invalidCommand(std::istream& in, std::ostream& out);
+  void refreshCommand(std::istream& in);
 }
 
 int main()
@@ -28,7 +27,14 @@ int main()
   std::string cmd;
   while (std::cin >> cmd)
   {
-    bukreev::executeCommand(cmd, std::cin, std::cout);
+    try
+    {
+      bukreev::executeCommand(cmd, std::cin, std::cout);
+    }
+    catch(const std::logic_error& e)
+    {
+      std::cout << "<INVALID COMMAND>\n";
+    }
   }
 }
 
@@ -36,11 +42,11 @@ void bukreev::executeCommand(std::string cmd, std::istream& in, std::ostream& ou
 {
   if (cmd == "note")
   {
-    bukreev::noteCommand(in, out);
+    bukreev::noteCommand(in);
   }
   else if (cmd == "line")
   {
-    bukreev::lineCommand(in, out);
+    bukreev::lineCommand(in);
   }
   else if (cmd == "show")
   {
@@ -48,15 +54,15 @@ void bukreev::executeCommand(std::string cmd, std::istream& in, std::ostream& ou
   }
   else if (cmd == "drop")
   {
-    bukreev::dropCommand(in, out);
+    bukreev::dropCommand(in);
   }
   else if (cmd == "link")
   {
-    bukreev::linkCommand(in, out);
+    bukreev::linkCommand(in);
   }
   else if (cmd == "halt")
   {
-    bukreev::haltCommand(in, out);
+    bukreev::haltCommand(in);
   }
   else if (cmd == "mind")
   {
@@ -68,45 +74,41 @@ void bukreev::executeCommand(std::string cmd, std::istream& in, std::ostream& ou
   }
   else if (cmd == "refresh")
   {
-    bukreev::refreshCommand(in, out);
+    bukreev::refreshCommand(in);
   }
   else
   {
-    bukreev::invalidCommand(in, out);
+    throw std::logic_error("Unknown command");
   }
 }
 
-void bukreev::noteCommand(std::istream& in, std::ostream& out)
+void bukreev::noteCommand(std::istream& in)
 {
   std::string name;
   if (!(in >> name))
   {
-    invalidCommand(in, out);
-    return;
+    throw std::logic_error("Invalid input");
   }
 
   if (notesMap.count(name))
   {
-    invalidCommand(in, out);
-    return;
+    throw std::logic_error("Note already exists");
   }
 
   notesMap[name] = std::make_shared< Note >(name);
 }
 
-void bukreev::lineCommand(std::istream& in, std::ostream& out)
+void bukreev::lineCommand(std::istream& in)
 {
   std::string name, line;
   if (!(in >> name >> std::quoted(line)))
   {
-    invalidCommand(in, out);
-    return;
+    throw std::logic_error("Invalid input");
   }
 
   if (!notesMap.count(name))
   {
-    invalidCommand(in, out);
-    return;
+    throw std::logic_error("Note does not exist");
   }
 
   notesMap[name]->appendLine(line);
@@ -117,78 +119,62 @@ void bukreev::showCommand(std::istream& in, std::ostream& out)
   std::string name;
   if (!(in >> name))
   {
-    invalidCommand(in, out);
-    return;
+    throw std::logic_error("Invalid input");
   }
 
   if (!notesMap.count(name))
   {
-    invalidCommand(in, out);
-    return;
+    throw std::logic_error("Note does not exist");
   }
 
   notesMap[name]->show(out);
 }
 
-void bukreev::dropCommand(std::istream& in, std::ostream& out)
+void bukreev::dropCommand(std::istream& in)
 {
   std::string name;
   if (!(in >> name))
   {
-    invalidCommand(in, out);
-    return;
+    throw std::logic_error("Invalid input");
   }
 
   if (!notesMap.count(name))
   {
-    invalidCommand(in, out);
-    return;
+    throw std::logic_error("Note does not exist");
   }
 
   notesMap.erase(name);
 }
 
-void bukreev::linkCommand(std::istream& in, std::ostream& out)
+void bukreev::linkCommand(std::istream& in)
 {
   std::string from, to;
 
   if (!(in >> from >> to))
   {
-    invalidCommand(in, out);
-    return;
+    throw std::logic_error("Invalid input");
   }
 
   if (!notesMap.count(from) || !notesMap.count(to))
   {
-    invalidCommand(in, out);
-    return;
+    throw std::logic_error("Note does not exist");
   }
 
-  try
-  {
-    notesMap[from]->addLink(notesMap[to]);
-  }
-  catch(const std::logic_error& e)
-  {
-    invalidCommand(in, out);
-    return;
-  }
+  notesMap[from]->addLink(notesMap[to]);
 }
 
-void bukreev::haltCommand(std::istream& in, std::ostream& out)
+void bukreev::haltCommand(std::istream& in)
 {
   std::string from, to;
 
   if (!(in >> from >> to))
   {
-    invalidCommand(in, out);
-    return;
+    throw std::logic_error("Invalid input");
   }
 
   if (!notesMap.count(from) || !notesMap.count(to))
   {
-    invalidCommand(in, out);
-    return;
+    throw std::logic_error("Note does not exist");
   }
 
   notesMap[from]->removeLink(to);
@@ -200,14 +186,12 @@ void bukreev::mindCommand(std::istream& in, std::ostream& out)
 
   if (!(in >> name))
   {
-    invalidCommand(in, out);
-    return;
+    throw std::logic_error("Invalid input");
   }
 
   if (!notesMap.count(name))
   {
-    invalidCommand(in, out);
-    return;
+    throw std::logic_error("Note does not exist");
   }
 
   notesMap[name]->showLinks(out);
@@ -219,40 +203,30 @@ void bukreev::expiredCommand(std::istream& in, std::ostream& out)
 
   if (!(in >> name))
   {
-    invalidCommand(in, out);
-    return;
+    throw std::logic_error("Invalid input");
   }
 
   if (!notesMap.count(name))
   {
-    invalidCommand(in, out);
-    return;
+    throw std::logic_error("Note does not exist");
   }
 
   out << notesMap[name]->countExpired() << '\n';
 }
 
-void bukreev::refreshCommand(std::istream& in, std::ostream& out)
+void bukreev::refreshCommand(std::istream& in)
 {
   std::string name;
 
   if (!(in >> name))
   {
-    invalidCommand(in, out);
-    return;
+    throw std::logic_error("Invalid input");
   }
 
   if (!notesMap.count(name))
   {
-    invalidCommand(in, out);
-    return;
+    throw std::logic_error("Note does not exist");
   }
 
   notesMap[name]->removeExpired();
-}
-
-void bukreev::invalidCommand(std::istream& in, std::ostream& out)
-{
-  out << "<INVALID COMMAND>\n";
-  in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
 }
