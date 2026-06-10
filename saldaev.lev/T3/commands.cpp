@@ -116,3 +116,23 @@ void saldaev::handleMin(std::istream &in, std::ostream &out, const std::vector< 
     throw std::invalid_argument("invalid");
   }
 }
+
+void saldaev::handleCount(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  std::string param;
+  if (!(in >> param)) {
+    throw std::invalid_argument("invalid");
+  }
+
+  if (param == "EVEN") {
+    out << std::count_if(polygons.begin(), polygons.end(), isEven);
+  } else if (param == "ODD") {
+    out << std::count_if(polygons.begin(), polygons.end(), isOdd);
+  } else {
+    size_t n = std::stoul(param);
+    if (n < 3) {
+      throw std::invalid_argument("invalid");
+    }
+    out << std::count_if(polygons.begin(), polygons.end(), std::bind(matchVertexies, std::placeholders::_1, n));
+  }
+}
