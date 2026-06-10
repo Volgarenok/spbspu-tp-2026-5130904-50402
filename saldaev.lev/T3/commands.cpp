@@ -95,3 +95,24 @@ void saldaev::handleMax(std::istream &in, std::ostream &out, const std::vector< 
     throw std::invalid_argument("invalid");
   }
 }
+
+void saldaev::handleMin(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  if (polygons.empty()) {
+    throw std::invalid_argument("invalid");
+  }
+  std::string param;
+  if (!(in >> param)) {
+    throw std::invalid_argument("invalid");
+  }
+
+  if (param == "AREA") {
+    auto it = std::min_element(polygons.begin(), polygons.end(), lessArea);
+    out << std::fixed << std::setprecision(1) << calcArea(*it);
+  } else if (param == "VERTEXES") {
+    auto it = std::min_element(polygons.begin(), polygons.end(), lessVertex);
+    out << it->points.size();
+  } else {
+    throw std::invalid_argument("invalid");
+  }
+}
