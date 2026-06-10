@@ -136,3 +136,8 @@ void saldaev::handleCount(std::istream &in, std::ostream &out, const std::vector
     out << std::count_if(polygons.begin(), polygons.end(), std::bind(matchVertexies, std::placeholders::_1, n));
   }
 }
+
+void saldaev::handleRects(std::istream &, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  out << std::count_if(polygons.begin(), polygons.end(), isRect);
+}

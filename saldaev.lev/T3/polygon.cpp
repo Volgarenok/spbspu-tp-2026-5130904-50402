@@ -14,6 +14,17 @@ namespace
     size_t j = (i + 1) % n;
     return pts[i].x * pts[j].y - pts[j].x * pts[i].y;
   }
+
+  bool checkRightAngle(const std::vector< saldaev::Point > &pts, size_t i, size_t n)
+  {
+    size_t prev = (i + n - 1) % n;
+    size_t next = (i + 1) % n;
+    int dx1 = pts[i].x - pts[prev].x;
+    int dy1 = pts[i].y - pts[prev].y;
+    int dx2 = pts[next].x - pts[i].x;
+    int dy2 = pts[next].y - pts[i].y;
+    return dx1 * dx2 + dy1 * dy2 == 0;
+  }
 }
 
 std::istream &saldaev::operator>>(std::istream &in, Point &point)
@@ -64,4 +75,15 @@ double saldaev::calcArea(const Polygon &polygon)
   std::transform(idxs.begin(), idxs.end(), terms.begin(), func);
   double sum = std::accumulate(terms.begin(), terms.end(), 0.0, std::plus< double >());
   return std::abs(sum) / 2.0;
+}
+
+bool saldaev::isRect(const Polygon &polygon)
+{
+  if (polygon.points.size() != 4) {
+    return false;
+  }
+  std::vector< size_t > idxs(4);
+  std::iota(idxs.begin(), idxs.end(), 0);
+  auto func = std::bind(checkRightAngle, std::cref(polygon.points), std::placeholders::_1, 4);
+  return std::all_of(idxs.begin(), idxs.end(), func);
 }
