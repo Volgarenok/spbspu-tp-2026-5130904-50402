@@ -54,8 +54,11 @@ namespace khalikov
     in >> name;
     try {
       auto &note = data.at(name);
-      for (const std::string &line : note->text) {
-        out << line << '\n';
+      if (!note->text.empty()) {
+        out << note->text.front();
+        for (size_t i = 1; i < note->text.size(); ++i) {
+          out << '\n'; << note->text[i];
+        }
       }
     } catch (const std::out_of_range &) {
       throw std::logic_error("Note with this name doesn't exist.");
@@ -118,10 +121,17 @@ namespace khalikov
     in >> name;
     try {
       auto &note = data.at(name);
+      std::vector< std::string > temp;
       for (const auto &link : note->links) {
-        std::shared_ptr< Note > ptr = link.lock();
+        auto ptr = link.lock();
         if (ptr) {
-          out << ptr->name << '\n';
+          temp.push_back(ptr->name);
+        }
+      }
+      if (!temp.empty()) {
+        out << temp.front();
+        for (size_t i = 1; i < temp.size(); ++i) {
+          out << '\n' << temp[i];
         }
       }
     } catch (const std::out_of_range &) {

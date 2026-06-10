@@ -27,7 +27,7 @@ int main()
   while (std::cin >> cmd) {
     try {
       cmds.at(cmd)(std::cin, std::cout, data);
-      if (cmd == "show" || cmd == "mind" || cmd == "expired") {
+      if (cmd == "show" || cmd == "mind") {
         std::cout << '\n';
       }
     } catch (const std::exception &) {
