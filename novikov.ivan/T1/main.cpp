@@ -27,7 +27,10 @@ int main()
     try
     {
       cmds.at(cmd)(std::cin, std::cout, notes);
-      std::cout << "\n";
+      if (cmd == "show" || cmd == "mind" || cmd == "expired")
+      {
+        std::cout << "\n";
+      }
     }
     catch (...)
     {
