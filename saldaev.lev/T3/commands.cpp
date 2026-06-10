@@ -33,6 +33,16 @@ namespace
     std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), saldaev::calcArea);
     out << std::accumulate(areas.begin(), areas.end(), 0.0, std::plus< double >());
   }
+
+  bool lessArea(const saldaev::Polygon &a, const saldaev::Polygon &b)
+  {
+    return saldaev::calcArea(a) < saldaev::calcArea(b);
+  }
+
+  bool lessVertex(const saldaev::Polygon &a, const saldaev::Polygon &b)
+  {
+    return a.points.size() < b.points.size();
+  }
 }
 
 void saldaev::handleArea(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
@@ -62,5 +72,26 @@ void saldaev::handleArea(std::istream &in, std::ostream &out, const std::vector<
       throw std::invalid_argument("invalid");
     }
     printFilteredSum(out, polygons, std::bind(matchVertexies, std::placeholders::_1, n));
+  }
+}
+
+void saldaev::handleMax(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  if (polygons.empty()) {
+    throw std::invalid_argument("invalid");
+  }
+  std::string param;
+  if (!(in >> param)) {
+    throw std::invalid_argument("invalid");
+  }
+
+  if (param == "AREA") {
+    auto it = std::max_element(polygons.begin(), polygons.end(), lessArea);
+    out << std::fixed << std::setprecision(1) << saldaev::calcArea(*it);
+  } else if (param == "VERTEXES") {
+    auto it = std::max_element(polygons.begin(), polygons.end(), lessVertex);
+    out << it->points.size();
+  } else {
+    throw std::invalid_argument("invalid");
   }
 }
