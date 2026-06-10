@@ -57,7 +57,7 @@ namespace khalikov
       if (!note->text.empty()) {
         out << note->text.front();
         for (size_t i = 1; i < note->text.size(); ++i) {
-          out << '\n'; << note->text[i];
+          out << '\n' << note->text[i];
         }
       }
     } catch (const std::out_of_range &) {
