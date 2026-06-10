@@ -32,9 +32,9 @@ void novikov::show(std::istream& in, std::ostream& out, novikov::map_t& notes)
   {
     out << entries[0];
   }
-  for (std::string line : entries)
+  for (size_t i = 1; i < entries.size(); ++i)
   {
-    out << '\n' << line;
+    out << '\n' << entries[i];
   }
 }
 
@@ -95,9 +95,9 @@ void novikov::mind(std::istream& in, std::ostream& out, novikov::map_t& notes)
   {
     out << linkIds[0];
   }
-  for (const std::string& id : linkIds)
+  for (size_t i = 1; i < linkIds.size(); ++i)
   {
-    out << "\n" << id;
+    out << "\n" << linkIds[i];
   }
 }
 
