@@ -43,6 +43,19 @@ namespace
   {
     return a.points.size() < b.points.size();
   }
+
+  using vecPolIt = std::vector< saldaev::Polygon >::const_iterator;
+  size_t countMaxseq(vecPolIt first, vecPolIt last, const saldaev::Polygon &sample, size_t currMax)
+  {
+    const auto start = std::find(first, last, sample);
+    if (start == last) {
+      return currMax;
+    }
+    const auto end =
+        std::find_if_not(start, last, std::bind(std::equal_to< saldaev::Polygon >(), std::placeholders::_1, sample));
+    const size_t seqLen = static_cast< size_t >(std::distance(start, end));
+    return countMaxseq(end, last, sample, std::max(currMax, seqLen));
+  }
 }
 
 void saldaev::handleArea(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
@@ -140,4 +153,19 @@ void saldaev::handleCount(std::istream &in, std::ostream &out, const std::vector
 void saldaev::handleRects(std::istream &, std::ostream &out, const std::vector< Polygon > &polygons)
 {
   out << std::count_if(polygons.begin(), polygons.end(), isRect);
+}
+
+void saldaev::handleMexseq(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  Polygon sample;
+  if (!(in >> sample)) {
+    throw std::invalid_argument("");
+  }
+
+  in >> std::ws;
+  if (in.peek() != EOF || in.peek() != '\n') {
+    throw std::invalid_argument("");
+  }
+
+  out << countMaxseq(polygons.begin(), polygons.end(), sample, 0) << '\n';
 }
