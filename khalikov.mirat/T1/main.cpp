@@ -1,3 +1,4 @@
+#include "note.hpp"
 #include <iostream>
 #include <vector>
 #include <string>
@@ -6,198 +7,30 @@
 #include <unordered_map>
 #include <memory>
 
-struct Note
-{
-  std::string name;
-  std::vector< std::string > text;
-  std::vector< std::weak_ptr< Note > > links;
-
-  Note(const std::string &nname):
-    name(nname)
-  {}
-};
-
-using d_t = std::unordered_map< std::string, std::shared_ptr< Note > >;
-
-void noteCommand(std::istream &in, std::ostream &, d_t &data)
-{
-  std::string name;
-  in >> name;
-  if (data.find(name) == data.cend()) {
-    data[name] = std::make_shared< Note >(name);
-  } else {
-    throw std::logic_error("Note already exist.");
-  }
-}
-
-void lineCommand(std::istream &in, std::ostream &, d_t &data)
-{
-  std::string name, str;
-  in >> name;
-  auto it = data.find(name);
-  if (it != data.cend()) {
-    in >> std::quoted(str);
-    it->second->text.push_back(str);
-  } else {
-    throw std::logic_error("Note with this name doesn't exist.");
-  }
-}
-
-void showCommand(std::istream &in, std::ostream &out, d_t &data)
-{
-  std::string name;
-  in >> name;
-  auto it = data.find(name);
-  if (it != data.cend()) {
-    for (auto yait = it->second->text.cbegin(); yait != it->second->text.cend(); ++yait) {
-      out << *yait << '\n';
-    }
-    if (it->second->text.empty()) {
-      out << '\n';
-    }
-  } else {
-    throw std::logic_error("Note with this name doesn't exist.");
-  }
-}
-
-void dropCommand(std::istream &in, std::ostream &, d_t &data)
-{
-  std::string name;
-  in >> name;
-  auto it = data.find(name);
-  if (it != data.cend()) {
-    data.erase(it);
-  } else {
-    throw std::logic_error("Note with this name doesn't exist.");
-  }
-}
-
-void linkCommand(std::istream &in, std::ostream &, d_t &data)
-{
-  std::string name, yaname;
-  in >> name >> yaname;
-  auto it = data.find(name);
-  auto yait = data.find(yaname);
-  if (it != data.cend() && yait != data.cend()) {
-    auto itlink = it->second->links.cbegin();
-    for (; itlink != it->second->links.cend(); ++itlink) {
-      if (itlink->lock() && itlink->lock()->name == yaname) {
-        throw std::logic_error("This note already linked with this");
-      }
-    }
-    it->second->links.push_back(yait->second);
-  } else {
-    throw std::logic_error("Note with this name doesn't exist.");
-  }
-}
-
-void haltCommand(std::istream &in, std::ostream &, d_t &data)
-{
-  std::string name, yaname;
-  in >> name >> yaname;
-  auto it = data.find(name);
-  auto yait = data.find(yaname);
-  if (it != data.cend() && yait != data.cend()) {
-    bool deleted = false;
-    auto itlink = it->second->links.begin();
-    for (; itlink != it->second->links.end(); ++itlink) {
-      if (itlink->lock() && itlink->lock()->name == yaname) {
-        it->second->links.erase(itlink);
-        deleted = true;
-        break;
-      }
-    }
-    if (!deleted) {
-      throw std::logic_error("Note is not linked with this.");
-    }
-  } else {
-    throw std::logic_error("Note with this name doesn't exist.");
-  }
-}
-
-void mindCommand(std::istream &in, std::ostream &out, d_t &data)
-{
-  std::string name;
-  in >> name;
-  auto it = data.find(name);
-  if (it != data.cend()) {
-    auto itlink = it->second->links.begin();
-    bool outputed = false;
-    for (; itlink != it->second->links.end(); ++itlink) {
-      if (itlink->lock()) {
-        out << itlink->lock()->name << '\n';
-        outputed = true;
-      }
-    }
-    if (!outputed) {
-      out << '\n';
-    }
-  } else {
-    throw std::logic_error("Note with this name doesn't exist.");
-  }
-}
-
-void expiredCommand(std::istream &in, std::ostream &out, d_t &data)
-{
-  std::string name;
-  in >> name;
-  auto it = data.find(name);
-  if (it != data.cend()) {
-    size_t count = 0;
-    auto itlink = it->second->links.begin();
-    for (; itlink != it->second->links.end(); ++itlink) {
-      if (itlink->expired()) {
-        count++;
-      }
-    }
-    out << count << '\n';
-  } else {
-    throw std::logic_error("Note with this name doesn't exist.");
-  }
-}
-
-void refreshCommand(std::istream &in, std::ostream &, d_t &data)
-{
-  std::string name;
-  in >> name;
-  auto it = data.find(name);
-  if (it != data.cend()) {
-    auto itlink = it->second->links.begin();
-    for (; itlink != it->second->links.end();) {
-      if (itlink->expired()) {
-        itlink = it->second->links.erase(itlink);
-      } else {
-        ++itlink;
-      }
-    }
-  } else {
-    throw std::logic_error("Note with this name doesn't exist.");
-  }
-}
+using d_t = std::unordered_map< std::string, std::shared_ptr< khalikov::Note > >;
 
 int main()
 {
   d_t data;
   using cmd_t = void (*)(std::istream &, std::ostream &, d_t &);
   std::unordered_map< std::string, cmd_t > cmds;
-  cmds["note"] = noteCommand;
-  cmds["line"] = lineCommand;
-  cmds["show"] = showCommand;
-  cmds["drop"] = dropCommand;
-  cmds["link"] = linkCommand;
-  cmds["halt"] = haltCommand;
-  cmds["mind"] = mindCommand;
-  cmds["expired"] = expiredCommand;
-  cmds["refresh"] = refreshCommand;
+  cmds["note"] = khalikov::noteCommand;
+  cmds["line"] = khalikov::lineCommand;
+  cmds["show"] = khalikov::showCommand;
+  cmds["drop"] = khalikov::dropCommand;
+  cmds["link"] = khalikov::linkCommand;
+  cmds["halt"] = khalikov::haltCommand;
+  cmds["mind"] = khalikov::mindCommand;
+  cmds["expired"] = khalikov::expiredCommand;
+  cmds["refresh"] = khalikov::refreshCommand;
   std::string cmd;
   while (std::cin >> cmd) {
     try {
       cmds.at(cmd)(std::cin, std::cout, data);
-    } catch (const std::out_of_range &) {
-      std::cout << "<INVALID COMMAND>\n";
-      auto toignore = std::numeric_limits< std::streamsize >::max();
-      std::cin.ignore(toignore, '\n');
-    } catch (const std::logic_error &e) {
+      if (cmd == "show" || cmd == "mind" || cmd == "expired") {
+        std::cout << '\n';
+      }
+    } catch (const std::exception &) {
       std::cout << "<INVALID COMMAND>\n";
       auto toignore = std::numeric_limits< std::streamsize >::max();
       std::cin.ignore(toignore, '\n');
