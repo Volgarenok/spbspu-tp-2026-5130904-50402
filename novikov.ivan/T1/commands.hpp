@@ -8,14 +8,15 @@
 
 namespace novikov
 {
+  struct Note;
+  using map_t = std::unordered_map< std::string, std::shared_ptr< novikov::Note > >;
+  using links_t = std::vector< std::pair< std::string, std::weak_ptr< novikov::Note > > >;
+
   struct Note
   {
     std::vector< std::string > entries;
     links_t links;
   };
-
-  using map_t = std::unordered_map< std::string, std::shared_ptr< novikov::Note > >;
-  using links_t = std::vector< std::pair< std::string, std::weak_ptr< novikov::Note > > >;
 
   void note(std::istream& in, std::ostream&, map_t& notes);
   void line(std::istream& in, std::ostream&, map_t& notes);
