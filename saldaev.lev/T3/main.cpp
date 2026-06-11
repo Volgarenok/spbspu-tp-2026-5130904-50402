@@ -7,6 +7,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include "commands.hpp"
 #include "polygon.hpp"
 
 int main(int argc, char **argv)
@@ -34,6 +35,12 @@ int main(int argc, char **argv)
   }
 
   std::map< std::string, std::function< void() > > commands;
+  commands["AREA"] = std::bind(saldaev::handleArea, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["MAX"] = std::bind(saldaev::handleMax, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["MIN"] = std::bind(saldaev::handleMin, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["COUNT"] = std::bind(saldaev::handleCount, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["RECTS"] = std::bind(saldaev::handleRects, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["MAXSEQ"] = std::bind(saldaev::handleMexseq, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
 
   std::string command;
   while (std::cin >> command) {
