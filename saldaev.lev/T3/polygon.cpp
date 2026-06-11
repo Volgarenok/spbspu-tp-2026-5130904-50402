@@ -92,3 +92,8 @@ bool saldaev::Polygon::operator==(const Polygon &other) const
 {
   return (points.size() == other.points.size()) && std::equal(points.begin(), points.end(), other.points.begin());
 }
+
+bool saldaev::Point::operator==(const Point &other) const
+{
+  return x == other.x && y == other.y;
+}
