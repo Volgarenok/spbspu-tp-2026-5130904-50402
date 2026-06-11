@@ -212,7 +212,7 @@ std::ostream &saldaev::operator<<(std::ostream &out, const Data &src)
     return out;
   }
   IOguard guard(out);
-  out << "(:" << "key1 " << "0b" << src.key1 << ":";
+  out << "(:" << "key1 " << "0b" << src.key1 << "':";
   out << "key2 " << "#c(" << std::fixed << std::setprecision(1) << src.key2.real() << ' ' << src.key2.imag() << "):";
   out << "key3 " << std::quoted(src.key3) << ":)";
   return out;
