@@ -1,10 +1,11 @@
-# Version 2.1
+# Version 3
 
-.PHONY: all labs clean
+.PHONY: all labs clean all-dockers
 .SECONDEXPANSION:
 .SECONDARY:
 
 BOOST_LOCATION := $(shell test -f .boost_location && cat .boost_location ; true)
+DOCKER_IMAGE ?= volgarenok/cxx-test:latest
 
 ifneq 'yes' '$(VERBOSE)'
 hidecmd := @
@@ -56,6 +57,8 @@ all: $(addprefix build-,$(labs))
 labs:
 	@echo $(labs)
 
+all-dockers: $(addprefix docker-test-,$(labs))
+
 $(addprefix run-,$(labs)): run-%: out/%/lab
 	@$(FAULT_INJECTION_CONFIG) $(if $(TIMEOUT),$(TIMEOUT_CMD) --signal=KILL $(TIMEOUT)s )$(if $(VALGRIND),valgrind $(VALGRIND) )$< $(ARGS)
 
@@ -97,5 +100,35 @@ $(header_checks): out/%.header: % | $$(@D)/.dir
 
 %/.dir:
 	@mkdir -p $(@D) && touch $@
+
+check-docker:
+	@which docker > /dev/null || (echo "Docker not installed. Run (Ubuntu/Debian):\nsudo apt install docker.io" && exit 1)
+	@docker version > /dev/null 2>&1 || (echo "Docker permission denied. Run:\nsudo usermod -aG docker $$USER\nThen re-login" && exit 1)
+
+$(addprefix doctest-,$(labs)): doctest-%: check-docker
+	$(eval student := $(word 1,$(subst /, ,$*)))
+	$(eval lab     := $(notdir $*))
+
+	@docker run --rm \
+		-v $(PWD):/workspace \
+		-w /workspace \
+		-e LAB=$(lab) \
+		-e STUDENT=$(student) \
+		-e BASE_BRANCH=origin/master \
+		$(DOCKER_IMAGE) \
+		/bin/bash -c "\
+			cd /workspace && \
+			echo '===   build    ===' && \
+			make build-$(student)/$(lab) && \
+			echo '=== acceptance ===' && \
+			/spbspu-labs-tests/test-lab-$(lab) $(student) out/$(student)/$(lab)/acceptance.xml || true && \
+			sleep 2s && \
+			echo '===  results   ===' && \
+			xsltproc -o 'out/$(student)/$(lab)/acceptance.md' \
+			'/spbspu-labs-tests/report-md.xslt' \
+			'out/$(student)/$(lab)/acceptance.xml' && \
+			cat out/$(student)/$(lab)/acceptance.md"
+
+	@rm -f vgcore.*
 
 include $(wildcard $(patsubst %.o,%.d,$(objects) $(test_objects)))
