@@ -87,3 +87,8 @@ bool saldaev::isRect(const Polygon &polygon)
   auto func = std::bind(checkRightAngle, std::cref(polygon.points), std::placeholders::_1, 4);
   return std::all_of(idxs.begin(), idxs.end(), func);
 }
+
+bool saldaev::Polygon::operator==(const Polygon &other) const
+{
+  return (points.size() == other.points.size()) && std::equal(points.begin(), points.end(), other.points.begin());
+}
