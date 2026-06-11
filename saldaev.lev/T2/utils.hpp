@@ -99,7 +99,7 @@ std::istream &saldaev::operator>>(std::istream &in, StringIO &&dest)
   if (!sentry) {
     return in;
   }
-  return std::getline(in >> DelimiterIO{'"'}, dest.ref, '"');
+  return in >> std::quoted(dest.ref);
 }
 
 std::istream &saldaev::operator>>(std::istream &in, LabelIO &&dest)
@@ -108,8 +108,9 @@ std::istream &saldaev::operator>>(std::istream &in, LabelIO &&dest)
   if (!sentry) {
     return in;
   }
-  std::string data = "";
-  if ((in >> StringIO{data}) && (data != dest.exp)) {
+  std::string label = "";
+  in >> label;
+  if (in && label != dest.exp) {
     in.setstate(std::ios::failbit);
   }
   return in;
