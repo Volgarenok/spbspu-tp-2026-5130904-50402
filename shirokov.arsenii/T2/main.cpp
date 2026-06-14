@@ -48,7 +48,6 @@ namespace shirokov
   struct DelimiterIO
   {
     char exp;
-    char& last;
   };
 
   struct LabelIO
@@ -118,14 +117,13 @@ std::istream& shirokov::operator>>(std::istream& in, DataStruct& dest)
   {
     std::vector< DataType > used;
     const std::vector< std::string > possibleLabels{"key1", "key2", "key3"};
-    char last = 0;
-    in >> sep{'(', last} >> sep{':', last};
+    in >> sep{'('} >> sep{':'};
     in >> label{used, possibleLabels} >> key{used.back(), input};
-    in >> sep{':', last};
+    in >> sep{':'};
     in >> label{used, possibleLabels} >> key{used.back(), input};
-    in >> sep{':', last};
+    in >> sep{':'};
     in >> label{used, possibleLabels} >> key{used.back(), input};
-    in >> sep{':', last} >> sep{')', last};
+    in >> sep{':'} >> sep{')'};
   }
 
   if (in)
@@ -182,4 +180,20 @@ bool shirokov::compare(const DataStruct& lhs, const DataStruct& rhs)
   c = c || (lhs.key1 == rhs.key1 && lhs.key2 < rhs.key2);
   c = c || (lhs.key1 == rhs.key1 && lhs.key2 == rhs.key2 && lhs.key3 < rhs.key3);
   return c;
+}
+
+std::istream& shirokov::operator>>(std::istream& in, sep&& dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  char c = '0';
+  in >> c;
+  if (in && (c != dest.exp))
+  {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
 }
