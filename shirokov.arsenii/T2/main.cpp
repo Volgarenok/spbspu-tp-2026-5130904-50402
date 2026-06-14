@@ -48,6 +48,7 @@ namespace shirokov
   struct DelimiterIO
   {
     char exp;
+    char& last;
   };
 
   struct LabelIO
@@ -111,18 +112,22 @@ std::istream& shirokov::operator>>(std::istream& in, DataStruct& dest)
   {
     return in;
   }
+  IOguard g(in);
+
   DataStruct input;
   {
     std::vector< DataType > used;
     const std::vector< std::string > possibleLabels{"key1", "key2", "key3"};
-    in >> sep{'('} >> sep{':'};
+    char last = 0;
+    in >> sep{'(', last} >> sep{':', last};
     in >> label{used, possibleLabels} >> key{used.back(), input};
-    in >> sep{':'};
+    in >> sep{':', last};
     in >> label{used, possibleLabels} >> key{used.back(), input};
-    in >> sep{':'};
+    in >> sep{':', last};
     in >> label{used, possibleLabels} >> key{used.back(), input};
-    in >> sep{':'} >> sep{')'};
+    in >> sep{':', last} >> sep{')', last};
   }
+
   if (in)
   {
     dest = input;
@@ -132,6 +137,11 @@ std::istream& shirokov::operator>>(std::istream& in, DataStruct& dest)
 
 std::istream& shirokov::operator>>(std::istream& in, key&& dest)
 {
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
   switch (dest.type)
   {
   case UllOct:
@@ -148,4 +158,20 @@ std::istream& shirokov::operator>>(std::istream& in, key&& dest)
     break;
   }
   return in;
+}
+
+shirokov::IOguard::IOguard(std::basic_ios< char >& s):
+  s_(s),
+  width_(s.width()),
+  precision_(s.precision()),
+  fmt_(s.flags()),
+  fill_(s.fill())
+{}
+
+shirokov::IOguard::~IOguard()
+{
+  s_.width(width_);
+  s_.fill(fill_);
+  s_.precision(precision_);
+  s_.flags(fmt_);
 }
