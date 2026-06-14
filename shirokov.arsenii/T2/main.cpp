@@ -175,3 +175,11 @@ shirokov::IOguard::~IOguard()
   s_.precision(precision_);
   s_.flags(fmt_);
 }
+
+bool shirokov::compare(const DataStruct& lhs, const DataStruct& rhs)
+{
+  bool c = lhs.key1 < rhs.key1;
+  c = c || (lhs.key1 == rhs.key1 && lhs.key2 < rhs.key2);
+  c = c || (lhs.key1 == rhs.key1 && lhs.key2 == rhs.key2 && lhs.key3 < rhs.key3);
+  return c;
+}
