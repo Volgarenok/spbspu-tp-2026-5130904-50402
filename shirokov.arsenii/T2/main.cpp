@@ -1,5 +1,7 @@
 #include <algorithm>
+#include <ios>
 #include <iostream>
+#include <istream>
 #include <iterator>
 #include <string>
 #include <vector>
@@ -32,6 +34,17 @@ namespace shirokov
     ull& ref;
   };
 
+  struct StringIO
+  {
+    std::string& ref;
+  };
+
+  struct KeyIO
+  {
+    const DataType& type;
+    DataStruct& input;
+  };
+
   struct DelimiterIO
   {
     char exp;
@@ -39,7 +52,8 @@ namespace shirokov
 
   struct LabelIO
   {
-    std::string exp;
+    std::vector< DataType >& used;
+    const std::vector< std::string >& possibleLabels;
   };
 
   class IOguard
@@ -56,10 +70,19 @@ namespace shirokov
     char fill_;
   };
 
-  std::istream& operator>>(std::istream&, DelimiterIO&&);
-  std::istream& operator>>(std::istream&, UllOctIO&&);
-  std::istream& operator>>(std::istream&, UllBinIO&&);
-  std::istream& operator>>(std::istream&, LabelIO&&);
+  using sep = DelimiterIO;
+  using label = LabelIO;
+  using ull_oct = UllOctIO;
+  using ull_bin = UllBinIO;
+  using str = StringIO;
+  using key = KeyIO;
+
+  std::istream& operator>>(std::istream&, sep&&);
+  std::istream& operator>>(std::istream&, ull_oct&&);
+  std::istream& operator>>(std::istream&, ull_bin&&);
+  std::istream& operator>>(std::istream&, label&&);
+  std::istream& operator>>(std::istream&, str&&);
+  std::istream& operator>>(std::istream&, key&&);
   std::istream& operator>>(std::istream&, DataStruct&);
   std::ostream& operator<<(std::ostream&, const DataStruct&);
   bool compare(const DataStruct&, const DataStruct&);
@@ -79,4 +102,50 @@ int main()
     using oit_t = std::ostream_iterator< shirokov::DataStruct >;
     std::copy(std::begin(data), std::end(data), oit_t{std::cout, "\n"});
   }
+}
+
+std::istream& shirokov::operator>>(std::istream& in, DataStruct& dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  DataStruct input;
+  {
+    std::vector< DataType > used;
+    const std::vector< std::string > possibleLabels{"key1", "key2", "key3"};
+    in >> sep{'('} >> sep{':'};
+    in >> label{used, possibleLabels} >> key{used.back(), input};
+    in >> sep{':'};
+    in >> label{used, possibleLabels} >> key{used.back(), input};
+    in >> sep{':'};
+    in >> label{used, possibleLabels} >> key{used.back(), input};
+    in >> sep{':'} >> sep{')'};
+  }
+  if (in)
+  {
+    dest = input;
+  }
+  return in;
+}
+
+std::istream& shirokov::operator>>(std::istream& in, key&& dest)
+{
+  switch (dest.type)
+  {
+  case UllOct:
+    in >> ull_oct{dest.input.key1};
+    break;
+  case UllBin:
+    in >> ull_bin{dest.input.key2};
+    break;
+  case String:
+    in >> str{dest.input.key3};
+    break;
+  default:
+    in.setstate(std::ios::failbit);
+    break;
+  }
+  return in;
 }
