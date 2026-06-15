@@ -21,7 +21,8 @@ namespace shirokov
   {
     UllOct,
     UllBin,
-    String
+    String,
+    Unknown
   };
 
   struct UllOctIO
@@ -195,5 +196,36 @@ std::istream& shirokov::operator>>(std::istream& in, sep&& dest)
   {
     in.setstate(std::ios::failbit);
   }
+  return in;
+}
+
+std::istream& shirokov::operator>>(std::istream& in, label&& dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  std::string data;
+  in >> data;
+  DataType inputType;
+  if (data == dest.possibleLabels[0])
+  {
+    inputType = DataType::UllOct;
+  }
+  else if (data == dest.possibleLabels[1])
+  {
+    inputType = DataType::UllBin;
+  }
+  else if (data == dest.possibleLabels[2])
+  {
+    inputType = DataType::String;
+  }
+  else
+  {
+    inputType = DataType::Unknown;
+    in.setstate(std::ios::failbit);
+  }
+  dest.used.push_back(inputType);
   return in;
 }
