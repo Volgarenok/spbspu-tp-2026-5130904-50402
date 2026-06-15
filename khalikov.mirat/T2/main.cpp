@@ -16,8 +16,53 @@ namespace khalikov {
 	  std::string key3;
 	};
 
-int main()
-{
+  struct DelimiterIO {
+    char exp;
+  };
+
+  struct DoubleIO {
+    double& ref;
+  };
+
+  struct UllIO {
+    unsigned long long& ref;
+  };
+
+  struct StringIO {
+    std::string& ref;
+  };
+
+  enum class Key {
+    KEY1,
+    KEY2,
+    KEY3
+  };
+
+  struct KeyIO {
+    Key& ref;
+  };
+
+  class IoGuard {
+    public:
+      explicit IoGuard(std::basic_ios< char >& s);
+      ~IoGuard();
+    private:
+      std::basic_ios< char >& s_;
+      char fill_;
+      std::streamsize precision_;
+      std::basic_ios< char >::fmtflags fmt_;
+   };
+
+  std::istream& operator>>(std::istream& in, DoubleIO&& dest);
+  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
+  std::istream& operator>>(std::istream& in, UllIO&& dest);
+  std::istream& operator>>(std::istream& in, StringIO&& dest);
+  std::istream& operator>>(std::istream& in, KeyIO&& dest);
+  std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
+  std::istream& operator>>(std::istream& in, DataStruct& dest);
+}
+
+int main() {
   std::vector< khalikov::DataStruct > data;
   {
     using iit_t = std::istream_iterator< khalikov::DataStruct >;
@@ -36,3 +81,7 @@ int main()
     std::copy(data.begin(), data.end(), oit_t(std::cout, '\n'));
   }
 }
+
+
+
+
