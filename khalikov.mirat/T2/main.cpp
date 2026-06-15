@@ -83,6 +83,20 @@ int main() {
   }
 }
 
+std::istream& operator>>(std::istream& in, DelimiterIO&& dest) {
+  std::istream::sentry s(in);
+  if (!s) {
+    return in;
+  }
+  char c = '0';
+  in >> c;
+  if (in && (c != dest.exp))
+  {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
+}
+
 std::ostream& khalikov::operator<<(std::ostream& out, const DataStruct& src) {
   std::ostream::sentry s(out);
   if (!s) {
