@@ -161,7 +161,11 @@ std::istream &khalikov::operator>>(std::istream &in, KeyIO &&dest)
     return in;
   }
   std::string curr = "";
-  in >> curr;
+  char c = '0';
+  for (size_t i = 0; i < 4; ++i) {
+    in >> c;
+    curr += c;
+  }
   if (curr == "key1") {
     dest.ref = Key::KEY1;
   } else if (curr == "key2") {
