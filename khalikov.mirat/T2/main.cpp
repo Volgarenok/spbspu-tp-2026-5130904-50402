@@ -235,7 +235,7 @@ std::ostream &khalikov::operator<<(std::ostream &out, const DataStruct &src)
   IoGuard fmtguard(out);
   out << "(:";
   out << "key1 " << std::fixed << std::setprecision(1) << src.key1 << 'd';
-  out << ":key2 " << std::oct << std::showbase << src.key2;
+  out << ":key2 " << '0' << std::oct << src.key2;
   out << ":key3 \"" << src.key3 << '"';
   out << ":)";
   return out;
