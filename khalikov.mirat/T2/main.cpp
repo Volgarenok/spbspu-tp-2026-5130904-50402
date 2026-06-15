@@ -53,12 +53,13 @@ namespace khalikov {
       std::basic_ios< char >::fmtflags fmt_;
    };
 
+  bool operator<(const DataStruct& lhs, const DataStruct& rhs);
   std::istream& operator>>(std::istream& in, DoubleIO&& dest);
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
   std::istream& operator>>(std::istream& in, UllIO&& dest);
   std::istream& operator>>(std::istream& in, StringIO&& dest);
   std::istream& operator>>(std::istream& in, KeyIO&& dest);
-  std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
+  std::ostream& operator<<(std::ostream& out, const DataStruct& src);
   std::istream& operator>>(std::istream& in, DataStruct& dest);
 }
 
@@ -80,6 +81,20 @@ int main() {
     using oit_t = std::ostream_iterator<khalikov::DataStruct>;
     std::copy(data.begin(), data.end(), oit_t(std::cout, '\n'));
   }
+}
+
+std::ostream& khalikov::operator<<(std::ostream& out, const DataStruct& src) {
+  std::ostream::sentry s(out);
+  if (!s) {
+    return out;
+  }
+  IoGuard fmtguard(out);
+  out << "(:";
+  out << "key1 " << std::fixed << std::setprecision(1) << src.key1 << 'd';
+  out << ":key2 " << std::oct << std::showbase << src.key2;
+  out << ":key3 \"" << src.key3 << '"';
+  out << ":)";
+  return out;
 }
 
 khalikov::IoGuard::IoGuard(std::basic_ios< char >& s):
