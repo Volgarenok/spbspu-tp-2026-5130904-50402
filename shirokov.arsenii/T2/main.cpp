@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cctype>
 #include <ios>
 #include <iostream>
 #include <istream>
@@ -51,6 +52,11 @@ namespace shirokov
     char exp;
   };
 
+  struct DelimiterUnCaseIO
+  {
+    char exp;
+  };
+
   struct LabelIO
   {
     std::vector< DataType >& used;
@@ -72,6 +78,7 @@ namespace shirokov
   };
 
   using sep = DelimiterIO;
+  using uncase_sep = DelimiterUnCaseIO;
   using label = LabelIO;
   using ull_oct = UllOctIO;
   using ull_bin = UllBinIO;
@@ -79,6 +86,7 @@ namespace shirokov
   using key = KeyIO;
 
   std::istream& operator>>(std::istream&, sep&&);
+  std::istream& operator>>(std::istream&, uncase_sep&&);
   std::istream& operator>>(std::istream&, ull_oct&&);
   std::istream& operator>>(std::istream&, ull_bin&&);
   std::istream& operator>>(std::istream&, label&&);
@@ -227,5 +235,65 @@ std::istream& shirokov::operator>>(std::istream& in, label&& dest)
     in.setstate(std::ios::failbit);
   }
   dest.used.push_back(inputType);
+  return in;
+}
+
+std::istream& shirokov::operator>>(std::istream& in, ull_oct&& dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  in >> std::oct >> dest.ref;
+  return in;
+}
+
+std::istream& shirokov::operator>>(std::istream& in, ull_bin&& dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  in >> sep{'0'} >> uncase_sep{'b'};
+  std::string buffer;
+  if (in >> buffer)
+  {
+    try
+    {
+      dest.ref = std::stoull(buffer, nullptr, 2);
+    }
+    catch (...)
+    {
+      in.setstate(std::ios_base::failbit);
+    }
+  }
+  return in;
+}
+
+std::istream& shirokov::operator>>(std::istream& in, str&& dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  return std::getline(in >> sep{'"'}, dest.ref, '"');
+}
+
+std::istream& shirokov::operator>>(std::istream& in, uncase_sep&& dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  char c = '0';
+  in >> c;
+  if (in && (std::toupper(c) != dest.exp) && (std::tolower(c) != dest.exp))
+  {
+    in.setstate(std::ios::failbit);
+  }
   return in;
 }
