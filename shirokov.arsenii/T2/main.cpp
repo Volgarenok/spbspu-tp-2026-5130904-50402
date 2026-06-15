@@ -297,3 +297,11 @@ std::istream& shirokov::operator>>(std::istream& in, uncase_sep&& dest)
   }
   return in;
 }
+
+std::ostream& shirokov::operator<<(std::ostream& out, const DataStruct& src)
+{
+  out << "(:key1 " << 0 << src.key1;
+  out << ":key2 " << "0b" << src.key2;
+  out << ":key3 " << "\"" << src.key3 << "\":)";
+  return out;
+}
