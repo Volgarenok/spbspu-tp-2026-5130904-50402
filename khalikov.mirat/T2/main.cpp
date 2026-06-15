@@ -6,6 +6,7 @@
 #include <vector>
 #include <iomanip>
 #include <limits>
+#include <algorithm>
 
 namespace khalikov {
 
@@ -53,6 +54,8 @@ namespace khalikov {
       char fill_;
    };
 
+  void check(std::istream& in, bool& flag);
+
   bool operator<(const DataStruct& lhs, const DataStruct& rhs);
   std::istream& operator>>(std::istream& in, DoubleIO&& dest);
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
@@ -81,6 +84,66 @@ int main() {
     using oit_t = std::ostream_iterator<khalikov::DataStruct>;
     std::copy(data.begin(), data.end(), oit_t(std::cout, "\n"));
   }
+}
+
+void khalikov::check(std::istream& in, bool& flag) {
+  if (flag) {
+    in.setstate(std::ios::failbit);
+  }
+  flag = true;
+}
+
+bool khalikov::operator<(const DataStruct& lhs, const DataStruct& rhs) {
+  bool c = lhs.key1 < rhs.key1;
+  c = c || (lhs.key1 == rhs.key1 && lhs.key2 < rhs.key2);
+  c = c || (lhs.key1 == rhs.key1 && lhs.key2 == rhs.key2 && lhs.key3.length() < rhs.key3.length());
+  return c;
+}
+
+std::istream& khalikov::operator>>(std::istream& in, DataStruct& dest) {
+  std::istream::sentry s(in);
+  if (!s) {
+    return in;
+  }
+  DataStruct input;
+  bool hk1 = false;
+  bool hk2 = false;
+  bool hk3 = false;
+  {
+    using sep = DelimiterIO;
+    using label = KeyIO;
+    using dbl = DoubleIO;
+    using str = StringIO;
+    using ull = UllIO;
+    in >> sep{ '(' } >> sep{ ':' };
+    for (size_t i = 0; i < 3; ++i) {
+      Key key;
+      in >> label{ key };
+      switch (key) {
+        case Key::KEY1:
+          check(in, hk1);
+          in >> dbl{ input.key1 };
+          break;
+        case Key::KEY2:
+          check(in, hk2);
+          in >> ull{ input.key2 };
+          break;
+        case Key::KEY3:
+          check(in, hk3);
+          in >> str{ input.key3 };
+          break;
+      }
+      in >> sep{ ':' };
+    }
+    in >> sep{ ')' };
+    if (in && hk1 && hk2 && hk3) {
+      dest = input;
+    }
+    else {
+      in.setstate(std::ios::failbit);
+    }
+  }
+    return in;
 }
 
 std::istream& khalikov::operator>>(std::istream& in, KeyIO&& dest) {
@@ -118,7 +181,6 @@ std::istream& khalikov::operator>>(std::istream& in, UllIO&& dest) {
   if (!s) {
     return in;
   }
-  IoGuard fmtguard(in);
   in >> std::oct >> dest.ref >> std::dec;
   return in;
 }
@@ -169,9 +231,9 @@ std::ostream& khalikov::operator<<(std::ostream& out, const DataStruct& src) {
 khalikov::IoGuard::IoGuard(std::basic_ios< char >& s):
   s_(s),
   width_(s.width()),
-  fill_(s.fill()),
   precision_(s.precision()),
-  fmt_(s.flags())
+  fmt_(s.flags()),
+  fill_(s.fill())
 {}
 
 khalikov::IoGuard::~IoGuard() {
