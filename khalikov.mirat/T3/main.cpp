@@ -36,15 +36,11 @@ namespace khalikov
   std::ostream &operator<<(std::ostream &out, const Point &src);
   std::ostream &operator<<(std::ostream &out, const Polygon &src);
 
-  size_t countMaxSeq(
-    std::vector< Polygon >::const_iterator first,
-    std::vector< Polygon >::const_iterator last,
-    const Polygon &example, size_t currMax);
+  size_t countMaxSeq(std::vector< Polygon >::const_iterator first, std::vector< Polygon >::const_iterator last,
+                     const Polygon &example, size_t currMax);
 
-  void getFrame(
-    std::vector< Polygon >::const_iterator first,
-    std::vector< Polygon >::const_iterator last,
-    int &minX, int &minY, int &maxX, int &maxY);
+  void getFrame(std::vector< Polygon >::const_iterator first, std::vector< Polygon >::const_iterator last, int &minX,
+                int &minY, int &maxX, int &maxY);
 
   bool compX(const Point &lhs, const Point &rhs);
   bool compY(const Point &lhs, const Point &rhs);
@@ -139,7 +135,7 @@ void khalikov::getFrame(it_t first, it_t last, int &minX, int &minY, int &maxX, 
 void khalikov::inFrame(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
   khalikov::Polygon example;
-  if (!(in >>example)) {
+  if (!(in >> example)) {
     throw std::invalid_argument("");
   }
   int minX = std::numeric_limits< int >::max();
