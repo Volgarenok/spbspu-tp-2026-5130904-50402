@@ -45,10 +45,14 @@ namespace khalikov
   bool compX(const Point &lhs, const Point &rhs);
   bool compY(const Point &lhs, const Point &rhs);
   bool isPointInFrame(int minX, int minY, int maxX, int maxY, const Point &pt);
+  bool isEven(const Polygon &poly);
+  bool isOdd(const Polygon &poly);
+  bool isNum(size_t num, const Polygon &poly);
 
   void show(std::istream &, std::ostream &out, const std::vector< Polygon > &polygons);
   void maxSeq(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons);
   void inFrame(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons);
+  void count(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons);
 }
 
 int main(int argc, char **argv)
@@ -72,9 +76,11 @@ int main(int argc, char **argv)
     }
   }
   std::unordered_map< std::string, std::function< void() > > cmds;
-  cmds["show"] = std::bind(khalikov::show, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["SHOW"] = std::bind(khalikov::show, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   cmds["MAXSEQ"] = std::bind(khalikov::maxSeq, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   cmds["INFRAME"] = std::bind(khalikov::inFrame, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["COUNT"] = std::bind(khalikov::count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+
   std::string cmd;
   while (std::cin >> cmd) {
     try {
@@ -87,6 +93,21 @@ int main(int argc, char **argv)
       std::cout << "<INVALID COMMAND>\n";
     }
   }
+}
+
+bool khalikov::isNum(size_t num, const Polygon &poly)
+{
+  return (poly.points.size() == num);
+}
+
+bool khalikov::isOdd(const Polygon &poly)
+{
+  return ((poly.points.size() % 2) != 0);
+}
+
+bool khalikov::isEven(const Polygon &poly)
+{
+  return ((poly.points.size() % 2) == 0);
 }
 
 bool khalikov::compX(const Point &lhs, const Point &rhs)
@@ -132,11 +153,37 @@ void khalikov::getFrame(it_t first, it_t last, int &minX, int &minY, int &maxX, 
   getFrame(std::next(first), last, minX, minY, maxX, maxY);
 }
 
+void khalikov::count(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  std::string arg;
+  if (!(in >> arg)) {
+    throw std::invalid_argument("Input error");
+  }
+  size_t res = 0;
+  using namespace std::placeholders;
+  if (arg == "EVEN") {
+    res = std::count_if(polygons.begin(), polygons.end(), isEven);
+  } else if (arg == "ODD") {
+    res = std::count_if(polygons.begin(), polygons.end(), isOdd);
+  } else {
+    try {
+      size_t num = std::stoull(arg);
+      if (num < 3) {
+        throw std::invalid_argument("Input error");
+      }
+      res = std::count_if(polygons.begin(), polygons.end(), std::bind(isNum, num, _1));
+    } catch (...) {
+      throw std::invalid_argument("Input error");
+    }
+  }
+  out << res << '\n';
+}
+
 void khalikov::inFrame(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
   khalikov::Polygon example;
   if (!(in >> example)) {
-    throw std::invalid_argument("");
+    throw std::invalid_argument("Input error");
   }
   in >> std::ws;
   if (in.peek() != EOF && in.peek() != '\n') {
@@ -162,7 +209,7 @@ void khalikov::maxSeq(std::istream &in, std::ostream &out, const std::vector< Po
 {
   khalikov::Polygon example;
   if (!(in >> example)) {
-    throw std::invalid_argument("");
+    throw std::invalid_argument("Input error");
   }
   if (in.peek() != EOF && in.peek() != '\n') {
     out << "<INVALID COMMAND>\n";
