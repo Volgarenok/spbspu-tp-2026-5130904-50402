@@ -41,8 +41,18 @@ namespace khalikov
     std::vector< Polygon >::const_iterator last,
     const Polygon &example, size_t currMax);
 
+  void getFrame(
+    std::vector< Polygon >::const_iterator first,
+    std::vector< Polygon >::const_iterator last,
+    int &minX, int &minY, int &maxX, int &maxY);
+
+  bool compX(const Point &lhs, const Point &rhs);
+  bool compY(const Point &lhs, const Point &rhs);
+  bool isPointInFrame(int minX, int minY, int maxX, int maxY, const Point &pt);
+
   void show(std::istream &, std::ostream &out, const std::vector< Polygon > &polygons);
   void maxSeq(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons);
+  void inFrame(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons);
 }
 
 int main(int argc, char **argv)
@@ -68,6 +78,7 @@ int main(int argc, char **argv)
   std::unordered_map< std::string, std::function< void() > > cmds;
   cmds["show"] = std::bind(khalikov::show, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   cmds["MAXSEQ"] = std::bind(khalikov::maxSeq, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["INFRAME"] = std::bind(khalikov::inFrame, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   std::string cmd;
   while (std::cin >> cmd) {
     try {
@@ -82,8 +93,24 @@ int main(int argc, char **argv)
   }
 }
 
+bool khalikov::compX(const Point &lhs, const Point &rhs)
+{
+  return lhs.x < rhs.x;
+}
+
+bool khalikov::compY(const Point &lhs, const Point &rhs)
+{
+  return lhs.y < rhs.y;
+}
+
+bool khalikov::isPointInFrame(int minX, int minY, int maxX, int maxY, const Point &pt)
+{
+  return (pt.x >= minX && pt.x <= maxX && pt.y >= minY && pt.y <= maxY);
+}
+
 using it_t = std::vector< khalikov::Polygon >::const_iterator;
-size_t khalikov::countMaxSeq(it_t first, it_t last, const khalikov::Polygon &example, size_t currMax) {
+size_t khalikov::countMaxSeq(it_t first, it_t last, const khalikov::Polygon &example, size_t currMax)
+{
   const auto start = std::find(first, last, example);
   if (start == last) {
     return currMax;
@@ -95,6 +122,40 @@ size_t khalikov::countMaxSeq(it_t first, it_t last, const khalikov::Polygon &exa
   return countMaxSeq(end, last, example, std::max(currMax, res));
 }
 
+void khalikov::getFrame(it_t first, it_t last, int &minX, int &minY, int &maxX, int &maxY)
+{
+  if (first == last) {
+    return;
+  }
+  auto x_bounds = std::minmax_element(first->points.begin(), first->points.end(), compX);
+  auto y_bounds = std::minmax_element(first->points.begin(), first->points.end(), compY);
+  minX = std::min(minX, x_bounds.first->x);
+  maxX = std::max(maxX, x_bounds.second->x);
+  minY = std::min(minY, y_bounds.first->y);
+  maxY = std::max(maxY, y_bounds.second->y);
+  getFrame(std::next(first), last, minX, minY, maxX, maxY);
+}
+
+void khalikov::inFrame(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  khalikov::Polygon example;
+  if (!(in >>example)) {
+    throw std::invalid_argument("");
+  }
+  int minX = std::numeric_limits< int >::max();
+  int minY = std::numeric_limits< int >::max();
+  int maxX = std::numeric_limits< int >::min();
+  int maxY = std::numeric_limits< int >::min();
+  getFrame(polygons.begin(), polygons.end(), minX, minY, maxX, maxY);
+  using namespace std::placeholders;
+  const auto checkPoint = std::bind(isPointInFrame, minX, minY, maxX, maxY, _1);
+  if (std::all_of(example.points.begin(), example.points.end(), checkPoint)) {
+    out << "<TRUE>\n";
+  } else {
+    out << "<FALSE>\n";
+  }
+}
+
 void khalikov::maxSeq(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
   khalikov::Polygon example;
@@ -104,7 +165,6 @@ void khalikov::maxSeq(std::istream &in, std::ostream &out, const std::vector< Po
   size_t res = khalikov::countMaxSeq(polygons.begin(), polygons.end(), example, 0);
   out << res << '\n';
 }
-
 
 bool khalikov::operator==(const Point &lhs, const Point &rhs)
 {
