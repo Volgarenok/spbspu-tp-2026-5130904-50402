@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
   cmds["AREA"] = shirokov::area;
   cmds["MAX"] = shirokov::max;
   cmds["MIN"] = shirokov::min;
-  // cmds["COUNT"] = shirokov::count;
+  cmds["COUNT"] = shirokov::count;
   // cmds["MAXSEQ"] = shirokov::maxseq;
   // cmds["RECTS"] = shirokov::rects;
 
