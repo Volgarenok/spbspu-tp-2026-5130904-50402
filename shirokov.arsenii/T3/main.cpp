@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
   shirokov::plg_t polygons = shirokov::parse(in);
   using cmd_t = void (*)(std::istream&, std::ostream&, shirokov::plg_t&);
   std::unordered_map< std::string, cmd_t > cmds;
-  // cmds["AREA"] = shirokov::area;
+  cmds["AREA"] = shirokov::area;
   // cmds["MAX"] = shirokov::max;
   // cmds["MIN"] = shirokov::min;
   // cmds["COUNT"] = shirokov::count;
