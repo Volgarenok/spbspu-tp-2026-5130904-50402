@@ -27,14 +27,22 @@ namespace khalikov
     char exp;
   };
 
+  bool operator==(const Point &lhs, const Point &rhs);
+  bool operator==(const Polygon &lhs, const Polygon &rhs);
+
   std::istream &operator>>(std::istream &in, DelimiterIO &&dest);
   std::istream &operator>>(std::istream &in, Point &dest);
   std::istream &operator>>(std::istream &in, Polygon &dest);
   std::ostream &operator<<(std::ostream &out, const Point &src);
   std::ostream &operator<<(std::ostream &out, const Polygon &src);
 
-  void show(std::istream &, std::ostream &out, const std::vector< Polygon > &polygons);
+  size_t countMaxSeq(
+    std::vector< Polygon >::const_iterator first,
+    std::vector< Polygon >::const_iterator last,
+    const Polygon &example, size_t currMax);
 
+  void show(std::istream &, std::ostream &out, const std::vector< Polygon > &polygons);
+  void maxSeq(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons);
 }
 
 int main(int argc, char **argv)
@@ -59,6 +67,7 @@ int main(int argc, char **argv)
   }
   std::unordered_map< std::string, std::function< void() > > cmds;
   cmds["show"] = std::bind(khalikov::show, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["MAXSEQ"] = std::bind(khalikov::maxSeq, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   std::string cmd;
   while (std::cin >> cmd) {
     try {
@@ -71,6 +80,40 @@ int main(int argc, char **argv)
       std::cout << "INVALID COMMAND\n";
     }
   }
+}
+
+using it_t = std::vector< khalikov::Polygon >::const_iterator;
+size_t khalikov::countMaxSeq(it_t first, it_t last, const khalikov::Polygon &example, size_t currMax) {
+  const auto start = std::find(first, last, example);
+  if (start == last) {
+    return currMax;
+  }
+  using namespace std::placeholders;
+  const auto isEqual = std::bind(std::equal_to< khalikov::Polygon >(), _1, example);
+  const auto end = std::find_if_not(start, last, isEqual);
+  size_t res = static_cast< size_t >(std::distance(start, end));
+  return countMaxSeq(end, last, example, std::max(currMax, res));
+}
+
+void khalikov::maxSeq(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  khalikov::Polygon example;
+  if (!(in >> example)) {
+    throw std::invalid_argument("");
+  }
+  size_t res = khalikov::countMaxSeq(polygons.begin(), polygons.end(), example, 0);
+  out << res << '\n';
+}
+
+
+bool khalikov::operator==(const Point &lhs, const Point &rhs)
+{
+  return (lhs.x == rhs.x && lhs.y == rhs.y);
+}
+
+bool khalikov::operator==(const Polygon &lhs, const Polygon &rhs)
+{
+  return lhs.points == rhs.points;
 }
 
 void khalikov::show(std::istream &, std::ostream &out, const std::vector< Polygon > &polygons)
