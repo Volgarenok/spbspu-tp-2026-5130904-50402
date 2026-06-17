@@ -1,6 +1,7 @@
 #include "parser.hpp"
 #include <algorithm>
 #include <iterator>
+#include <sstream>
 #include <vector>
 
 shirokov::IOguard::IOguard(std::basic_ios< char >& s):
@@ -84,10 +85,49 @@ std::istream& shirokov::operator>>(std::istream& in, Polygon& p)
   return in >> PolygonIO{p};
 }
 
+std::istream& shirokov::operator>>(std::istream& in, shirokov::Line& dest)
+{
+  std::getline(in, dest.lineText);
+  return in;
+}
+
+shirokov::PolygonLineInserter::PolygonLineInserter(shirokov::plg_t& containerVec):
+  container(containerVec)
+{}
+
+shirokov::PolygonLineInserter& shirokov::PolygonLineInserter::operator=(const shirokov::Line& line)
+{
+  std::istringstream iss(line.lineText);
+  shirokov::Polygon poly;
+  if (iss >> poly)
+  {
+    char ch = 0;
+    if (!(iss >> ch))
+    {
+      container.push_back(poly);
+    }
+  }
+  return *this;
+}
+
+shirokov::PolygonLineInserter& shirokov::PolygonLineInserter::operator*()
+{
+  return *this;
+}
+
+shirokov::PolygonLineInserter& shirokov::PolygonLineInserter::operator++()
+{
+  return *this;
+}
+
+shirokov::PolygonLineInserter& shirokov::PolygonLineInserter::operator++(int)
+{
+  return *this;
+}
+
 shirokov::plg_t shirokov::parse(std::istream& in)
 {
   shirokov::plg_t data;
-  using iit_t = std::istream_iterator< shirokov::Polygon >;
-  std::copy(iit_t{in}, iit_t{}, std::back_inserter(data));
+  std::copy(std::istream_iterator< Line >(in), std::istream_iterator< Line >(), PolygonLineInserter{data});
   return data;
 }
