@@ -84,7 +84,7 @@ int main(int argc, char **argv)
         std::cin.clear();
       }
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      std::cout << "INVALID COMMAND\n";
+      std::cout << "<INVALID COMMAND>\n";
     }
   }
 }
@@ -138,6 +138,12 @@ void khalikov::inFrame(std::istream &in, std::ostream &out, const std::vector< P
   if (!(in >> example)) {
     throw std::invalid_argument("");
   }
+  in >> std::ws;
+  if (in.peek() != EOF && in.peek() != '\n') {
+    out << "<INVALID COMMAND>\n";
+    in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    return;
+  }
   int minX = std::numeric_limits< int >::max();
   int minY = std::numeric_limits< int >::max();
   int maxX = std::numeric_limits< int >::min();
@@ -157,6 +163,11 @@ void khalikov::maxSeq(std::istream &in, std::ostream &out, const std::vector< Po
   khalikov::Polygon example;
   if (!(in >> example)) {
     throw std::invalid_argument("");
+  }
+  if (in.peek() != EOF && in.peek() != '\n') {
+    out << "<INVALID COMMAND>\n";
+    in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    return;
   }
   size_t res = khalikov::countMaxSeq(polygons.begin(), polygons.end(), example, 0);
   out << res << '\n';
