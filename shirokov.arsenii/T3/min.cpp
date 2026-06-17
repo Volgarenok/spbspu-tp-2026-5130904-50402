@@ -12,8 +12,8 @@
 namespace
 {
   double getPolygonArea(const shirokov::Polygon&);
-  void maxArea(std::ostream&, const shirokov::plg_t&);
-  void maxVertexes(std::ostream&, const shirokov::plg_t&);
+  void minArea(std::ostream&, const shirokov::plg_t&);
+  void minVertexes(std::ostream&, const shirokov::plg_t&);
 
   struct CrossProductFunctor
   {
@@ -63,28 +63,28 @@ namespace
     return std::abs(std::accumulate(partialAreas.begin(), partialAreas.end(), 0.0)) / 2;
   }
 
-  void maxArea(std::ostream& out, const shirokov::plg_t& polygons)
+  void minArea(std::ostream& out, const shirokov::plg_t& polygons)
   {
     if (polygons.empty())
     {
       throw std::logic_error("AREA requires at least one polygon in the dataset");
     }
-    auto it = std::max_element(polygons.begin(), polygons.end(), AreaComparator{});
+    auto it = std::min_element(polygons.begin(), polygons.end(), AreaComparator{});
     out << getPolygonArea(*it) << "\n";
   }
 
-  void maxVertexes(std::ostream& out, const shirokov::plg_t& polygons)
+  void minVertexes(std::ostream& out, const shirokov::plg_t& polygons)
   {
     if (polygons.empty())
     {
       throw std::logic_error("VERTEXES requires at least one polygon in the dataset");
     }
-    auto it = std::max_element(polygons.begin(), polygons.end(), VertexComparator{});
+    auto it = std::min_element(polygons.begin(), polygons.end(), VertexComparator{});
     out << it->points.size() << "\n";
   }
 }
 
-void shirokov::max(std::istream& in, std::ostream& out, shirokov::plg_t& polygons)
+void shirokov::min(std::istream& in, std::ostream& out, shirokov::plg_t& polygons)
 {
   std::string subCmd;
   if (!(in >> subCmd))
@@ -97,11 +97,11 @@ void shirokov::max(std::istream& in, std::ostream& out, shirokov::plg_t& polygon
 
   if (subCmd == "AREA")
   {
-    maxArea(out, polygons);
+    minArea(out, polygons);
   }
   else if (subCmd == "VERTEXES")
   {
-    maxVertexes(out, polygons);
+    minVertexes(out, polygons);
   }
   else
   {
