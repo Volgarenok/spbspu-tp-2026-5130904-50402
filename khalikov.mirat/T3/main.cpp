@@ -9,6 +9,7 @@
 #include <memory>
 #include <fstream>
 #include <functional>
+#include <numeric>
 
 namespace khalikov
 {
@@ -48,6 +49,8 @@ namespace khalikov
   bool isEven(const Polygon &poly);
   bool isOdd(const Polygon &poly);
   bool isNum(size_t num, const Polygon &poly);
+  double crossTerm(const std::vector< Point > &pts, size_t i, size_t n);
+  double calcArea(const Polygon &poly);
 
   void show(std::istream &, std::ostream &out, const std::vector< Polygon > &polygons);
   void maxSeq(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons);
@@ -80,7 +83,6 @@ int main(int argc, char **argv)
   cmds["MAXSEQ"] = std::bind(khalikov::maxSeq, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   cmds["INFRAME"] = std::bind(khalikov::inFrame, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   cmds["COUNT"] = std::bind(khalikov::count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-
   std::string cmd;
   while (std::cin >> cmd) {
     try {
@@ -93,6 +95,28 @@ int main(int argc, char **argv)
       std::cout << "<INVALID COMMAND>\n";
     }
   }
+}
+
+double khalikov::crossTerm(const std::vector< Point > &pts, size_t i, size_t n)
+{
+  size_t j = (i + 1) % n;
+  return pts[i].x * pts[j].y - pts[j].x * pts[i].y;
+}
+
+double khalikov::calcArea(const Polygon &poly)
+{
+  size_t n = poly.points.size();
+  if (n < 3) {
+    return 0.0;
+  }
+  std::vector< size_t > idxs(n);
+  std::iota(idxs.begin(), idxs.end(), 0);
+  std::vector< double > areas(n);
+  using namespace std::placeholders;
+  auto g = std::bind(crossTerm, std::cref(poly.points), _1, n);
+  std::transform(idxs.begin(), idxs.end(), areas.begin(), g);
+  double sum = std::accumulate(areas.begin(), areas.end(), 0.0, std::plus< double >());
+  return std::abs(sum) / 2.0;
 }
 
 bool khalikov::isNum(size_t num, const Polygon &poly)
