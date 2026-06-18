@@ -57,9 +57,21 @@ namespace muhamadiarov
   std::ostream& operator<<(std::ostream& out, const DataStruct& data);
 
   bool operator<(const DataStruct& lhs, const DataStruct& rhs);
+
+  void check(std::istream& in, char exc);
 }
 
 namespace muh = muhamadiarov;
+
+void muh::check(std::istream& in, char exc)
+{
+  char c = 0;
+  in >> c;
+  if (c != exc)
+  {
+    in.setstate(std::ios::failbit);
+  }
+}
 
 std::istream& muh::operator>>(std::istream& in, DoubleIO&& d)
 {
@@ -69,13 +81,45 @@ std::istream& muh::operator>>(std::istream& in, DoubleIO&& d)
     return in;
   }
   in >> d.data_;
-  char c = ' ';
-  in >>c;
-  if ((c != 'D' && c != 'd') || in)
+  char c = 0;
+  in >> c;
+  if (c != 'D' && c != 'd')
   {
     in.setstate(std::ios::failbit);
   }
   return in;
 }
 
+std::istream& muh::operator>>(std::istream& in, DelimiterIO&& c)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  chech(in, c.exp_);
+  return in;
+}
+
+std::istream& muh::operator>>(std::istream& in, RatIO&& r)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  in >> DelimiterIO{'('} >> DelimiterIO{':'} >> DelimiterIO{'N'};
+  if (!in)
+  {
+    return in;
+  }
+  in >> r.first;
+  in >> DelimiterIO{':'} >> DelimiterIO{'D'};
+  if (!in)
+  {
+    return in;
+  }
+  in >> r.second;
+  return in >> DelimiterIO{':'} >> DelimiterIO{')'};
+}
 #endif
