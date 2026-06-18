@@ -13,6 +13,12 @@ namespace muhamadiarov
     double key1_;
     std::pair< long long, unsigned long long > key2_;
     std::string key3_;
+    
+    DataStruct():
+      key1_(0),
+      key2_({0, 0}),
+      key3_()
+    {}
   };
 
   struct DoubleIO
@@ -51,9 +57,9 @@ namespace muhamadiarov
   std::istream& operator>>(std::istream& in, RatIO&& r);
   std::istream& operator>>(std::istream& in, StringIO&& s);
   std::istream& operator>>(std::istream& in, DelimiterIO&& c);
-  std::istream& operator>>(std::istream& in, KeyIO& k);
+  std::istream& operator>>(std::istream& in, KeyIO&& k);
 
-  std::istream& operator>>(std::istream& in, DataStruct&& data);
+  std::istream& operator>>(std::istream& in, DataStruct& data);
   std::ostream& operator<<(std::ostream& out, const DataStruct& data);
 
   bool operator<(const DataStruct& lhs, const DataStruct& rhs);
@@ -139,7 +145,7 @@ std::istream& muh::operator>>(std::istream& in, StringIO&& s)
   return in;
 }
 
-std::istream& muh::operator>>(std::istream& in, KeyIO& k)
+std::istream& muh::operator>>(std::istream& in, KeyIO&& k)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -171,7 +177,7 @@ std::istream& muh::operator>>(std::istream& in, KeyIO& k)
   return in;
 }
 
-std::istream& muh::operator>>(std::istream& in, DataStruct&& data)
+std::istream& muh::operator>>(std::istream& in, DataStruct& data)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -214,9 +220,30 @@ std::ostream& muh::operator<<(std::ostream& out, const DataStruct& data)
   {
     return out;
   }
-  out << "(:key1 " << data.key1_ << "d";
+  out << "(:key1 " << std::fixed << std::setprecision(1) << data.key1_ << "d";
   out << ":key2 (:N " << data.key2_.first << ":D " << data.key2_.second << ":)";
   out << ":key3 \"" << data.key3_ << "\":)";
   return out;
+}
+
+bool muh::operator<(const DataStruct& lhs, const DataStruct& rhs)
+{
+  if (lhs.key1_ != rhs.key1_)
+  {
+    return lhs.key1_ < rhs.key1_;
+  }
+
+  if (lhs.key2_.second == 0 || rhs.key2_.second == 0)
+  {
+    return false;
+  }
+
+  long double lval = static_cast< long double >(lhs.key2_.first) / lhs.key2_.second;
+  long double rval = static_cast< long double >(rhs.key2_.first) / rhs.key2_.second;
+  if (lval != rval)
+  {
+    return lval < rval;
+  }
+  return lhs.key3_.size() < rhs.key3_.size();
 }
 #endif
