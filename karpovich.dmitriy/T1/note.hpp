@@ -30,6 +30,7 @@ namespace karpovich
   void cmdMind(std::istream &in, std::ostream &out, NoteMap &notes);
   void cmdExpired(std::istream &in, std::ostream &out, NoteMap &notes);
   void cmdRefresh(std::istream &in, std::ostream &out, NoteMap &notes);
+  void cmdLoop(std::istream &in, std::ostream &out, NoteMap &notes);
 }
 
 #endif

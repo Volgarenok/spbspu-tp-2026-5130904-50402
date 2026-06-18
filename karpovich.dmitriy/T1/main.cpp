@@ -18,11 +18,12 @@ int main()
   cmds["mind"] = karpovich::cmdMind;
   cmds["expired"] = karpovich::cmdExpired;
   cmds["refresh"] = karpovich::cmdRefresh;
+  cmds["loop"] = karpovich::cmdLoop;
   std::string cmd;
   while (std::cin >> cmd) {
     try {
       cmds.at(cmd)(std::cin, std::cout, notes);
-      if (cmd == "show" || cmd == "mind" || cmd == "expired") {
+      if (cmd == "show" || cmd == "mind" || cmd == "expired" || cmd == "loop") {
         std::cout << '\n';
       }
     } catch (const std::exception &) {
