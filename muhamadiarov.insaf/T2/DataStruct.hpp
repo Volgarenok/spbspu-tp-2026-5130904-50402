@@ -13,7 +13,7 @@ namespace muhamadiarov
     double key1_;
     std::pair< long long, unsigned long long > key2_;
     std::string key3_;
-    
+
     DataStruct():
       key1_(0),
       key2_({0, 0}),
