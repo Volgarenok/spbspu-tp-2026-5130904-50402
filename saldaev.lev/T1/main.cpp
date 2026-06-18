@@ -20,7 +20,9 @@ int main()
   while (std::cin >> comand) {
     try {
       cmds.at(comand)(std::cin, std::cout, notes);
-      std::cout << '\n';
+      if (comand == "show" || comand == "expired" || comand == "mind") {
+        std::cout << '\n';
+      }
     } catch (...) {
       std::cout << "<INVALID COMMAND>\n";
       std::streamsize toignore = std::numeric_limits< std::streamsize >::max();
