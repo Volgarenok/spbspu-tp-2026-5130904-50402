@@ -310,7 +310,8 @@ void khalikov::area(std::istream &in, std::ostream &out, const std::vector< Poly
   }
 }
 
-void khalikov::count(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons) {
+void khalikov::count(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+{
   std::string arg;
   if (!(in >> arg)) {
     throw std::invalid_argument("Input error");
