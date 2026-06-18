@@ -63,6 +63,7 @@ void shirokov::maxseq(std::istream& in, std::ostream& out, shirokov::plg_t& poly
   shirokov::Polygon target;
   if (!(in >> target))
   {
+    in.clear();
     throw std::logic_error("Invalid polygon format");
   }
 
