@@ -185,10 +185,10 @@ void saldaev::handleMind(std::istream &in, std::ostream &out, noteMap &notes)
   std::vector< std::weak_ptr< saldaev::Note > >::const_iterator end = activeLinks.cend();
 
   if (begin != end) {
-    out << (*begin).lock().get();
+    out << (*begin).lock().get()->getName();
     ++begin;
     for (; begin != end; ++begin) {
-      out << '\n' << (*begin).lock().get();
+      out << '\n' << (*begin).lock().get()->getName();
     }
   }
 }
