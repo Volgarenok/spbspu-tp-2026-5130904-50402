@@ -122,4 +122,20 @@ std::istream& muh::operator>>(std::istream& in, RatIO&& r)
   in >> r.second;
   return in >> DelimiterIO{':'} >> DelimiterIO{')'};
 }
+
+std::istream& muh::operator>>(std::istream& in, StringIO&& s)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  in >> DelimiterIO{'"'};
+  if (!in)
+  {
+    return in;
+  }
+  in >> s.data_;
+  return in >> DelimiterIO{'"'};
+}
 #endif
