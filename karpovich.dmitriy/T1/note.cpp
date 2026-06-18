@@ -4,6 +4,35 @@
 #include <stdexcept>
 #include <string>
 
+namespace
+{
+  using str_t = std::string;
+  using mp_t = karpovich::NoteMap;
+  using vstr_t = std::vector< str_t >;
+  bool findLoop(const str_t &startName, const str_t &currentName, size_t depthLeft, mp_t &notes, vstr_t &path)
+  {
+    if (depthLeft == 0) {
+      return false;
+    }
+    const std::shared_ptr< karpovich::Note > &current = notes.at(currentName);
+    for (size_t i = 0; i < current->links.size(); ++i) {
+      const str_t &nextName = current->links[i].first;
+      if (current->links[i].second.expired()) {
+        continue;
+      }
+      path.push_back(nextName);
+      if (nextName == startName) {
+        return true;
+      }
+      if (findLoop(startName, nextName, depthLeft - 1, notes, path)) {
+        return true;
+      }
+      path.pop_back();
+    }
+    return false;
+  }
+}
+
 karpovich::Note::Note(const std::string &name):
   name(name),
   lines(),
@@ -160,17 +189,15 @@ void karpovich::cmdLoop(std::istream &in, std::ostream &out, NoteMap &notes)
   if (!(in >> name >> n)) {
     throw std::logic_error("Invalid args");
   }
-  std::shared_ptr< Note > start = notes.at(name);
-  std::vector< std::shared_ptr< Note > > path;
-  path.push_back(start);
-
-  bool found = false;
-  if (!found) {
+  notes.at(name);
+  std::vector< std::string > path;
+  path.push_back(name);
+  if (!findLoop(name, name, n + 1, notes, path)) {
     out << "<NO LOOP>";
     return;
   }
   for (size_t i = 0; i < path.size() - 1; ++i) {
-    out << path[i]->name << ' ' << path[i++]->name;
+    out << path[i] << ' ' << path[i + 1];
     if (i < path.size() - 2) {
       out << '\n';
     }
