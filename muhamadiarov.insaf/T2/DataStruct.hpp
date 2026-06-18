@@ -51,7 +51,7 @@ namespace muhamadiarov
   std::istream& operator>>(std::istream& in, RatIO&& r);
   std::istream& operator>>(std::istream& in, StringIO&& s);
   std::istream& operator>>(std::istream& in, DelimiterIO&& c);
-  std::istream& operator>>(std::istream& in, KeyIO&& k);
+  std::istream& operator>>(std::istream& in, KeyIO& k);
 
   std::istream& operator>>(std::istream& in, DataStruct&& data);
   std::ostream& operator<<(std::ostream& out, const DataStruct& data);
@@ -97,7 +97,7 @@ std::istream& muh::operator>>(std::istream& in, DelimiterIO&& c)
   {
     return in;
   }
-  chech(in, c.exp_);
+  check(in, c.exp_);
   return in;
 }
 
@@ -113,13 +113,13 @@ std::istream& muh::operator>>(std::istream& in, RatIO&& r)
   {
     return in;
   }
-  in >> r.first;
+  in >> r.data_.first;
   in >> DelimiterIO{':'} >> DelimiterIO{'D'};
   if (!in)
   {
     return in;
   }
-  in >> r.second;
+  in >> r.data_.second;
   return in >> DelimiterIO{':'} >> DelimiterIO{')'};
 }
 
@@ -135,11 +135,11 @@ std::istream& muh::operator>>(std::istream& in, StringIO&& s)
   {
     return in;
   }
-  in >> s.data_;
-  return in >> DelimiterIO{'"'};
+  std::getline(in, s.data_, '"');
+  return in;
 }
 
-std::istream& muh::operator>>(std::istream& in, KeyIO&& k)
+std::istream& muh::operator>>(std::istream& in, KeyIO& k)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -169,5 +169,41 @@ std::istream& muh::operator>>(std::istream& in, KeyIO&& k)
     in.setstate(std::ios::failbit);
   }
   return in;
+}
+
+std::istream& muh::operator>>(std::istream& in, DataStruct&& data)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  in >> DelimiterIO{'('} >> DelimiterIO{':'};
+  for (size_t i = 0; i < 3; ++i)
+  {
+    if (!in)
+    {
+      return in;
+    }
+    Key key;
+    in >> KeyIO{key};
+    if (!in)
+    {
+      return in;
+    }
+    switch (key)
+    {
+      case Key::KEY1:
+        in >> DoubleIO{data.key1_};
+        break;
+      case Key::KEY2:
+        in >> RatIO{data.key2_};
+        break;
+      case Key::KEY3:
+        in >> StringIO{data.key3_};
+        break;
+    }
+  }
+  return in >> DelimiterIO{':'} >> DelimiterIO{')'};
 }
 #endif
