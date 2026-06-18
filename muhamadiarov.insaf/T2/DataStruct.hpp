@@ -53,6 +53,19 @@ namespace muhamadiarov
     Key& key_;
   };
 
+  class IOGuard
+  {
+  public:
+    explicit IOGuard(std::basic_ios<char> &s);
+    ~IOGuard();
+
+  private:
+    std::basic_ios<char> &s_;
+    char fill_;
+    std::streamsize precision_;
+    std::basic_ios<char>::fmtflags fmt_;
+  };
+
   std::istream& operator>>(std::istream& in, DoubleIO&& d);
   std::istream& operator>>(std::istream& in, RatIO&& r);
   std::istream& operator>>(std::istream& in, StringIO&& s);
@@ -72,6 +85,7 @@ namespace muh = muhamadiarov;
 void muh::check(std::istream& in, char exc)
 {
   char c = 0;
+  in >> std::ws;
   in >> c;
   if (c != exc)
   {
@@ -136,12 +150,7 @@ std::istream& muh::operator>>(std::istream& in, StringIO&& s)
   {
     return in;
   }
-  in >> DelimiterIO{'"'};
-  if (!in)
-  {
-    return in;
-  }
-  std::getline(in, s.data_, '"');
+  std::getline(in >> DelimiterIO{'"'}, s.data_, '"');
   return in;
 }
 
@@ -184,9 +193,10 @@ std::istream& muh::operator>>(std::istream& in, DataStruct& data)
   {
     return in;
   }
-  in >> DelimiterIO{'('} >> DelimiterIO{':'};
+  in >> DelimiterIO{'('};
   for (size_t i = 0; i < 3; ++i)
   {
+    in >> DelimiterIO{':'};
     if (!in)
     {
       return in;
@@ -245,5 +255,19 @@ bool muh::operator<(const DataStruct& lhs, const DataStruct& rhs)
     return lval < rval;
   }
   return lhs.key3_.size() < rhs.key3_.size();
+}
+
+muh::IOGuard::IOGuard(std::basic_ios<char> &s):
+  s_(s),
+  fill_(s.fill()),
+  precision_(s.precision()),
+  fmt_(s.flags())
+{}
+
+muh::IOGuard::~IOGuard()
+{
+  s_.fill(fill_);
+  s_.precision(precision_);
+  s_.flags(fmt_);
 }
 #endif
