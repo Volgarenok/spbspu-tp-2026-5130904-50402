@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <utility>
+#include <iomanip>
 
 namespace muhamadiarov
 {
@@ -34,16 +35,16 @@ namespace muhamadiarov
     char exp_;
   };
 
-  struct KeyIO
-  {
-    Key& key_;
-  };
-
   enum class Key
   {
     KEY1,
     KEY2,
     KEY3
+  };
+
+  struct KeyIO
+  {
+    Key& key_;
   };
 
   std::istream& operator>>(std::istream& in, DoubleIO&& d);
@@ -58,5 +59,23 @@ namespace muhamadiarov
   bool operator<(const DataStruct& lhs, const DataStruct& rhs);
 }
 
+namespace muh = muhamadiarov;
+
+std::istream& muh::operator>>(std::istream& in, DoubleIO&& d)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  in >> d.data_;
+  char c = ' ';
+  in >>c;
+  if ((c != 'D' && c != 'd') || in)
+  {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
+}
 
 #endif
