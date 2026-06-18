@@ -43,6 +43,8 @@ namespace khalikov
   void getFrame(std::vector< Polygon >::const_iterator first, std::vector< Polygon >::const_iterator last, int &minX,
                 int &minY, int &maxX, int &maxY);
 
+  bool compareVertexes(const Polygon &lhs, const Polygon &rhs);
+  bool compareArea(const Polygon &lhs, const Polygon &rhs);
   bool compX(const Point &lhs, const Point &rhs);
   bool compY(const Point &lhs, const Point &rhs);
   bool isPointInFrame(int minX, int minY, int maxX, int maxY, const Point &pt);
@@ -60,6 +62,8 @@ namespace khalikov
   void inFrame(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons);
   void count(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons);
   void area(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons);
+  void max(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons);
+  void min(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons);
 }
 
 int main(int argc, char **argv)
@@ -88,6 +92,8 @@ int main(int argc, char **argv)
   cmds["INFRAME"] = std::bind(khalikov::inFrame, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   cmds["COUNT"] = std::bind(khalikov::count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   cmds["AREA"] = std::bind(khalikov::area, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["MAX"] = std::bind(khalikov::max, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["MIN"] = std::bind(khalikov::min, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   std::string cmd;
   while (std::cin >> cmd) {
     try {
@@ -99,6 +105,64 @@ int main(int argc, char **argv)
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       std::cout << "<INVALID COMMAND>\n";
     }
+  }
+}
+
+bool khalikov::compareArea(const Polygon &lhs, const Polygon &rhs)
+{
+  return calcArea(lhs) < calcArea(rhs);
+}
+
+bool khalikov::compareVertexes(const Polygon &lhs, const Polygon &rhs)
+{
+  return lhs.points.size() < rhs.points.size();
+}
+
+void khalikov::min(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  std::string arg;
+  if (!(in >> arg) || polygons.empty()) {
+    throw std::invalid_argument("Input error");
+  }
+  if (in.peek() != EOF && in.peek() != '\n') {
+    out << "<INVALID COMMAND>\n";
+    in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    return;
+  }
+  if (arg == "AREA") {
+    auto it = std::min_element(polygons.begin(), polygons.end(), compareArea);
+    out << std::fixed << std::setprecision(1) << calcArea(*it) << '\n';
+  } else if (arg == "VERTEXES") {
+    auto it = std::min_element(polygons.begin(), polygons.end(), compareVertexes);
+    out << it->points.size() << '\n';
+  } else {
+    out << "<INVALID COMMAND>\n";
+    in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    return;
+  }
+}
+
+void khalikov::max(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  std::string arg;
+  if (!(in >> arg) || polygons.empty()) {
+    throw std::invalid_argument("Input error");
+  }
+  if (in.peek() != EOF && in.peek() != '\n') {
+    out << "<INVALID COMMAND>\n";
+    in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    return;
+  }
+  if (arg == "AREA") {
+    auto it = std::max_element(polygons.begin(), polygons.end(), compareArea);
+    out << std::fixed << std::setprecision(1) << calcArea(*it) << '\n';
+  } else if (arg == "VERTEXES") {
+    auto it = std::max_element(polygons.begin(), polygons.end(), compareVertexes);
+    out << it->points.size() << '\n';
+  } else {
+    out << "<INVALID COMMAND>\n";
+    in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    return;
   }
 }
 
