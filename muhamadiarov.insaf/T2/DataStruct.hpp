@@ -206,4 +206,17 @@ std::istream& muh::operator>>(std::istream& in, DataStruct&& data)
   }
   return in >> DelimiterIO{':'} >> DelimiterIO{')'};
 }
+
+std::ostream& muh::operator<<(std::ostream& out, const DataStruct& data)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
+  out << "(:key1 " << data.key1_ << "d";
+  out << ":key2 (:N " << data.key2_.first << ":D " << data.key2_.second << ":)";
+  out << ":key3 \"" << data.key3_ << "\":)";
+  return out;
+}
 #endif
