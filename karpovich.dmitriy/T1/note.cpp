@@ -1,4 +1,5 @@
 #include "note.hpp"
+#include <cstddef>
 #include <iomanip>
 #include <stdexcept>
 #include <string>
@@ -150,4 +151,28 @@ void karpovich::cmdRefresh(std::istream &in, std::ostream &, NoteMap &notes)
     }
   }
   links.resize(write_idx);
+}
+
+void karpovich::cmdLoop(std::istream &in, std::ostream &out, NoteMap &notes)
+{
+  std::string name;
+  size_t n = 0;
+  if (!(in >> name >> n)) {
+    throw std::logic_error("Invalid args");
+  }
+  std::shared_ptr< Note > start = notes.at(name);
+  std::vector< std::shared_ptr< Note > > path;
+  path.push_back(start);
+
+  bool found = false;
+  if (!found) {
+    out << "<NO LOOP>";
+    return;
+  }
+  for (size_t i = 0; i < path.size() - 1; ++i) {
+    out << path[i]->name << ' ' << path[i++]->name;
+    if (i < path.size() - 2) {
+      out << '\n';
+    }
+  }
 }
