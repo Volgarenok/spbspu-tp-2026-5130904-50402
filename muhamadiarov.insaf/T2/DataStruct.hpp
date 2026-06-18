@@ -138,4 +138,36 @@ std::istream& muh::operator>>(std::istream& in, StringIO&& s)
   in >> s.data_;
   return in >> DelimiterIO{'"'};
 }
+
+std::istream& muh::operator>>(std::istream& in, KeyIO&& k)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  std::string str;
+  in >> str;
+  if (!in)
+  {
+    return in;
+  }
+  if (str == "key1")
+  {
+    k.key_ = Key::KEY1;
+  }
+  else if (str == "key2")
+  {
+    k.key_ = Key::KEY2;
+  }
+  else if (str == "key3")
+  {
+    k.key_ = Key::KEY3;
+  }
+  else
+  {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
+}
 #endif
