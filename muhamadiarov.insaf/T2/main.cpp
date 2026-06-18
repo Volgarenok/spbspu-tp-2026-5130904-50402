@@ -3,11 +3,7 @@
 #include <iterator>
 #include <algorithm>
 #include <limits>
-
-namespace muhamadiarov
-{
-  struct DataStruct;
-}
+#include "DataStruct.hpp"
 
 int main()
 {
@@ -29,6 +25,6 @@ int main()
 
   using oit_t = std::ostream_iterator< T >;
 
-  std::copy(data.begin(), data.end(), oit_t{std::cout, '\n'});
+  std::copy(data.begin(), data.end(), oit_t{std::cout, "\n"});
   return 0;
 }
