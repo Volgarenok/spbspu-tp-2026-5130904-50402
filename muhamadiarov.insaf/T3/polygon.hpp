@@ -3,17 +3,19 @@
 
 #include <vector>
 #include <iostream>
+#include <iterator>
 
 namespace muhamadiarov
 {
   struct Point
   {
-    int x, y;
+    int x_;
+    int y_;
   };
 
   struct Polygon
   {
-    std::vector< Point > points;
+    std::vector< Point > points_;
   };
 
   std::istream& operator>>(std::istream& in, Point& point);
