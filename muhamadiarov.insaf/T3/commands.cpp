@@ -137,3 +137,42 @@ void muh::max(std::istream &in, std::ostream &out, const std::vector< Polygon > 
     throw std::logic_error("Invalid command");
   }
 }
+
+void muh::min(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  std::string command;
+  if (!(in >> command))
+  {
+    throw std::runtime_error("error input");
+  }
+
+  if (polygons.empty())
+  {
+    throw std::logic_error("Empty collection");
+  }
+
+  if (command == "AREA")
+  {
+    std::vector< double > areas(polygons.size());
+    std::transform(polygons.begin(), polygons.end(), areas.begin(), getArea);
+    auto it = std::min_element(areas.begin(), areas.end());
+    if (it != areas.end())
+    {
+      out << std::fixed << std::setprecision(1) << *it << '\n';
+    }
+  }
+  else if (command == "VERTEXES")
+  {
+    std::vector< size_t > counts;
+    std::transform(polygons.begin(), polygons.end(), std::back_inserter(counts), getVerticesCount);
+    auto it = std::min_element(counts.begin(), counts.end());
+    if (it != counts.end())
+    {
+      out << *it << '\n';
+    }
+  }
+  else
+  {
+    throw std::logic_error("Invalid command");
+  }
+}
