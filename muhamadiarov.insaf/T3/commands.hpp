@@ -2,6 +2,11 @@
 #define CMDS_HPP
 #include <iostream>
 #include <vector>
+#include <string>
+#include <algorithm>
+#include <iomanip>
+#include <functional>
+#include <numeric>
 #include "polygon.hpp"
 
 namespace muhamadiarov
