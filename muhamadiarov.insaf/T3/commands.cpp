@@ -176,3 +176,30 @@ void muh::min(std::istream &in, std::ostream &out, const std::vector< Polygon > 
     throw std::logic_error("Invalid command");
   }
 }
+
+void muh::count(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  std::string command;
+  if (!(in >> command))
+  {
+    throw std::runtime_error("error input");
+  }
+  if (command == "EVEN")
+  {
+    out << std::count_if(polygons.begin(), polygons.end(), isEven) << '\n';
+  } 
+  else if (command == "ODD")
+  {
+    out << std::count_if(polygons.begin(), polygons.end(), isOdd) << '\n';
+  }
+  else
+  {
+    const size_t count  = std::stoull(command);
+    if (count < 3)
+    {
+      throw std::logic_error("Invalid command");
+    }
+    out << std::count_if(polygons.begin(), polygons.end(), 
+      std::bind(isCountOfVertices, std::placeholders::_1, count)) << '\n';
+  }
+}
