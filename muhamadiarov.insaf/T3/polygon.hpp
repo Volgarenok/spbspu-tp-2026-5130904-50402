@@ -17,6 +17,7 @@ namespace muhamadiarov
     std::vector< Point > points_;
   };
 
+  bool operator==(const Point& lhs, const Point& rhs);
   std::istream& operator>>(std::istream& in, Point& point);
   std::istream& operator>>(std::istream& in, Polygon& polygon);
 }

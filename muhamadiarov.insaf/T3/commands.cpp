@@ -18,8 +18,12 @@ namespace muhamadiarov
     };
 
     std::vector< double > crossProducts;
-    std::transform(p.points_.begin(), p.points_.end() - 1, p.points_.begin() + 1,
-      std::back_inserter(crossProducts), Accumulator());
+    std::transform(
+      p.points_.begin(),
+      p.points_.end() - 1,
+      p.points_.begin() + 1,
+      std::back_inserter(crossProducts), Accumulator()
+    );
 
     crossProducts.push_back(Accumulator()(p.points_.back(), p.points_.front()));
     const double sum = std::accumulate(crossProducts.begin(), crossProducts.end(), 0.0);
@@ -52,11 +56,72 @@ namespace muhamadiarov
   {
     return p.points_.size();
   }
+
+  bool isRightAngle(const Point& a, const Point& b, const Point& c)
+  {
+    double dx1 = b.x_ - a.x_;
+    double dy1 = b.y_ - a.y_;
+    double dx2 = c.x_ - b.x_;
+    double dy2 = c.y_ - b.y_;
+    double result = dx1 * dx2 + dy1 * dy2;
+    return std::abs(result) < 1e-9;
+  }
+
+  struct CheckAngleFunctor
+  {
+    const Polygon& polygon_;
+
+    CheckAngleFunctor(const Polygon& polygon):
+      polygon_(polygon)
+    {}
+    
+    bool operator()(const Point& current) const
+    {
+      auto it = std::find_if(
+        polygon_.points_.begin(), 
+        polygon_.points_.end(),
+        std::bind(std::equal_to<Point>(), std::placeholders::_1, current)
+      );
+      
+      if (it == polygon_.points_.end())
+      {
+        return false;
+      }
+      
+      size_t idx = std::distance(polygon_.points_.begin(), it);
+      
+      size_t prev = (idx == 0) ? polygon_.points_.size() - 1 : idx - 1;
+      size_t next = (idx + 1) % polygon_.points_.size();
+      
+      return isRightAngle(
+        polygon_.points_[prev],
+        polygon_.points_[idx],
+        polygon_.points_[next]);
+    }
+  };
+
+  bool hasRightAngle(const Polygon& p)
+  {
+    if (p.points_.size() < 3)
+    {
+      return false;
+    }
+
+    std::vector< bool > cHas(p.points_.size());
+    CheckAngleFunctor angleChecker(p);
+    std::transform(p.points_.begin(), p.points_.end(), cHas.begin(), angleChecker);
+
+    return std::any_of(
+      cHas.begin(),
+      cHas.end(),
+      std::bind(std::equal_to< bool >(), std::placeholders::_1, true)
+    );
+  }
 }
 
 namespace muh = muhamadiarov;
 
-void muh::area(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+void muh::area(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
   std::string command;
   if (!(in >> command))
@@ -93,13 +158,17 @@ void muh::area(std::istream &in, std::ostream &out, const std::vector< Polygon >
       throw std::logic_error("Invalid argument");
     }
 
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(polygonsIf),
-      std::bind(isCountOfVertices, std::placeholders::_1, count));
+    std::copy_if(
+      polygons.begin(),
+      polygons.end(),
+      std::back_inserter(polygonsIf),
+      std::bind(isCountOfVertices, std::placeholders::_1, count)
+    );
     out << sumArea(polygonsIf) << '\n';
   }
 }
 
-void muh::max(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+void muh::max(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
   std::string command;
   if (!(in >> command))
@@ -138,7 +207,7 @@ void muh::max(std::istream &in, std::ostream &out, const std::vector< Polygon > 
   }
 }
 
-void muh::min(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+void muh::min(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
   std::string command;
   if (!(in >> command))
@@ -164,7 +233,12 @@ void muh::min(std::istream &in, std::ostream &out, const std::vector< Polygon > 
   else if (command == "VERTEXES")
   {
     std::vector< size_t > counts;
-    std::transform(polygons.begin(), polygons.end(), std::back_inserter(counts), getVerticesCount);
+    std::transform(
+      polygons.begin(),
+      polygons.end(),
+      std::back_inserter(counts),
+      getVerticesCount
+    );
     auto it = std::min_element(counts.begin(), counts.end());
     if (it != counts.end())
     {
@@ -177,7 +251,7 @@ void muh::min(std::istream &in, std::ostream &out, const std::vector< Polygon > 
   }
 }
 
-void muh::count(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+void muh::count(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
   std::string command;
   if (!(in >> command))
@@ -199,7 +273,16 @@ void muh::count(std::istream &in, std::ostream &out, const std::vector< Polygon 
     {
       throw std::logic_error("Invalid command");
     }
-    out << std::count_if(polygons.begin(), polygons.end(), 
-      std::bind(isCountOfVertices, std::placeholders::_1, count)) << '\n';
+    out << std::count_if(
+      polygons.begin(),
+      polygons.end(), 
+      std::bind(isCountOfVertices, std::placeholders::_1, count)
+    );
+     out << '\n';
   }
+}
+
+void muh::rightshapes(std::istream&, std::ostream& out, const std::vector< Polygon >& polygons)
+{
+  out << std::count_if(polygons.begin(), polygons.end(), hasRightAngle) << '\n';
 }

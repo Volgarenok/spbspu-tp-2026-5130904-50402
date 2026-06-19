@@ -48,3 +48,8 @@ std::istream& muh::operator>>(std::istream& in, Polygon& polygon)
   return in;
 }
 
+bool muh::operator==(const Point& lhs, const Point& rhs)
+{
+  return (lhs.x_ == rhs.x_) && (lhs.y_ == rhs.y_);
+}
+
