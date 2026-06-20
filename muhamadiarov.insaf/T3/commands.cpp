@@ -117,11 +117,228 @@ namespace muhamadiarov
       std::bind(std::equal_to< bool >(), std::placeholders::_1, true)
     );
   }
+
+  struct Segment
+  {
+    Point p1_;
+    Point p2_;
+  };
+
+  struct BoundingBox
+  {
+    Point rightUp_;
+    Point rightDown_;
+    Point leftUp_;
+    Point leftDown_;
+  };
+
+  struct GetBoundingBoxFunctor
+  {
+    BoundingBox operator()(const Polygon& polygon) const
+    {
+      if (polygon.points_.empty())
+      {
+        BoundingBox emptyBox{{0, 0}, {0, 0}, {0, 0}, {0, 0}};
+        return emptyBox;
+      }
+      
+      auto minXIter = std::min_element(
+        polygon.points_.begin(),
+        polygon.points_.end(),
+        std::bind(
+          std::less<int>(),
+          std::bind(&Point::x_, std::placeholders::_1),
+          std::bind(&Point::x_, std::placeholders::_2)
+        )
+      );
+      
+      auto maxXIter = std::max_element(
+        polygon.points_.begin(),
+        polygon.points_.end(),
+        std::bind(
+          std::less<int>(),
+          std::bind(&Point::x_, std::placeholders::_1),
+          std::bind(&Point::x_, std::placeholders::_2)
+        )
+      );
+      
+      auto minYIter = std::min_element(
+        polygon.points_.begin(),
+        polygon.points_.end(),
+        std::bind(
+          std::less<int>(),
+          std::bind(&Point::y_, std::placeholders::_1),
+          std::bind(&Point::y_, std::placeholders::_2)
+        )
+      );
+      
+      auto maxYIter = std::max_element(
+        polygon.points_.begin(),
+        polygon.points_.end(),
+        std::bind(
+          std::less<int>(),
+          std::bind(&Point::y_, std::placeholders::_1),
+          std::bind(&Point::y_, std::placeholders::_2)
+        )
+      );
+      
+      BoundingBox box;
+      box.rightUp_ = {maxXIter->x_ + 1, maxYIter->y_ + 1};
+      box.rightDown_ = {maxXIter->x_ + 1, minYIter->y_ - 1};
+      box.leftDown_ = {minXIter->x_ - 1, minYIter->y_ - 1};
+      box.leftUp_ = {minXIter->x_ - 1, maxYIter->y_ + 1};
+      return box;
+    }
+  };
+
+  Segment getSegment(const Point& p1, const Point& p2)
+  {
+    Segment seg;
+    seg.p1_ = p1;
+    seg.p2_ = p2;
+    return seg;
+  }
+
+  struct GetSegmentsFunctor
+  {
+    std::vector<Segment> operator()(const Polygon& polygon) const
+    {
+      std::vector<Segment> segments(polygon.points_.size());
+      std::transform(
+        polygon.points_.begin(),
+        polygon.points_.end() - 1,
+        polygon.points_.begin() + 1,
+        segments.begin(),
+        getSegment
+      );
+      
+      segments.back().p1_ = polygon.points_.back();
+      segments.back().p2_ = polygon.points_.front();
+      
+      return segments;
+    }
+  };
+
+  double crossProduct(const Point& a, const Point& b, const Point& c) {
+    return (b.x_ - a.x_) * (c.y_ - a.y_) - (b.y_ - a.y_) * (c.x_ - a.x_);
+  }
+
+  bool onSegment(const Point& a, const Point& b, const Point& c) {
+    bool b1 = c.x_ <= std::max(a.x_, b.x_) && c.x_ >= std::min(a.x_, b.x_);
+    bool b2 = c.y_ <= std::max(a.y_, b.y_) && c.y_ >= std::min(a.y_, b.y_);
+    return b1 && b2;
+  }
+
+  bool doIntersect(const Segment& s1, const Segment& s2) {
+    Point p1 = s1.p1_;
+    Point p2 = s1.p2_;
+    Point p3 = s2.p1_;
+    Point p4 = s2.p2_;
+
+    double d1 = crossProduct(p3, p4, p1);
+    double d2 = crossProduct(p3, p4, p2);
+    double d3 = crossProduct(p1, p2, p3);
+    double d4 = crossProduct(p1, p2, p4);
+
+    
+    bool b1 = (d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0);
+    bool b2 = (d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0);
+    if (b1 && b2)
+    {
+      return true;
+    }
+
+    if (d1 == 0 && onSegment(p3, p4, p1))
+    {
+      return true;
+    }
+    if (d2 == 0 && onSegment(p3, p4, p2))
+    {
+      return true;
+    }
+    if (d3 == 0 && onSegment(p1, p2, p3))
+    {
+      return true;
+    }
+    if (d4 == 0 && onSegment(p1, p2, p4))
+    {
+      return true;
+    }
+
+    return false;
+  }
+
+  struct PointInBoxFunctor
+  {
+    const BoundingBox box_;
+    const std::vector< Segment >& seg_; 
+
+    PointInBoxFunctor(const BoundingBox& box, const std::vector<Segment>& segments):
+      box_(box),
+      seg_(segments)
+    {}
+
+    bool operator()(const Point& p) const
+    {
+      Segment seg{box_.rightUp_, p};
+      size_t c1 = std::count_if(
+        seg_.begin(),
+        seg_.end(),
+        std::bind(doIntersect, std::placeholders::_1, seg)
+      );
+      seg = {box_.rightDown_, p};
+      size_t c2 = std::count_if(
+        seg_.begin(),
+        seg_.end(),
+        std::bind(doIntersect, std::placeholders::_1, seg)
+      );
+      seg = {box_.leftUp_, p};
+      size_t c3 = std::count_if(
+        seg_.begin(),
+        seg_.end(),
+        std::bind(doIntersect, std::placeholders::_1, seg)
+      );
+      seg = {box_.leftDown_, p};
+      size_t c4 = std::count_if(
+        seg_.begin(),
+        seg_.end(),
+        std::bind(doIntersect, std::placeholders::_1, seg)
+      );
+      return (c1 % 2 == 1) && (c2 % 2 == 1) && (c3 % 2 == 1) && (c4 % 2 == 1);
+    }
+  };
+
+  struct PolygonIntersectionFunctor
+  {
+    const Polygon& p_;
+
+    PolygonIntersectionFunctor(const Polygon& polygon):
+      p_(polygon)
+    {}
+  
+    bool operator()(const Polygon& p) const
+    {
+      GetSegmentsFunctor gs;
+      std::vector< Segment > s = gs(p);
+      GetBoundingBoxFunctor gb;
+      BoundingBox box = gb(p_);
+      PointInBoxFunctor pnbf(box, s);
+      return std::any_of(
+        p_.points_.begin(),
+        p_.points_.end(),
+        pnbf
+      );
+    }
+  };
 }
 
 namespace muh = muhamadiarov;
 
-void muh::area(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+void muh::area(
+  std::istream& in,
+  std::ostream& out,
+  const std::vector< Polygon >& polygons
+)
 {
   std::string command;
   if (!(in >> command))
@@ -134,12 +351,22 @@ void muh::area(std::istream& in, std::ostream& out, const std::vector< Polygon >
   std::vector< Polygon > polygonsIf;
   if (command == "EVEN")
   {
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(polygonsIf), isEven);
+    std::copy_if(
+      polygons.begin(),
+      polygons.end(),
+      std::back_inserter(polygonsIf),
+      isEven
+    );
     out << sumArea(polygonsIf) << '\n';
   }
   else if (command == "ODD")
   {
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(polygonsIf), isOdd);
+    std::copy_if(
+      polygons.begin(),
+      polygons.end(),
+      std::back_inserter(polygonsIf),
+      isOdd
+    );
     out << sumArea(polygonsIf) << '\n';
   }
   else if (command == "MEAN")
@@ -168,7 +395,11 @@ void muh::area(std::istream& in, std::ostream& out, const std::vector< Polygon >
   }
 }
 
-void muh::max(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+void muh::max(
+  std::istream& in,
+  std::ostream& out,
+  const std::vector< Polygon >& polygons
+)
 {
   std::string command;
   if (!(in >> command))
@@ -194,7 +425,12 @@ void muh::max(std::istream& in, std::ostream& out, const std::vector< Polygon >&
   else if (command == "VERTEXES")
   {
     std::vector< size_t > counts;
-    std::transform(polygons.begin(), polygons.end(), std::back_inserter(counts), getVerticesCount);
+    std::transform(
+      polygons.begin(),
+      polygons.end(),
+      std::back_inserter(counts),
+      getVerticesCount
+    );
     auto it = std::max_element(counts.begin(), counts.end());
     if (it != counts.end())
     {
@@ -207,7 +443,11 @@ void muh::max(std::istream& in, std::ostream& out, const std::vector< Polygon >&
   }
 }
 
-void muh::min(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+void muh::min(
+  std::istream& in,
+  std::ostream& out,
+  const std::vector< Polygon >& polygons
+)
 {
   std::string command;
   if (!(in >> command))
@@ -251,7 +491,11 @@ void muh::min(std::istream& in, std::ostream& out, const std::vector< Polygon >&
   }
 }
 
-void muh::count(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+void muh::count(
+  std::istream& in,
+  std::ostream& out,
+  const std::vector< Polygon >& polygons
+)
 {
   std::string command;
   if (!(in >> command))
@@ -282,7 +526,27 @@ void muh::count(std::istream& in, std::ostream& out, const std::vector< Polygon 
   }
 }
 
-void muh::rightshapes(std::istream&, std::ostream& out, const std::vector< Polygon >& polygons)
+void muh::rightshapes(
+  std::istream&,
+  std::ostream& out,
+  const std::vector< Polygon >& polygons
+)
 {
   out << std::count_if(polygons.begin(), polygons.end(), hasRightAngle) << '\n';
+}
+
+void muh::intersections(
+  std::istream& in,
+  std::ostream& out,
+  const std::vector< Polygon >& polygons
+)
+{
+  Polygon inPoligon;
+  if (!(in >> inPoligon))
+  {
+    throw std::runtime_error("Error input");
+  }
+  
+  PolygonIntersectionFunctor checker{inPoligon};
+  out << std::count_if(polygons.begin(), polygons.end(), checker) << '\n';
 }
