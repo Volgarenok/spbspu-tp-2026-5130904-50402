@@ -47,8 +47,8 @@ std::istream& muh::operator>>(std::istream& in, Polygon& polygon)
     in.setstate(std::ios::failbit);
   }
 
-  char c;
-  if (in >> std::ws >> c)
+  Point p;
+  if (in >> p)
   {
     in.setstate(std::ios::failbit);
     polygon.points_.clear();
