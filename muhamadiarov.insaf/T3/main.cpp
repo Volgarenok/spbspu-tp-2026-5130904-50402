@@ -43,14 +43,14 @@ int main(int argc, char **argv)
   commands["MAX"] = std::bind(muh::max, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["MIN"] = std::bind(muh::min, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["COUNT"] = std::bind(muh::count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  
+
   std::string command;
   while (std::cin >> command)
   {
     try
     {
       commands.at(command)();
-    } 
+    }
     catch (const std::exception &)
     {
       if (std::cin.fail())

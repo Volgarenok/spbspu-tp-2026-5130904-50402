@@ -8,7 +8,7 @@ namespace muhamadiarov
     {
       return 0.0;
     }
-    
+
     struct Accumulator
     {
       double operator()(const Point& a, const Point& b)
@@ -74,25 +74,25 @@ namespace muhamadiarov
     CheckAngleFunctor(const Polygon& polygon):
       polygon_(polygon)
     {}
-    
+
     bool operator()(const Point& current) const
     {
       auto it = std::find_if(
-        polygon_.points_.begin(), 
+        polygon_.points_.begin(),
         polygon_.points_.end(),
         std::bind(std::equal_to<Point>(), std::placeholders::_1, current)
       );
-      
+
       if (it == polygon_.points_.end())
       {
         return false;
       }
-      
+
       size_t idx = std::distance(polygon_.points_.begin(), it);
-      
+
       size_t prev = (idx == 0) ? polygon_.points_.size() - 1 : idx - 1;
       size_t next = (idx + 1) % polygon_.points_.size();
-      
+
       return isRightAngle(
         polygon_.points_[prev],
         polygon_.points_[idx],
@@ -124,73 +124,6 @@ namespace muhamadiarov
     Point p2_;
   };
 
-  struct BoundingBox
-  {
-    Point rightUp_;
-    Point rightDown_;
-    Point leftUp_;
-    Point leftDown_;
-  };
-
-  struct GetBoundingBoxFunctor
-  {
-    BoundingBox operator()(const Polygon& polygon) const
-    {
-      if (polygon.points_.empty())
-      {
-        BoundingBox emptyBox{{0, 0}, {0, 0}, {0, 0}, {0, 0}};
-        return emptyBox;
-      }
-      
-      auto minXIter = std::min_element(
-        polygon.points_.begin(),
-        polygon.points_.end(),
-        std::bind(
-          std::less<int>(),
-          std::bind(&Point::x_, std::placeholders::_1),
-          std::bind(&Point::x_, std::placeholders::_2)
-        )
-      );
-      
-      auto maxXIter = std::max_element(
-        polygon.points_.begin(),
-        polygon.points_.end(),
-        std::bind(
-          std::less<int>(),
-          std::bind(&Point::x_, std::placeholders::_1),
-          std::bind(&Point::x_, std::placeholders::_2)
-        )
-      );
-      
-      auto minYIter = std::min_element(
-        polygon.points_.begin(),
-        polygon.points_.end(),
-        std::bind(
-          std::less<int>(),
-          std::bind(&Point::y_, std::placeholders::_1),
-          std::bind(&Point::y_, std::placeholders::_2)
-        )
-      );
-      
-      auto maxYIter = std::max_element(
-        polygon.points_.begin(),
-        polygon.points_.end(),
-        std::bind(
-          std::less<int>(),
-          std::bind(&Point::y_, std::placeholders::_1),
-          std::bind(&Point::y_, std::placeholders::_2)
-        )
-      );
-      
-      BoundingBox box;
-      box.rightUp_ = {maxXIter->x_ + 1, maxYIter->y_ + 1};
-      box.rightDown_ = {maxXIter->x_ + 1, minYIter->y_ - 1};
-      box.leftDown_ = {minXIter->x_ - 1, minYIter->y_ - 1};
-      box.leftUp_ = {minXIter->x_ - 1, maxYIter->y_ + 1};
-      return box;
-    }
-  };
-
   Segment getSegment(const Point& p1, const Point& p2)
   {
     Segment seg;
@@ -211,10 +144,10 @@ namespace muhamadiarov
         segments.begin(),
         getSegment
       );
-      
+
       segments.back().p1_ = polygon.points_.back();
       segments.back().p2_ = polygon.points_.front();
-      
+
       return segments;
     }
   };
@@ -240,7 +173,7 @@ namespace muhamadiarov
     double d3 = crossProduct(p1, p2, p3);
     double d4 = crossProduct(p1, p2, p4);
 
-    
+
     bool b1 = (d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0);
     bool b2 = (d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0);
     if (b1 && b2)
@@ -268,43 +201,56 @@ namespace muhamadiarov
     return false;
   }
 
-  struct PointInBoxFunctor
+  struct AnySegmentIntersectsFunctor
   {
-    const BoundingBox box_;
-    const std::vector< Segment >& seg_; 
+    const Segment& seg_;
 
-    PointInBoxFunctor(const BoundingBox& box, const std::vector<Segment>& segments):
-      box_(box),
-      seg_(segments)
+    AnySegmentIntersectsFunctor(const Segment& seg):
+      seg_(seg)
+    {}
+
+    bool operator()(const Segment& other) const
+    {
+      return doIntersect(other, seg_);
+    }
+  };
+
+  struct SegmentIntersectsPolygonFunctor
+  {
+    const std::vector< Segment >& segs_;
+
+    SegmentIntersectsPolygonFunctor(const std::vector< Segment >& segs):
+      segs_(segs)
+    {}
+
+    bool operator()(const Segment& seg) const
+    {
+      return std::any_of(
+        segs_.begin(),
+        segs_.end(),
+        AnySegmentIntersectsFunctor(seg)
+      );
+    }
+  };
+
+  struct PointInPolygonFunctor
+  {
+    const std::vector< Segment >& segs_;
+
+    PointInPolygonFunctor(const std::vector< Segment >& segs):
+      segs_(segs)
     {}
 
     bool operator()(const Point& p) const
     {
-      Segment seg{box_.rightUp_, p};
-      size_t c1 = std::count_if(
-        seg_.begin(),
-        seg_.end(),
-        std::bind(doIntersect, std::placeholders::_1, seg)
+      Point far{ 1000000, p.y_ };
+      Segment ray{ p, far };
+      size_t cnt = std::count_if(
+        segs_.begin(),
+        segs_.end(),
+        std::bind(doIntersect, std::placeholders::_1, ray)
       );
-      seg = {box_.rightDown_, p};
-      size_t c2 = std::count_if(
-        seg_.begin(),
-        seg_.end(),
-        std::bind(doIntersect, std::placeholders::_1, seg)
-      );
-      seg = {box_.leftUp_, p};
-      size_t c3 = std::count_if(
-        seg_.begin(),
-        seg_.end(),
-        std::bind(doIntersect, std::placeholders::_1, seg)
-      );
-      seg = {box_.leftDown_, p};
-      size_t c4 = std::count_if(
-        seg_.begin(),
-        seg_.end(),
-        std::bind(doIntersect, std::placeholders::_1, seg)
-      );
-      return (c1 % 2 == 1) && (c2 % 2 == 1) && (c3 % 2 == 1) && (c4 % 2 == 1);
+      return (cnt % 2) == 1;
     }
   };
 
@@ -315,18 +261,37 @@ namespace muhamadiarov
     PolygonIntersectionFunctor(const Polygon& polygon):
       p_(polygon)
     {}
-  
-    bool operator()(const Polygon& p) const
+
+    bool operator()(const Polygon& other) const
     {
       GetSegmentsFunctor gs;
-      std::vector< Segment > s = gs(p);
-      GetBoundingBoxFunctor gb;
-      BoundingBox box = gb(p_);
-      PointInBoxFunctor pnbf(box, s);
-      return std::any_of(
+      std::vector< Segment > segsP  = gs(p_);
+      std::vector< Segment > segsOther = gs(other);
+
+      bool edgesIntersect = std::any_of(
+        segsP.begin(),
+        segsP.end(),
+        SegmentIntersectsPolygonFunctor(segsOther)
+      );
+      if (edgesIntersect)
+      {
+        return true;
+      }
+
+      bool pInsideOther = std::any_of(
         p_.points_.begin(),
         p_.points_.end(),
-        pnbf
+        PointInPolygonFunctor(segsOther)
+      );
+      if (pInsideOther)
+      {
+        return true;
+      }
+
+      return std::any_of(
+        other.points_.begin(),
+        other.points_.end(),
+        PointInPolygonFunctor(segsP)
       );
     }
   };
@@ -508,7 +473,7 @@ void muh::count(
   if (command == "EVEN")
   {
     out << std::count_if(polygons.begin(), polygons.end(), isEven) << '\n';
-  } 
+  }
   else if (command == "ODD")
   {
     out << std::count_if(polygons.begin(), polygons.end(), isOdd) << '\n';
@@ -522,7 +487,7 @@ void muh::count(
     }
     out << std::count_if(
       polygons.begin(),
-      polygons.end(), 
+      polygons.end(),
       std::bind(isCountOfVertices, std::placeholders::_1, count)
     );
      out << '\n';
@@ -549,7 +514,7 @@ void muh::intersections(
   {
     throw std::runtime_error("Error input");
   }
-  
+
   PolygonIntersectionFunctor checker{inPoligon};
   out << std::count_if(polygons.begin(), polygons.end(), checker) << '\n';
 }

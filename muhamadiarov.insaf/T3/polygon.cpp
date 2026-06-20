@@ -31,7 +31,7 @@ std::istream& muh::operator>>(std::istream& in, Polygon& polygon)
   if (!sentry)
   {
     return in;
-  }  
+  }
   size_t count;
   if (!(in >> count) || count < 3)
   {
