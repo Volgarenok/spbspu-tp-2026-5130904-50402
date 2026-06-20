@@ -346,6 +346,7 @@ void muh::area(
     throw std::runtime_error("error input");
   }
 
+  IOguard ioguard(out);
   out << std::fixed << std::setprecision(1);
 
   std::vector< Polygon > polygonsIf;
@@ -419,6 +420,7 @@ void muh::max(
     auto it = std::max_element(areas.begin(), areas.end());
     if (it != areas.end())
     {
+      IOguard ioguard(out);
       out << std::fixed << std::setprecision(1) << *it << '\n';
     }
   }
@@ -467,6 +469,7 @@ void muh::min(
     auto it = std::min_element(areas.begin(), areas.end());
     if (it != areas.end())
     {
+      IOguard ioguard(out);
       out << std::fixed << std::setprecision(1) << *it << '\n';
     }
   }

@@ -8,6 +8,7 @@
 #include <functional>
 #include <numeric>
 #include "polygon.hpp"
+#include "ioguard.hpp"
 
 namespace muhamadiarov
 {

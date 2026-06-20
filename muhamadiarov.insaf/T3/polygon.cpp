@@ -31,16 +31,17 @@ std::istream& muh::operator>>(std::istream& in, Polygon& polygon)
   if (!sentry)
   {
     return in;
-  }
+  }  
   size_t count;
-  if (!(in >>count) || count < 3)
+  if (!(in >> count) || count < 3)
   {
     in.setstate(std::ios::failbit);
     return in;
   }
-  using iit_t = std::istream_iterator< Point >;
-  std::copy(iit_t{in}, iit_t{}, std::back_inserter(polygon.points_));
-  if (polygon.points_.size() != count)
+  polygon.points_.resize(count);
+  using iit_t = std::istream_iterator<Point>;
+  std::copy_n(iit_t(in), count, polygon.points_.begin());
+  if (!in)
   {
     polygon.points_.clear();
     in.setstate(std::ios::failbit);

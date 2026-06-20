@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <iterator>
+#include <algorithm>
 
 namespace muhamadiarov
 {
