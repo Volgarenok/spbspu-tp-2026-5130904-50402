@@ -515,6 +515,13 @@ void muh::intersections(
     throw std::runtime_error("Error input");
   }
 
+  in >> std::ws;
+  char next = in.peek();
+  if (next == '(' || next == '-' || (next >= '0' && next <= '9'))
+  {
+    throw std::runtime_error("Invalid polygon");
+  }
+
   PolygonIntersectionFunctor checker{inPoligon};
   out << std::count_if(polygons.begin(), polygons.end(), checker) << '\n';
 }

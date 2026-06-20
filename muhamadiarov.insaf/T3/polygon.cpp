@@ -31,7 +31,7 @@ std::istream& muh::operator>>(std::istream& in, Polygon& polygon)
   if (!sentry)
   {
     return in;
-  }
+  }  
   size_t count;
   if (!(in >> count) || count < 3)
   {
@@ -46,13 +46,6 @@ std::istream& muh::operator>>(std::istream& in, Polygon& polygon)
     polygon.points_.clear();
     in.setstate(std::ios::failbit);
   }
-
-  Point p;
-  if (in >> p)
-  {
-    in.setstate(std::ios::failbit);
-    polygon.points_.clear();
-  }
   return in;
 }
 
@@ -60,4 +53,5 @@ bool muh::operator==(const Point& lhs, const Point& rhs)
 {
   return (lhs.x_ == rhs.x_) && (lhs.y_ == rhs.y_);
 }
+
 
