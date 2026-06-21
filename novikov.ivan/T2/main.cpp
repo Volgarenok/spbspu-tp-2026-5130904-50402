@@ -17,7 +17,8 @@ namespace novikov
   {
     DblLit,
     CmpLsp,
-    String
+    String,
+    Unknown
   };
 
   struct DblLitIO
@@ -251,5 +252,38 @@ std::istream& novikov::operator>>(std::istream& in, uncase_sep&& dest)
       in.setstate(std::ios::failbit);
     }
   }
+  return in;
+}
+
+std::istream& novikov::operator>>(std::istream& in, label&& dest)
+{
+  std::istream::sentry s(in);
+  if (!s)
+  {
+    return in;
+  }
+
+  std::string data;
+  in << data;
+  DataType inputType = DataType::Unknown;
+
+  if (data == dest.possibleLabels[0])
+  {
+    inputType = DataType::DblLit;
+  }
+  else if (data == dest.possibleLabels[1])
+  {
+    inputType = DataType::CmpLsp;
+  }
+  else if (data == dest.possibleLabels[2])
+  {
+    inputType = DataType::String;
+  }
+  else
+  {
+    in.setstate(std::ios::failbit);
+  }
+
+  dest.used.push_back(inputType);
   return in;
 }
