@@ -162,3 +162,23 @@ void petrov::refreshLinks(std::istream &is, std::ostream &, notes_t &db)
   db.at(name)->links.swap(vec);
 }
 
+void petrov::cmdLoop(std::istream &is, std::ostream &os, notes_t &db)
+{
+  std::string name;
+  size_t n = 0;
+  is >> name >> n;
+  db.at(name);
+  std::vector< std::string > path;
+  path.push_back(name);
+  if (!petrov::findLoop(name, name, n + 1, db, path)) {
+    os << "<NO LOOP>";
+    return;
+  }
+  for (size_t i = 0; i < path.size() - 1; ++i) {
+    os << path[i] << ' ' << path[i + 1];
+    if (i < path.size() - 2) {
+      os << '\n';
+    }
+  }
+}
+
