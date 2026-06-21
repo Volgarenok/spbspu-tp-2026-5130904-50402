@@ -198,3 +198,20 @@ novikov::IOguard::~IOguard()
   s_.precision(precision_);
   s_.flags(fmt_);
 }
+
+bool novikov::compare(const DataStruct& lhs, const DataStruct& rhs)
+{
+  if (lhs.key1 != rhs.key1)
+  {
+    return lhs.key1 < rhs.key1;
+  }
+
+  double abs_lhs_k2 = std::abs(lhs.key2);
+  double abs_rhs_k2 = std::abs(rhs.key2);
+  if (abs_lhs_k2 != abs_rhs_k2)
+  {
+    return abs_lhs_k2 < abs_rhs_k2;
+  }
+
+  return lhs.key3.length() < rhs.key3.length();
+}
