@@ -7,7 +7,6 @@
 #include <string>
 #include <vector>
 #include <complex>
-#include <cmath>
 #include <iomanip>
 
 namespace novikov
@@ -270,7 +269,6 @@ std::istream& novikov::operator>>(std::istream& in, label&& dest)
   }
 
   std::string data;
-  char c = 0;
   if (!std::getline(in, data, ' '))
   {
     in.setstate(std::ios::failbit);
