@@ -215,3 +215,41 @@ bool novikov::compare(const DataStruct& lhs, const DataStruct& rhs)
 
   return lhs.key3.length() < rhs.key3.length();
 }
+
+std::istream& novikov::operator>>(std::istream& in, sep&& dest)
+{
+  std::istream::sentry s(in);
+  if (!s)
+  {
+    return in;
+  }
+  char c = 0;
+  if (in.get(c))
+  {
+    if (c != dest.exp)
+    {
+      in.putback(c);
+      in.setstate(std::ios::failbit);
+    }
+  }
+  return in;
+}
+
+std::istream& novikov::operator>>(std::istream& in, uncase_sep&& dest)
+{
+  std::istream::sentry s(in);
+  if (!s)
+  {
+    return in;
+  }
+  char c = 0;
+  if (in.get(c))
+  {
+    if (std::toupper(c) != std::toupper(dest.exp))
+    {
+      in.putback(c);
+      in.setstate(std::ios::failbit);
+    }
+  }
+  return in;
+}
