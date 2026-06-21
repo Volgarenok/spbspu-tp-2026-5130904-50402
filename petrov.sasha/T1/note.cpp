@@ -7,6 +7,31 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <limits>
+
+bool petrov::findLoop(const std::string &startName, const std::string &currentName,
+                      size_t depthLeft, petrov::notes_t &db, std::vector< std::string > &path)
+{
+  if (depthLeft == 0) {
+    return false;
+  }
+  const std::shared_ptr< petrov::Note > current = db.at(currentName);
+  for (auto it = current->links.begin(); it != current->links.end(); ++it) {
+    if (it->expired()) {
+      continue;
+    }
+    const std::string nextName = it->lock()->name;
+    path.push_back(nextName);
+    if (nextName == startName) {
+      return true;
+    }
+    if (petrov::findLoop(startName, nextName, depthLeft - 1, db, path)) {
+      return true;
+    }
+    path.pop_back();
+  }
+  return false;
+}
 
 petrov::Note::Note(std::string name):
   name(name),
