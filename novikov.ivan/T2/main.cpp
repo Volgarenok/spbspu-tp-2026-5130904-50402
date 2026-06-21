@@ -1,8 +1,14 @@
 #include <algorithm>
+#include <cctype>
+#include <ios>
 #include <iostream>
 #include <iterator>
+#include <limits>
 #include <string>
 #include <vector>
+#include <complex>
+#include <cmath>
+#include <iomanip>
 
 namespace novikov
 {
@@ -246,7 +252,7 @@ std::istream& novikov::operator>>(std::istream& in, uncase_sep&& dest)
   char c = 0;
   if (in.get(c))
   {
-    if (std::toupper(c) != std::toupper(dest.exp))
+    if (std::toupper(static_cast< unsigned char >(c)) != std::toupper(static_cast< unsigned char >(dest.exp)))
     {
       in.putback(c);
       in.setstate(std::ios::failbit);
@@ -264,7 +270,12 @@ std::istream& novikov::operator>>(std::istream& in, label&& dest)
   }
 
   std::string data;
-  in << data;
+  char c = 0;
+  if (!std::getline(in, data, ' '))
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
   DataType inputType = DataType::Unknown;
 
   if (data == dest.possibleLabels[0])
@@ -336,5 +347,27 @@ std::istream& novikov::operator>>(std::istream& in, str&& dest)
   {
     return in;
   }
-  return std::getline(in >> sep{'"'}, dest.ref, '"');
+  in >> sep{'"'};
+  if (!in)
+  {
+    return in;
+  }
+  return std::getline(in, dest.ref, '"');
+}
+
+std::ostream& novikov::operator<<(std::ostream& out, const DataStruct& src)
+{
+  std::ostream::sentry s(out);
+  if (!s)
+  {
+    return out;
+  }
+
+  IOguard g(out);
+  out << std::fixed << std::setprecision(1);
+
+  out << "(:key1 " << src.key1 << "d";
+  out << ":key2 #c(" << src.key2.real() << " " << src.key2.imag() << ")";
+  out << ":key3 \"" << src.key3 << "\":)";
+  return out;
 }
