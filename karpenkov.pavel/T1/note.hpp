@@ -60,6 +60,18 @@ namespace karpenkov
         }
       }
     }
+    void removeLink(const std::shared_ptr< Note > &note)
+    {
+      auto it = links.begin();
+      while (it != links.end()) {
+
+        if (it->lock() == note) {
+          links.erase(it);
+          return;
+        }
+        ++it;
+      }
+    }
 
   private:
     std::string name;
