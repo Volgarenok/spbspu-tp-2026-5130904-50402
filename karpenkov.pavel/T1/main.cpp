@@ -15,6 +15,8 @@ int main()
       listOfCommands.at(command)(std::cin, std::cout, notes);
     } catch (...) {
       std::cout << "<INVALID COMMAND>";
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
   return 0;

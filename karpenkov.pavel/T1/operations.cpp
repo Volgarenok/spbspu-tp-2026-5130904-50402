@@ -35,8 +35,7 @@ namespace karpenkov
   void addLine(std::istream &in, std::ostream &, mapOfNotes &notes)
   {
     std::string name, text;
-    in >> name;
-    if (name.empty()) {
+    if (!(in >> name)) {
       throw std::runtime_error("empty arguments for line");
     }
     if (notes.find(name) == notes.cend()) {
@@ -107,7 +106,14 @@ namespace karpenkov
   void showLinks(std::istream &in, std::ostream &out, mapOfNotes &notes)
   {
     std::string name;
-    in >> name;
+    if (!(in >> name)) {
+      throw std::runtime_error("missing argument");
+    }
+    std::string tail;
+    std::getline(in, tail);
+    if (!isOnlySpaces(tail)) {
+      throw std::runtime_error("extra arguments");
+    }
     if (notes.find(name) == notes.cend()) {
       throw std::runtime_error("note doesn't exist");
     }
