@@ -17,6 +17,8 @@ int main()
     } catch (...) {
       std::cout << "<INVALID COMMAND>\n";
       std::cin.clear();
+      std::string dummy;
+      std::getline(std::cin, dummy);
     }
   }
   return 0;

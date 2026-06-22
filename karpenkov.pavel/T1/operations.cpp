@@ -41,8 +41,7 @@ namespace karpenkov
     if (notes.find(name) == notes.cend()) {
       throw std::runtime_error("note with such name doesn't exist");
     }
-    in >> std::quoted(text);
-    if (!in) {
+    if (!(in >> std::quoted(text))) {
       throw std::runtime_error("invalid quoted string");
     }
     std::string tail;
