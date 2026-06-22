@@ -1,6 +1,7 @@
 #include <iostream>
 #include "operations.hpp"
 #include <unordered_map>
+#include <limits>
 
 int main()
 {
@@ -14,7 +15,7 @@ int main()
     try {
       listOfCommands.at(command)(std::cin, std::cout, notes);
     } catch (...) {
-      std::cout << "<INVALID COMMAND>";
+      std::cout << "<INVALID COMMAND>\n";
       std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
