@@ -3,7 +3,7 @@
 #include <limits>
 #include <unordered_map>
 #include "commands.hpp"
-#include "parser.hpp"
+#include "Parser.hpp"
 
 int main(int argc, char* argv[])
 {
