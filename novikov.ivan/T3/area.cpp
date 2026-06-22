@@ -7,10 +7,18 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include "commands.hpp"
 #include "Parser.hpp"
 
 namespace
 {
+  double getPolygonArea(const novikov::Polygon& p);
+  bool isCharDigit(char c);
+  void areaEven(std::ostream& out, const novikov::plg_t& polygons);
+  void areaOdd(std::ostream& out, const novikov::plg_t& polygons);
+  void areaMean(std::ostream& out, const novikov::plg_t& polygons);
+  void areaNum(std::ostream& out, const novikov::plg_t& polygons, size_t num);
+
   struct CrossProductFunctor
   {
   public:
@@ -27,19 +35,6 @@ namespace
   private:
     const std::vector< novikov::Point >& points;
   };
-
-  double getPolygonArea(const novikov::Polygon& p)
-  {
-    if (p.points.empty())
-    {
-      return 0;
-    }
-    std::vector< size_t > indices(p.points.size());
-    std::iota(indices.begin(), indices.end(), 0);
-    std::vector< double > partialAreas(p.points.size());
-    std::transform(indices.begin(), indices.end(), partialAreas.begin(), CrossProductFunctor{p.points});
-    return std::abs(std::accumulate(partialAreas.begin(), partialAreas.end(), 0.0)) / 2;
-  }
 
   struct EvenAreaTransformer
   {
@@ -95,6 +90,19 @@ namespace
       return getPolygonArea(p);
     }
   };
+
+  double getPolygonArea(const novikov::Polygon& p)
+  {
+    if (p.points.empty())
+    {
+      return 0;
+    }
+    std::vector< size_t > indices(p.points.size());
+    std::iota(indices.begin(), indices.end(), 0);
+    std::vector< double > partialAreas(p.points.size());
+    std::transform(indices.begin(), indices.end(), partialAreas.begin(), CrossProductFunctor{p.points});
+    return std::abs(std::accumulate(partialAreas.begin(), partialAreas.end(), 0.0)) / 2;
+  }
 
   bool isCharDigit(char c)
   {
