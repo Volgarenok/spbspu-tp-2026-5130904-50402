@@ -11,5 +11,9 @@ namespace karpenkov
   void showNote(std::istream &in, std::ostream &out, mapOfNotes &notes);
   void dropNote(std::istream &in, std::ostream &, mapOfNotes &notes);
   void addLink(std::istream &in, std::ostream &, mapOfNotes &notes);
+  void removeLink(std::istream &in, std::ostream &, mapOfNotes &notes);
+  void showLinks(std::istream &in, std::ostream &out, mapOfNotes &notes);
+  void showExpired(std::istream &in, std::ostream &out, mapOfNotes &notes);
+  void refreshLinks(std::istream &in, std::ostream &, mapOfNotes &notes);
 }
 #endif

@@ -5,11 +5,9 @@
 int main()
 {
   std::unordered_map< std::string, void (*)(std::istream &, std::ostream &, karpenkov::mapOfNotes &) > listOfCommands{
-      {"note", karpenkov::addNote},
-      {"line", karpenkov::addLine},
-      {"show", karpenkov::showNote},
-      {"drop", karpenkov::dropNote},
-      {"link", karpenkov::addLink}};
+      {"note", karpenkov::addNote},   {"line", karpenkov::addLine},        {"show", karpenkov::showNote},
+      {"drop", karpenkov::dropNote},  {"link", karpenkov::addLink},        {"halt", karpenkov::removeLink},
+      {"mind", karpenkov::showLinks}, {"expired", karpenkov::showExpired}, {"refresh", karpenkov::refreshLinks}};
   karpenkov::mapOfNotes notes;
   std::string command;
   while (std::cin >> command) {
