@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <stdexcept>
 
 namespace karpenkov
 {
@@ -18,6 +19,10 @@ namespace karpenkov
     }
     void printNote(std::ostream &out)
     {
+      if (lines.empty()) {
+        out << '\n';
+        return;
+      }
       for (size_t i = 0; i < lines.size(); ++i) {
         out << lines[i] << '\n';
       }
@@ -27,18 +32,23 @@ namespace karpenkov
       for (size_t i = 0; i < links.size(); ++i) {
         std::shared_ptr< Note > sp = links[i].lock();
         if (sp == to) {
-          return;
+          throw std::logic_error("duplicate link");
         }
       }
       links.push_back(to);
     }
     void printLinks(std::ostream &out) const
     {
+      bool printed = false;
       for (const std::weak_ptr< Note > &link : links) {
         std::shared_ptr< Note > sp = link.lock();
         if (sp) {
           out << sp->name << '\n';
+          printed = true;
         }
+      }
+      if (!printed) {
+        out << '\n';
       }
     }
     size_t countExpired() const
