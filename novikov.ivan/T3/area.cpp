@@ -12,12 +12,12 @@
 
 namespace
 {
-  double getPolygonArea(const novikov::Polygon& p);
-  bool isCharDigit(char c);
-  void areaEven(std::ostream& out, const novikov::plg_t& polygons);
-  void areaOdd(std::ostream& out, const novikov::plg_t& polygons);
-  void areaMean(std::ostream& out, const novikov::plg_t& polygons);
-  void areaNum(std::ostream& out, const novikov::plg_t& polygons, size_t num);
+  double getPolygonArea(const novikov::Polygon&);
+  bool isCharDigit(char);
+  void areaEven(std::ostream&, const novikov::plg_t&);
+  void areaOdd(std::ostream&, const novikov::plg_t&);
+  void areaMean(std::ostream&, const novikov::plg_t&);
+  void areaNum(std::ostream&, const novikov::plg_t&, size_t);
 
   struct CrossProductFunctor
   {

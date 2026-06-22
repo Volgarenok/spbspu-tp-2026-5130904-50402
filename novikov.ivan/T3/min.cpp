@@ -7,13 +7,13 @@
 #include <string>
 #include <vector>
 #include "commands.hpp"
-#include "Parser.hpp"
+#include "parser.hpp"
 
 namespace
 {
   double getPolygonArea(const novikov::Polygon&);
-  void maxArea(std::ostream&, const novikov::plg_t&);
-  void maxVertexes(std::ostream&, const novikov::plg_t&);
+  void minArea(std::ostream&, const novikov::plg_t&);
+  void minVertexes(std::ostream&, const novikov::plg_t&);
 
   struct CrossProductFunctor
   {
@@ -63,28 +63,28 @@ namespace
     return std::abs(std::accumulate(partialAreas.begin(), partialAreas.end(), 0.0)) / 2;
   }
 
-  void maxArea(std::ostream& out, const novikov::plg_t& polygons)
+  void minArea(std::ostream& out, const novikov::plg_t& polygons)
   {
     if (polygons.empty())
     {
       throw std::logic_error("AREA requires at least one polygon in the dataset");
     }
-    auto it = std::max_element(polygons.begin(), polygons.end(), AreaComparator{});
+    auto it = std::min_element(polygons.begin(), polygons.end(), AreaComparator{});
     out << getPolygonArea(*it) << "\n";
   }
 
-  void maxVertexes(std::ostream& out, const novikov::plg_t& polygons)
+  void minVertexes(std::ostream& out, const novikov::plg_t& polygons)
   {
     if (polygons.empty())
     {
       throw std::logic_error("VERTEXES requires at least one polygon in the dataset");
     }
-    auto it = std::max_element(polygons.begin(), polygons.end(), VertexComparator{});
+    auto it = std::min_element(polygons.begin(), polygons.end(), VertexComparator{});
     out << it->points.size() << "\n";
   }
 }
 
-void novikov::max(std::istream& in, std::ostream& out, novikov::plg_t& polygons)
+void novikov::min(std::istream& in, std::ostream& out, novikov::plg_t& polygons)
 {
   std::string subCmd;
   if (!(in >> subCmd))
@@ -97,11 +97,11 @@ void novikov::max(std::istream& in, std::ostream& out, novikov::plg_t& polygons)
 
   if (subCmd == "AREA")
   {
-    maxArea(out, polygons);
+    minArea(out, polygons);
   }
   else if (subCmd == "VERTEXES")
   {
-    maxVertexes(out, polygons);
+    minVertexes(out, polygons);
   }
   else
   {
