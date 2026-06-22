@@ -2,15 +2,29 @@
 #include <iomanip>
 #include <iostream>
 #include <stdexcept>
+#include <cctype>
 
 namespace karpenkov
 {
+  bool isOnlySpaces(const std::string &str)
+  {
+    for (char c : str) {
+      if (!std::isspace(static_cast< unsigned char >(c))) {
+        return false;
+      }
+    }
+    return true;
+  }
   void addNote(std::istream &in, std::ostream &, mapOfNotes &notes)
   {
     std::string name;
-    in >> name;
-    if (name.empty()) {
+    if (!(in >> name)) {
       throw std::runtime_error("empty note name");
+    }
+    std::string tail;
+    std::getline(in, tail);
+    if (!isOnlySpaces(tail)) {
+      throw std::runtime_error("extra arguments");
     }
     if (notes.find(name) != notes.cend()) {
       throw std::runtime_error("note with this name is already exist");
@@ -32,15 +46,24 @@ namespace karpenkov
     if (!in) {
       throw std::runtime_error("invalid quoted string");
     }
+    std::string tail;
+    std::getline(in, tail);
+    if (!isOnlySpaces(tail)) {
+      throw std::runtime_error("extra arguments");
+    }
     std::shared_ptr< Note > neededNote = notes.at(name);
     neededNote->newLine(text);
   }
   void dropNote(std::istream &in, std::ostream &, mapOfNotes &notes)
   {
     std::string name;
-    in >> name;
-    if (name.empty()) {
+    if (!(in >> name)) {
       throw std::runtime_error("empty argument for deleting note");
+    }
+    std::string tail;
+    std::getline(in, tail);
+    if (!isOnlySpaces(tail)) {
+      throw std::runtime_error("extra arguments");
     }
     if (notes.find(name) == notes.cend()) {
       throw std::runtime_error("note with such name doesn't exist");
@@ -50,9 +73,13 @@ namespace karpenkov
   void showNote(std::istream &in, std::ostream &out, mapOfNotes &notes)
   {
     std::string name;
-    in >> name;
-    if (name.empty()) {
+    if (!(in >> name)) {
       throw std::runtime_error("empty name argument for showNote");
+    }
+    std::string tail;
+    std::getline(in, tail);
+    if (!isOnlySpaces(tail)) {
+      throw std::runtime_error("extra arguments");
     }
     if (notes.find(name) == notes.cend()) {
       throw std::runtime_error("note with such name doesn't exist");
@@ -63,8 +90,14 @@ namespace karpenkov
   void addLink(std::istream &in, std::ostream &, mapOfNotes &notes)
   {
     std::string noteTo, noteFrom;
-    in >> noteFrom;
-    in >> noteTo;
+    if (!(in >> noteFrom >> noteTo)) {
+      throw std::runtime_error("missing argument");
+    }
+    std::string tail;
+    std::getline(in, tail);
+    if (!isOnlySpaces(tail)) {
+      throw std::runtime_error("extra arguments");
+    }
     if (notes.find(noteFrom) == notes.cend() || notes.find(noteTo) == notes.cend()) {
       throw std::runtime_error("no such note");
     }
@@ -83,7 +116,14 @@ namespace karpenkov
   void showExpired(std::istream &in, std::ostream &out, mapOfNotes &notes)
   {
     std::string name;
-    in >> name;
+    if (!(in >> name)) {
+      throw std::runtime_error("missing argument");
+    }
+    std::string tail;
+    std::getline(in, tail);
+    if (!isOnlySpaces(tail)) {
+      throw std::runtime_error("extra arguments");
+    }
     if (notes.find(name) == notes.cend()) {
       throw std::runtime_error("note doesn't exist");
     }
@@ -92,7 +132,14 @@ namespace karpenkov
   void refreshLinks(std::istream &in, std::ostream &, mapOfNotes &notes)
   {
     std::string name;
-    in >> name;
+    if (!(in >> name)) {
+      throw std::runtime_error("missing argument");
+    }
+    std::string tail;
+    std::getline(in, tail);
+    if (!isOnlySpaces(tail)) {
+      throw std::runtime_error("extra arguments");
+    }
     if (notes.find(name) == notes.cend()) {
       throw std::runtime_error("note doesn't exist");
     }
@@ -102,8 +149,14 @@ namespace karpenkov
   {
     std::string noteFrom;
     std::string noteTo;
-    in >> noteFrom;
-    in >> noteTo;
+    if (!(in >> noteFrom >> noteTo)) {
+      throw std::runtime_error("missing argument");
+    }
+    std::string tail;
+    std::getline(in, tail);
+    if (!isOnlySpaces(tail)) {
+      throw std::runtime_error("extra arguments");
+    }
     if (notes.find(noteFrom) == notes.cend()) {
       throw std::runtime_error("note-from doesn't exist");
     }
