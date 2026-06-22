@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <iterator>
 #include <vector>
+#include <sstream>
 
 novikov::IOGuard::IOGuard(std::basic_ios< char >& s):
     s_(s),
@@ -84,10 +85,49 @@ std::istream& novikov::operator>>(std::istream& in, Polygon& p)
   return in >> PolygonIO{p};
 }
 
+std::istream& novikov::operator>>(std::istream& in, novikov::Line& dest)
+{
+  std::getline(in, dest.lineText);
+  return in;
+}
+
+novikov::PolygonLineInserter::PolygonLineInserter(novikov::plg_t& containerVec):
+    container(containerVec)
+{}
+
+novikov::PolygonLineInserter& novikov::PolygonLineInserter::operator=(const novikov::Line& line)
+{
+  std::istringstream iss(line.lineText);
+  novikov::Polygon poly;
+  if (iss >> poly)
+  {
+    char ch = 0;
+    if (!(iss >> ch))
+    {
+      container.push_back(poly);
+    }
+  }
+  return *this;
+}
+
+novikov::PolygonLineInserter& novikov::PolygonLineInserter::operator*()
+{
+  return *this;
+}
+
+novikov::PolygonLineInserter& novikov::PolygonLineInserter::operator++()
+{
+  return *this;
+}
+
+novikov::PolygonLineInserter& novikov::PolygonLineInserter::operator++(int)
+{
+  return *this;
+}
+
 novikov::plg_t novikov::parse(std::istream& in)
 {
   novikov::plg_t data;
-  using iit_t = std::istream_iterator< novikov::Polygon >;
-  std::copy(iit_t{in}, iit_t{}, std::back_inserter(data));
+  std::copy(std::istream_iterator< Line >(in), std::istream_iterator< Line >(), PolygonLineInserter{data});
   return data;
 }
