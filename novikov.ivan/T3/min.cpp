@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 #include "commands.hpp"
-#include "parser.hpp"
+#include "Parser.hpp"
 
 namespace
 {
