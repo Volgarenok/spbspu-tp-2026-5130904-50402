@@ -1,6 +1,7 @@
 #include <iostream>
 #include "operations.hpp"
 #include <unordered_map>
+#include <sstream>
 #include <limits>
 
 int main()
@@ -10,13 +11,18 @@ int main()
       {"drop", karpenkov::dropNote},  {"link", karpenkov::addLink},        {"halt", karpenkov::removeLink},
       {"mind", karpenkov::showLinks}, {"expired", karpenkov::showExpired}, {"refresh", karpenkov::refreshLinks}};
   karpenkov::mapOfNotes notes;
-  std::string command;
-  while (std::cin >> command) {
+  std::string line;
+
+  while (std::getline(std::cin, line)) {
+    std::istringstream in(line);
+    std::string command;
+    if (!(in >> command)) {
+      continue;
+    }
     try {
-      listOfCommands.at(command)(std::cin, std::cout, notes);
+      listOfCommands.at(command)(in, std::cout, notes);
     } catch (...) {
       std::cout << "<INVALID COMMAND>\n";
-      std::cin.clear();
     }
   }
   return 0;
