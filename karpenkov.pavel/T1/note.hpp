@@ -10,14 +10,14 @@ namespace karpenkov
   public:
     Note(const std::string &name):
       name(name) {};
-    void newLine(std::string &quote)
+    void newLine(std::string &text)
     {
-      lines.push_back("\"" + quote.substr(1, quote.size() - 1) + "\"");
+      lines.push_back(text);
     }
-    void printNote()
+    void printNote(std::ostream &out)
     {
       for (size_t i = 0; i < lines.size(); ++i) {
-        std::cout << lines[i] << '\n';
+        out << lines[i] << '\n';
       }
     }
     void createLink(std::shared_ptr< Note > to)
@@ -29,6 +29,36 @@ namespace karpenkov
         }
       }
       links.push_back(to);
+    }
+    void printLinks(std::ostream &out) const
+    {
+      for (const std::weak_ptr< Note > &link : links) {
+        std::shared_ptr< Note > sp = link.lock();
+        if (sp) {
+          out << sp->name << '\n';
+        }
+      }
+    }
+    size_t countExpired() const
+    {
+      size_t count = 0;
+      for (const std::weak_ptr< Note > &link : links) {
+        if (link.expired()) {
+          ++count;
+        }
+      }
+      return count;
+    }
+    void refreshLinks()
+    {
+      auto it = links.begin();
+      while (it != links.end()) {
+        if (it->expired()) {
+          it = links.erase(it);
+        } else {
+          ++it;
+        }
+      }
     }
 
   private:

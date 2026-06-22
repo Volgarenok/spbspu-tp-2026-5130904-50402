@@ -1,4 +1,5 @@
 #include "operations.hpp"
+#include <iomanip>
 #include <iostream>
 #include <stdexcept>
 
@@ -19,7 +20,7 @@ namespace karpenkov
   }
   void addLine(std::istream &in, std::ostream &, mapOfNotes &notes)
   {
-    std::string name, quote;
+    std::string name, text;
     in >> name;
     if (name.empty()) {
       throw std::runtime_error("empty arguments for line");
@@ -27,9 +28,12 @@ namespace karpenkov
     if (notes.find(name) == notes.cend()) {
       throw std::runtime_error("note with such name doesn't exist");
     }
-    std::getline(in, quote);
+    in >> std::quoted(text);
+    if (!in) {
+      throw std::runtime_error("invalid quoted string");
+    }
     std::shared_ptr< Note > neededNote = notes.at(name);
-    neededNote->newLine(quote);
+    neededNote->newLine(text);
   }
   void dropNote(std::istream &in, std::ostream &, mapOfNotes &notes)
   {
@@ -54,7 +58,7 @@ namespace karpenkov
       throw std::runtime_error("note with such name doesn't exist");
     }
     std::shared_ptr< Note > neededNote = notes.at(name);
-    neededNote->printNote();
+    neededNote->printNote(out);
   }
   void addLink(std::istream &in, std::ostream &, mapOfNotes &notes)
   {
