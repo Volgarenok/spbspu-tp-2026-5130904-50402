@@ -46,6 +46,11 @@ void novikov::drop(std::istream &in, std::ostream &, mapNotes &db)
 {
   std::string name;
   in >> name;
+  try {
+    db.at(name);
+  } catch (const std::out_of_range &) {
+    throw std::logic_error("Note not exist");
+  }
   db.erase(name);
 }
 
