@@ -1,19 +1,19 @@
 #ifndef NOTE_HPP
 #define NOTE_HPP
-#include <cstddef>
-#include <string>
 #include <vector>
+#include <string>
 #include <memory>
 
 namespace lavrentev
 {
   struct Note
   {
-    std::string name;
     std::vector< std::string > lines;
-    std::vector< std::weak_ptr< lavrentev::Note > > ptrs;
-    Note() = default;
-    explicit Note(const std::string& n) : name(n) {}
+    std::vector< std::weak_ptr< Note > > ptrs;
+    std::string name;
+
+    Note();
+    explicit Note(const std::string& n);
   };
 }
 

@@ -5,8 +5,8 @@
 
 int main()
 {
-  std::unordered_map<std::string, std::shared_ptr<lavrentev::Note>> db;
-  std::unordered_map<std::string, lavrentev::cmd_t> cmds;
+  std::unordered_map< std::string, std::shared_ptr< lavrentev::Note > > db;
+  std::unordered_map< std::string, lavrentev::cmd_t > cmds;
 
   cmds["note"] = lavrentev::note;
   cmds["line"] = lavrentev::line;
@@ -32,7 +32,7 @@ int main()
     catch (const std::exception &)
     {
       std::cout << "<INVALID COMMAND>\n";
-      auto toignore = std::numeric_limits<std::streamsize>::max();
+      long toignore = std::numeric_limits< std::streamsize >::max();
       std::cin.ignore(toignore, '\n');
     }
   }

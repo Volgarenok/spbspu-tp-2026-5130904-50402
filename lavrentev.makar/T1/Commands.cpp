@@ -5,26 +5,26 @@
 #include <unordered_map>
 
 void lavrentev::note(std::istream &in, std::ostream &,
-    std::unordered_map<std::string, std::shared_ptr<Note>> &db)
+  dbTemp &db)
 {
   std::string newName;
   in >> newName;
-  if (db.find(newName) != db.end())
+  if (db.at(newName))
   {
     throw std::logic_error("Node is already exists");
   }
-  std::shared_ptr<Note> newNote = std::make_shared<Note>(newName);
+  std::shared_ptr< Note > newNote = std::make_shared< Note >(newName);
   db.insert({newName, newNote});
 }
 
 void lavrentev::line(std::istream &in,
-    std::ostream &,
-    std::unordered_map<std::string,
-    std::shared_ptr<Note>> &db)
+  std::ostream &,
+  std::unordered_map< std::string,
+  std::shared_ptr< Note > > &db)
 {
   std::string name, text;
   in >> name;
-  if (db.find(name) == db.end())
+  if (!db.at(name))
   {
     throw std::logic_error("No such Note");
   }
@@ -33,13 +33,13 @@ void lavrentev::line(std::istream &in,
 }
 
 void lavrentev::show(std::istream &in,
-    std::ostream &out,
-    std::unordered_map<std::string,
-    std::shared_ptr<Note>> &db)
+  std::ostream &out,
+  std::unordered_map< std::string,
+  std::shared_ptr< Note > > &db)
 {
   std::string name;
   in >> name;
-  if (db.find(name) != db.end())
+  if (db.at(name))
   {
     if (db.find(name)->second->lines.empty())
     {
@@ -58,13 +58,13 @@ void lavrentev::show(std::istream &in,
 }
 
 void lavrentev::drop(std::istream &in,
-    std::ostream &,
-    std::unordered_map<std::string,
-    std::shared_ptr<Note>> &db)
+  std::ostream &,
+  std::unordered_map< std::string,
+  std::shared_ptr< Note > > &db)
 {
   std::string name;
   in >> name;
-  if (db.find(name) != db.end())
+  if (db.at(name))
   {
     db.erase(name);
     return;
@@ -73,19 +73,19 @@ void lavrentev::drop(std::istream &in,
 }
 
 void lavrentev::link(std::istream &in,
-    std::ostream &,
-    std::unordered_map<std::string,
-    std::shared_ptr<Note>> &db)
+  std::ostream &,
+  std::unordered_map< std::string,
+  std::shared_ptr< Note > > &db)
 {
   std::string noteTo, noteFrom;
   in >> noteFrom >> noteTo;
-  if (db.find(noteTo) == db.end() || db.find(noteFrom) == db.end())
+  if (!db.at(noteTo) || !db.at(noteFrom))
   {
     throw std::logic_error("No such Note");
   }
   for (size_t i = 0; i < db[noteFrom]->ptrs.size(); ++i)
   {
-    std::shared_ptr<Note> k = db[noteFrom]->ptrs[i].lock();
+    std::shared_ptr< Note > k = db[noteFrom]->ptrs[i].lock();
     if (k != nullptr)
     {
       if (k->name == noteTo)
@@ -94,18 +94,18 @@ void lavrentev::link(std::istream &in,
       }
     }
   }
-  std::weak_ptr<Note> newLink = db[noteTo];
+  std::weak_ptr< Note > newLink = db[noteTo];
   db[noteFrom]->ptrs.push_back(newLink);
 }
 
 void lavrentev::mind(std::istream &in,
-    std::ostream &out,
-    std::unordered_map<std::string,
-    std::shared_ptr<Note>> &db)
+  std::ostream &out,
+  std::unordered_map< std::string,
+  std::shared_ptr< Note > > &db)
 {
   std::string name;
   in >> name;
-  if (db.find(name) != db.end())
+  if (db.at(name))
   {
     if (db[name]->ptrs.empty())
     {
@@ -115,7 +115,7 @@ void lavrentev::mind(std::istream &in,
     size_t i = 0;
     for (; i < db[name]->ptrs.size(); ++i)
     {
-      std::shared_ptr<Note> firstLink = db[name]->ptrs[i].lock();
+      std::shared_ptr< Note > firstLink = db[name]->ptrs[i].lock();
       if (firstLink != nullptr)
       {
         out << firstLink->name;
@@ -126,7 +126,7 @@ void lavrentev::mind(std::istream &in,
     ++i;
     for (; i < db[name]->ptrs.size(); ++i)
     {
-      std::shared_ptr<Note> k = db[name]->ptrs[i].lock();
+      std::shared_ptr< Note > k = db[name]->ptrs[i].lock();
       if (k != nullptr)
       {
         out << "\n" << k->name;
@@ -138,20 +138,20 @@ void lavrentev::mind(std::istream &in,
 }
 
 void lavrentev::halt(std::istream &in,
-    std::ostream &,
-    std::unordered_map<std::string,
-    std::shared_ptr<Note>> &db)
+  std::ostream &,
+  std::unordered_map< std::string,
+  std::shared_ptr< Note > > &db)
 {
   std::string noteTo, noteFrom;
   in >> noteFrom >> noteTo;
-  if (db.find(noteTo) == db.end() || db.find(noteFrom) == db.end())
+  if (!db.at(noteTo) || !db.at(noteFrom))
   {
     throw std::logic_error("No such Note");
   }
-  auto &ptrs = db.find(noteFrom)->second->ptrs;
+  std::vector< std::weak_ptr< lavrentev::Note > > &ptrs = db.find(noteFrom)->second->ptrs;
   for (size_t i = 0; i < ptrs.size(); ++i)
   {
-    std::shared_ptr<Note> k = ptrs[i].lock();
+    std::shared_ptr< Note > k = ptrs[i].lock();
     if (k != nullptr)
     {
       if (k->name == noteTo)
@@ -165,18 +165,18 @@ void lavrentev::halt(std::istream &in,
 }
 
 void lavrentev::expired(
-    std::istream &in, std::ostream &out,
-    std::unordered_map<std::string, std::shared_ptr<Note>> &db)
+  std::istream &in, std::ostream &out,
+  dbTemp &db)
 {
   std::string name;
   in >> name;
-  if (db.find(name) == db.end())
+  if (!db.at(name))
   {
     throw std::logic_error("No such Note");
   }
   size_t count = 0;
-  std::shared_ptr<Note> notePtr = db[name];
-  for (auto wp : notePtr->ptrs)
+  std::shared_ptr< Note > notePtr = db[name];
+  for (std::weak_ptr< Note > wp : notePtr->ptrs)
   {
     if (wp.expired())
     {
@@ -187,16 +187,16 @@ void lavrentev::expired(
 }
 
 void lavrentev::refresh(
-    std::istream &in, std::ostream &,
-    std::unordered_map<std::string, std::shared_ptr<Note>> &db)
+  std::istream &in, std::ostream &,
+  dbTemp &db)
 {
   std::string name;
   in >> name;
-  if (db.find(name) == db.end())
+  if (!db.at(name))
   {
     throw std::logic_error("No such Note");
   }
-  std::shared_ptr<Note> notePtr = db[name];
+  std::shared_ptr< Note > notePtr = db[name];
   for (auto it = notePtr->ptrs.begin(); it != notePtr->ptrs.end();)
   {
     if (it->expired())
