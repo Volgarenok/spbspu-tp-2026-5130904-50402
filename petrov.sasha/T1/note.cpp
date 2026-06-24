@@ -72,7 +72,7 @@ void petrov::printNote(std::istream &is, std::ostream &os, notes_t &db)
 {
   std::string name;
   is >> name;
-  const auto &desc = db.at(name)->desc;
+  const std::vector< std::string > &desc = db.at(name)->desc;
   if (!desc.empty()) {
     os << desc.front();
     for (auto it = desc.begin() + 1; it != desc.end(); ++it) {
@@ -118,7 +118,7 @@ void petrov::printLinks(std::istream &is, std::ostream &os, notes_t &db)
 {
   std::string name;
   is >> name;
-  const auto &links = db.at(name)->links;
+  const std::vector< std::weak_ptr< Note > > &links = db.at(name)->links;
   auto it = links.begin();
   while (it != links.end() && it->expired()) {
     ++it;
@@ -140,7 +140,7 @@ void petrov::countExpired(std::istream &is, std::ostream &os, notes_t &db)
   std::string name;
   size_t expired = 0;
   is >> name;
-  const auto &links = db.at(name)->links;
+  const std::vector< std::weak_ptr< Note > > &links = db.at(name)->links;
   for (const std::weak_ptr< Note > &link : links) {
     if (link.expired()) {
       ++expired;
