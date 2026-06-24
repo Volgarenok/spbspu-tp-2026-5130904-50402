@@ -12,3 +12,11 @@ const std::shared_ptr< samarin::Note > &samarin::KnowledgeBase::require(const st
   }
   return found->second;
 }
+
+void samarin::KnowledgeBase::note(const std::string &name)
+{
+  if (notes_.find(name) != notes_.end()) {
+    throw std::invalid_argument("note already exists");
+  }
+  notes_.emplace(name, std::make_shared< Note >(name));
+}
