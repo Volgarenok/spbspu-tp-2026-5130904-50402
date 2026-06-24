@@ -23,22 +23,6 @@ std::istream &karpovich::operator>>(std::istream &in, LabelIO &&dest)
   return in;
 }
 
-std::istream &karpovich::operator>>(std::istream &in, BinDigitIO &&dest)
-{
-  std::istream::sentry sentry(in);
-  if (!sentry) {
-    return in;
-  }
-  char c = '\0';
-  in >> c;
-  if (c != '0' && c != '1') {
-    in.setstate(std::ios::failbit);
-  } else {
-    dest.ref = c;
-  }
-  return in;
-}
-
 std::istream &karpovich::operator>>(std::istream &in, BinIO &&dest)
 {
   std::istream::sentry sentry(in);
@@ -53,10 +37,7 @@ std::istream &karpovich::operator>>(std::istream &in, BinIO &&dest)
   std::string numBin;
   char c = '\0';
   while (in.peek() == '0' || in.peek() == '1') {
-    in >> BinDigitIO{c};
-    if (!in) {
-      return in;
-    }
+    in >> c;
     numBin.push_back(c);
   }
   if (numBin.empty()) {
