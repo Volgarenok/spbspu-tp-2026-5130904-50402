@@ -1,5 +1,5 @@
-#ifndef COMMANDS_HPP
-#define COMMANDS_HPP
+#ifndef NOTE_HPP
+#define NOTE_HPP
 
 #include <istream>
 #include <memory>
@@ -11,11 +11,13 @@
 
 namespace karpovich
 {
-  struct Note
+  class Note
   {
+  public:
     std::string name;
     std::vector< std::string > lines;
     std::vector< std::pair< std::string, std::weak_ptr< Note > > > links;
+    Note(const std::string &name);
   };
 
   using NoteMap = std::unordered_map< std::string, std::shared_ptr< Note > >;
@@ -29,6 +31,7 @@ namespace karpovich
   void cmdMind(std::istream &in, std::ostream &out, NoteMap &notes);
   void cmdExpired(std::istream &in, std::ostream &out, NoteMap &notes);
   void cmdRefresh(std::istream &in, std::ostream &out, NoteMap &notes);
+  void cmdLoop(std::istream &in, std::ostream &out, NoteMap &notes);
 }
 
 #endif
