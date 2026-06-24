@@ -17,11 +17,15 @@ int main()
       {"mind", petrov::printLinks},
       {"expired", petrov::countExpired},
       {"refresh", petrov::refreshLinks},
+      {"loop", petrov::cmdLoop},
   };
   std::string cmd;
   while (std::cin >> cmd) {
     try {
       cmds.at(cmd)(std::cin, std::cout, db);
+      if (cmd == "show" || cmd == "mind" || cmd == "expired" || cmd == "loop") {
+        std::cout << '\n';
+      }
     } catch (const std::exception &) {
       std::cout << "<INVALID COMMAND>\n";
       std::cin.ignore(petrov::streamMax, '\n');
