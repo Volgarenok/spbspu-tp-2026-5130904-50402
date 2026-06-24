@@ -7,7 +7,7 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "commands.hpp"
+#include "polygon_cmds.hpp"
 #include "shapes.hpp"
 
 int main(int argc, char **argv)

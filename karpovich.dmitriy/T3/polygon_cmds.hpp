@@ -1,5 +1,5 @@
-#ifndef COMMANDS_HPP
-#define COMMANDS_HPP
+#ifndef POLYGON_CMDS_HPP
+#define POLYGON_CMDS_HPP
 #include <iostream>
 #include <vector>
 #include "shapes.hpp"
