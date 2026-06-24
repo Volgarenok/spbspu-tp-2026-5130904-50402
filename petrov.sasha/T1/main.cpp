@@ -22,10 +22,7 @@ int main()
   while (std::cin >> cmd) {
     try {
       cmds.at(cmd)(std::cin, std::cout, db);
-    } catch (const std::out_of_range &) {
-      std::cout << "<INVALID COMMAND>\n";
-      std::cin.ignore(petrov::streamMax, '\n');
-    } catch (const std::logic_error &) {
+    } catch (const std::exception &e) {
       std::cout << "<INVALID COMMAND>\n";
       std::cin.ignore(petrov::streamMax, '\n');
     }
