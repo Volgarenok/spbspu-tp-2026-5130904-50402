@@ -20,3 +20,8 @@ void samarin::KnowledgeBase::note(const std::string &name)
   }
   notes_.emplace(name, std::make_shared< Note >(name));
 }
+
+void samarin::KnowledgeBase::line(const std::string &name, const std::string &text)
+{
+  require(name)->addLine(text);
+}
