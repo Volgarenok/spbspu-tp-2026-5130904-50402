@@ -101,9 +101,6 @@ void novikov::mind(std::istream &in, std::ostream &out, mapNotes &db)
       printed = true;
     }
   }
-  if (!printed) {
-    out << "\n";
-  }
 }
 
 void novikov::expired(std::istream &in, std::ostream &out, mapNotes &db)
