@@ -33,9 +33,9 @@ namespace petrov
   void countExpired(std::istream &is, std::ostream &os, notes_t &db);
   void cmdLoop(std::istream &is, std::ostream &os, notes_t &db);
   bool findLoop(const std::string &startName, const std::string &currentName,
-                size_t depthLeft, notes_t &db, std::vector< std::string > &path);
+                 size_t depthLeft, notes_t &db, std::vector< std::string > &path);
   using linkIt_t = std::vector< std::weak_ptr< Note > >::iterator;
-  linkIt_t find(linkIt_t, linkIt_t, std::string name);
+  linkIt_t find(linkIt_t start, linkIt_t end, const std::string& name);
 }
 
 #endif
