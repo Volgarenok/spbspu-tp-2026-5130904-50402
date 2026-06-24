@@ -12,10 +12,7 @@ void handle_note(std::istream &in, std::ostream &, chernikov::NoteDB &db)
 {
   std::string name;
   in >> name;
-  if (!db.createNote(name))
-  {
-    throw std::logic_error("note already exists or invalid");
-  }
+  db.createNote(name);
 }
 
 void handle_line(std::istream &in, std::ostream &, chernikov::NoteDB &db)
@@ -64,10 +61,7 @@ void handle_halt(std::istream &in, std::ostream &, chernikov::NoteDB &db)
 {
   std::string from, to;
   in >> from >> to;
-  if (!db.haltLink(from, to))
-  {
-    throw std::logic_error("cannot halt");
-  }
+  db.haltLink(from, to);
 }
 
 void handle_mind(std::istream &in, std::ostream &out, chernikov::NoteDB &db)
@@ -118,13 +112,11 @@ int main()
       auto it = handlers.find(cmd);
       if (it == handlers.end())
       {
-        throw std::out_of_range("unknown command");
+        std::cout << "<INVALID COMMAND>\n";
+        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+        continue;
       }
       it->second(std::cin, std::cout, db);
-    } catch (const std::out_of_range &)
-    {
-      std::cout << "<INVALID COMMAND>\n";
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     } catch (const std::logic_error &)
     {
       std::cout << "<INVALID COMMAND>\n";

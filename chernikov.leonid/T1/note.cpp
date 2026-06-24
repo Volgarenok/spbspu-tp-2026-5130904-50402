@@ -67,13 +67,15 @@ namespace chernikov {
   }
 
   void Note::removeExpiredLinks()
-  {
-    links_.erase(std::remove_if(links_.begin(), links_.end(),
-                                [](const auto &wp) {
-                                  return wp.expired();
-                                }),
-                 links_.end());
-  }
+{
+  links_.erase(
+    std::remove_if(links_.begin(), links_.end(),
+      [](const std::weak_ptr< Note > &wp) {
+        return wp.expired();
+      }),
+    links_.end()
+  );
+}
 
   const std::string &Note::name() const
   {

@@ -42,26 +42,26 @@ namespace chernikov {
   }
 
   bool NoteDB::linkNotes(const std::string &from, const std::string &to)
+{
+  auto fromNote = findNote(from);
+  auto toNote = findNote(to);
+  if (!fromNote || !toNote)
   {
-    auto fromNote = findNote(from);
-    auto toNote = findNote(to);
-    if (!fromNote || !toNote)
-    {
-      return false;
-    }
-    return fromNote->addLink(toNote);
+    return false;
   }
+  return fromNote->addLink(toNote);
+}
 
   bool NoteDB::haltLink(const std::string &from, const std::string &to)
+{
+  auto fromNote = findNote(from);
+  if (!fromNote)
   {
-    auto fromNote = findNote(from);
-    if (!fromNote)
-    {
-      return false;
-    }
-    fromNote->removeLink(to);
-    return true;
+    return false;
   }
+  fromNote->removeLink(to);
+  return true;
+}
 
   std::vector< std::string > NoteDB::mindLinks(const std::string &name) const
   {
