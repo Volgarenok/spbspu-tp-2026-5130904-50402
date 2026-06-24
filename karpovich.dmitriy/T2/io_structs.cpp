@@ -1,6 +1,7 @@
 #include "io_structs.hpp"
 #include <cstdlib>
 #include <delimiter.hpp>
+#include <exception>
 #include <ioguard.hpp>
 #include <iomanip>
 #include <iostream>
@@ -48,9 +49,7 @@ std::istream &karpovich::operator>>(std::istream &in, BinIO &&dest)
   }
   try {
     dest.ref = std::stoull(numBin);
-  } catch (const std::out_of_range &) {
-    in.setstate(std::ios::failbit);
-  } catch (const std::invalid_argument &) {
+  } catch (const std::exception &) {
     in.setstate(std::ios::failbit);
   }
   return in;

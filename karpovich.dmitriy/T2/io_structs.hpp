@@ -1,5 +1,5 @@
-#ifndef UTILS_HPP
-#define UTILS_HPP
+#ifndef IO_STRUCTS_HPP
+#define IO_STRUCTS_HPP
 
 #include <string>
 namespace karpovich
