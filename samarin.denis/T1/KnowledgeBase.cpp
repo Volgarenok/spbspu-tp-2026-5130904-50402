@@ -25,3 +25,11 @@ void samarin::KnowledgeBase::line(const std::string &name, const std::string &te
 {
   require(name)->addLine(text);
 }
+
+void samarin::KnowledgeBase::show(const std::string &name, std::ostream &out) const
+{
+  const std::shared_ptr< Note > &target = require(name);
+  for (const std::string &line: target->getLines()) {
+    out << line << '\n';
+  }
+}
