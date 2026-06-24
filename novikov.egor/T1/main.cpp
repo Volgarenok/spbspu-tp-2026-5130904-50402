@@ -21,11 +21,8 @@ int main()
   while (std::cin >> cmd) {
     try {
       cmds.at(cmd)(std::cin, std::cout, db);
-    } catch (const std::out_of_range &) {
-      std::cout << "<INVALID COMMAND>\n";
-      auto toignore = std::numeric_limits< std::streamsize >::max();
-      std::cin.ignore(toignore, '\n');
-    } catch (const std::logic_error&) {
+      std::cout << "\n";
+    } catch (const std::exception &) {
       std::cout << "<INVALID COMMAND>\n";
       auto toignore = std::numeric_limits< std::streamsize >::max();
       std::cin.ignore(toignore, '\n');
