@@ -8,8 +8,7 @@ namespace novikov
 {
   struct Note
   {
-    Note(const std::string &name):
-      name(name) {};
+    explicit Note(const std::string &name);
     std::string name;
     std::vector< std::string > lines;
     std::vector< std::weak_ptr< Note > > links;

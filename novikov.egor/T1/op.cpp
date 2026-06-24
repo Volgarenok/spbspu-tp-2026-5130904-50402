@@ -8,12 +8,11 @@ void novikov::note(std::istream &in, std::ostream &, mapNotes &db)
 {
   std::string name;
   in >> name;
-  auto note = db.find(name);
-  if (note != db.end()) {
+  auto new_note = std::make_shared< Note >(name);
+  auto result = db.insert({name, new_note});
+  if (!result.second) {
     throw std::logic_error("Note already exists");
   }
-  auto new_note = std::make_shared< Note >(name);
-  db[name] = new_note;
 }
 
 void novikov::line(std::istream &in, std::ostream &, mapNotes &db)
@@ -22,29 +21,24 @@ void novikov::line(std::istream &in, std::ostream &, mapNotes &db)
   in >> name;
   std::string text;
   in >> std::quoted(text);
-  auto note = db.find(name);
-  if (note == db.end()) {
-    throw std::logic_error("Note not exist");
-  }
-  note->second->lines.push_back(text);
+  auto &note = db.at(name);
+  note->lines.push_back(text);
 }
 
 void novikov::show(std::istream &in, std::ostream &out, mapNotes &db)
 {
   std::string name;
   in >> name;
-  auto note = db.find(name);
-  if (note == db.end()) {
-    throw std::logic_error("Note not exist");
-  }
+  auto &note = db.at(name);
 
-  if (note->second->lines.empty()) {
-    out << "\n";
+  const auto &lines = note->lines;
+  if (lines.empty()) {
     return;
   }
 
-  for (size_t i = 0; i < note->second->lines.size(); ++i) {
-    out << note->second->lines[i] << "\n";
+  out << lines[0];
+  for (size_t i = 1; i < lines.size(); ++i) {
+    out << "\n" << lines[i];
   }
 }
 
@@ -52,9 +46,6 @@ void novikov::drop(std::istream &in, std::ostream &, mapNotes &db)
 {
   std::string name;
   in >> name;
-  if (db.find(name) == db.end()) {
-    throw std::logic_error("Note not exist");
-  }
   db.erase(name);
 }
 
@@ -63,21 +54,16 @@ void novikov::link(std::istream &in, std::ostream &, mapNotes &db)
   std::string note_from;
   std::string note_to;
   in >> note_from >> note_to;
-  auto note1 = db.find(note_from);
-  auto note2 = db.find(note_to);
-  if (note1 == db.end()) {
-    throw std::logic_error("<note-from> not exist");
-  }
-  if (note2 == db.end()) {
-    throw std::logic_error("<note-to> not exist");
-  }
 
-  for (size_t i = 0; i < note1->second->links.size(); ++i) {
-    if (note1->second->links[i].lock() == note2->second) {
+  auto &note1 = db.at(note_from);
+  auto &note2 = db.at(note_to);
+
+  for (size_t i = 0; i < note1->links.size(); ++i) {
+    if (note1->links[i].lock() == note2) {
       throw std::logic_error("Dublicate");
     }
   }
-  note1->second->links.push_back(note2->second);
+  note1->links.push_back(note2);
 }
 
 void novikov::halt(std::istream &in, std::ostream &, mapNotes &db)
@@ -85,35 +71,33 @@ void novikov::halt(std::istream &in, std::ostream &, mapNotes &db)
   std::string note_from;
   std::string note_to;
   in >> note_from >> note_to;
-  auto note1 = db.find(note_from);
-  auto note2 = db.find(note_to);
-  if (note1 == db.end()) {
-    throw std::logic_error("<note-from> not exist");
-  }
-  if (note2 == db.end()) {
-    throw std::logic_error("<note-to> not exist");
-  }
-  for (size_t i = 0; i < note1->second->links.size(); ++i) {
-    if (note1->second->links[i].lock() == note2->second) {
-      note1->second->links.erase(note1->second->links.begin() + i);
+
+  auto &note1 = db.at(note_from);
+  auto &note2 = db.at(note_to);
+
+  for (size_t i = 0; i < note1->links.size(); ++i) {
+    if (note1->links[i].lock() == note2) {
+      note1->links.erase(note1->links.begin() + i);
       return;
     }
   }
+  throw std::logic_error("Link not exist");
 }
 
 void novikov::mind(std::istream &in, std::ostream &out, mapNotes &db)
 {
   std::string name;
   in >> name;
-  auto note = db.find(name);
-  if (note == db.end()) {
-    throw std::logic_error("Note not exist");
-  }
+  auto &note = db.at(name);
+
   bool printed = false;
-  for (size_t i = 0; i < note->second->links.size(); ++i) {
-    auto link = note->second->links[i].lock();
+  for (size_t i = 0; i < note->links.size(); ++i) {
+    auto link = note->links[i].lock();
     if (link) {
-      out << link->name << "\n";
+      if (printed) {
+        out << "\n";
+      }
+      out << link->name;
       printed = true;
     }
   }
@@ -126,33 +110,29 @@ void novikov::expired(std::istream &in, std::ostream &out, mapNotes &db)
 {
   std::string name;
   in >> name;
-  auto note = db.find(name);
-  if (note == db.end()) {
-    throw std::logic_error("Note not exist");
-  }
+  auto &note = db.at(name);
+
   size_t res = 0;
-  for (size_t i = 0; i < note->second->links.size(); ++i) {
-    auto link = note->second->links[i].lock();
+  for (size_t i = 0; i < note->links.size(); ++i) {
+    auto link = note->links[i].lock();
     if (!link) {
       ++res;
     }
   }
-  out << res << "\n";
+  out << res;
 }
 
 void novikov::refresh(std::istream &in, std::ostream &, mapNotes &db)
 {
   std::string name;
   in >> name;
-  auto note = db.find(name);
-  if (note == db.end()) {
-    throw std::logic_error("Note not exist");
-  }
+  auto &note = db.at(name);
+
   size_t i = 0;
-  while (i < note->second->links.size()) {
-    auto link = note->second->links[i].lock();
+  while (i < note->links.size()) {
+    auto link = note->links[i].lock();
     if (!link) {
-      note->second->links.erase(note->second->links.begin() + i);
+      note->links.erase(note->links.begin() + i);
     } else {
       ++i;
     }
