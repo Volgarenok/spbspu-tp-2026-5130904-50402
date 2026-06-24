@@ -164,7 +164,7 @@ void lavrentev::halt(std::istream &in,
   {
     db.at(noteTo);
     std::shared_ptr< Note > fromPtr = db.at(noteFrom);
-    
+
     std::vector< std::weak_ptr< lavrentev::Note > > &ptrs = fromPtr->ptrs;
     for (size_t i = 0; i < ptrs.size(); ++i)
     {
