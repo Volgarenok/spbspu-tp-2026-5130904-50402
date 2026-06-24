@@ -10,12 +10,12 @@
 #include <limits>
 
 bool petrov::findLoop(const std::string &startName, const std::string &currentName,
-                      size_t depthLeft, petrov::notes_t &db, std::vector< std::string > &path)
+                       size_t depthLeft, notes_t &db, std::vector< std::string > &path)
 {
   if (depthLeft == 0) {
     return false;
   }
-  const std::shared_ptr< petrov::Note > current = db.at(currentName);
+  const std::shared_ptr< Note > &current = db.at(currentName);
   for (auto it = current->links.begin(); it != current->links.end(); ++it) {
     if (it->expired()) {
       continue;
@@ -39,7 +39,7 @@ petrov::Note::Note(std::string name):
   links()
 {}
 
-petrov::linkIt_t petrov::find(linkIt_t start, linkIt_t end, std::string name)
+petrov::linkIt_t petrov::find(linkIt_t start, linkIt_t end, const std::string& name)
 {
   for (; start != end; ++start) {
     if (!start->expired() && start->lock()->name == name) {
