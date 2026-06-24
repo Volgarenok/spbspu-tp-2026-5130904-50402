@@ -14,6 +14,10 @@ namespace karpovich
   {
     unsigned long long &ref;
   };
+  struct BinDigitIO
+  {
+    char &ref;
+  };
   struct OctIO
   {
     unsigned long long &ref;
@@ -27,6 +31,7 @@ namespace karpovich
     std::string exp;
   };
   std::istream &operator>>(std::istream &in, LabelIO &&dest);
+  std::istream &operator>>(std::istream &in, BinDigitIO &&dest);
   std::istream &operator>>(std::istream &in, BinIO &&dest);
   std::istream &operator>>(std::istream &in, OctIO &&dest);
   std::istream &operator>>(std::istream &in, StringIO &&dest);

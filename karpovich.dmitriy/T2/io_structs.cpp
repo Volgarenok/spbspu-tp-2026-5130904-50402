@@ -12,10 +12,29 @@ std::istream &karpovich::operator>>(std::istream &in, LabelIO &&dest)
   if (!sentry) {
     return in;
   }
-  std::string label = "";
-  in >> label;
-  if (in && label != dest.exp) {
+  for (size_t i = 0; i < dest.exp.size(); ++i) {
+    char c = '\0';
+    in >> c;
+    if (!in || c != dest.exp[i]) {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+  }
+  return in;
+}
+
+std::istream &karpovich::operator>>(std::istream &in, BinDigitIO &&dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry) {
+    return in;
+  }
+  char c = '\0';
+  in >> c;
+  if (c != '0' && c != '1') {
     in.setstate(std::ios::failbit);
+  } else {
+    dest.ref = c;
   }
   return in;
 }
@@ -26,22 +45,19 @@ std::istream &karpovich::operator>>(std::istream &in, BinIO &&dest)
   if (!sentry) {
     return in;
   }
-  char c1 = '\0';
-  char c2 = '\0';
-  in >> c1 >> c2;
-  if (!in || c1 != '0' || (c2 != 'b' && c2 != 'B')) {
-    in.setstate(std::ios::failbit);
+  in >> DelimIO{'0'};
+  in >> DelimIO{'b', 'B'};
+  if (!in) {
     return in;
   }
-  char c = '\0';
   std::string numBin;
-  while (in.get(c)) {
-    if (c == '0' || c == '1') {
-      numBin.push_back(c);
-    } else {
-      in.putback(c);
-      break;
+  char c = '\0';
+  while (in.peek() == '0' || in.peek() == '1') {
+    in >> BinDigitIO{c};
+    if (!in) {
+      return in;
     }
+    numBin.push_back(c);
   }
   if (numBin.empty()) {
     in.setstate(std::ios::failbit);

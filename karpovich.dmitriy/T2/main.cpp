@@ -8,8 +8,8 @@
 int main()
 {
   using T = karpovich::DataStruct;
-  std::vector< T > data;
   using iit_t = std::istream_iterator< T >;
+  std::vector< T > data;
   while (!std::cin.eof()) {
     std::copy(iit_t{std::cin}, iit_t{}, std::back_inserter(data));
     if (std::cin.fail()) {

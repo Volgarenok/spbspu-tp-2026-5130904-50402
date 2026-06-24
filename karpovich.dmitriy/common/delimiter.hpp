@@ -6,7 +6,8 @@ namespace karpovich
 {
   struct DelimIO
   {
-    char exp;
+    char exp1;
+    char exp2 = '\0';
   };
   std::istream &operator>>(std::istream &in, DelimIO &&dest);
 }
