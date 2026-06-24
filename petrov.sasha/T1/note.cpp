@@ -39,7 +39,7 @@ petrov::Note::Note(std::string name):
   links()
 {}
 
-petrov::linkIt_t petrov::find(linkIt_t start, linkIt_t end, const std::string& name)
+petrov::linkIt_t petrov::find(linkIt_t start, linkIt_t end, const std::string &name)
 {
   for (; start != end; ++start) {
     if (!start->expired() && start->lock()->name == name) {
@@ -62,7 +62,8 @@ void petrov::addNote(std::istream &is, std::ostream &, notes_t &db)
 
 void petrov::addDesc(std::istream &is, std::ostream &, notes_t &db)
 {
-  std::string name, desc;
+  std::string name;
+  std::string desc;
   is >> name;
   is >> std::quoted(desc);
   db.at(name)->desc.push_back(desc);
@@ -79,7 +80,6 @@ void petrov::printNote(std::istream &is, std::ostream &os, notes_t &db)
       os << '\n' << *it;
     }
   }
-  os << '\n';
 }
 
 void petrov::dropNote(std::istream &is, std::ostream &, notes_t &db)
@@ -94,10 +94,12 @@ void petrov::dropNote(std::istream &is, std::ostream &, notes_t &db)
 
 void petrov::linkNote(std::istream &is, std::ostream &, notes_t &db)
 {
-  std::string from, to;
+  std::string from;
+  std::string to;
   is >> from >> to;
-  if (find(db.at(from)->links.begin(), db.at(from)->links.end(), to) == db.at(from)->links.end()) {
-    db.at(from)->links.push_back(db.at(to));
+  std::vector< std::weak_ptr< Note > > &links = db.at(from)->links;
+  if (find(links.begin(), links.end(), to) == links.end()) {
+    links.push_back(db.at(to));
   } else {
     throw std::logic_error("This link already exists");
   }
@@ -105,13 +107,15 @@ void petrov::linkNote(std::istream &is, std::ostream &, notes_t &db)
 
 void petrov::removeLink(std::istream &is, std::ostream &, notes_t &db)
 {
-  std::string from, to;
+  std::string from;
+  std::string to;
   is >> from >> to;
-  linkIt_t it = find(db.at(from)->links.begin(), db.at(from)->links.end(), to);
-  if (it == db.at(from)->links.end()) {
+  std::vector< std::weak_ptr< Note > > &links = db.at(from)->links;
+  linkIt_t it = find(links.begin(), links.end(), to);
+  if (it == links.end()) {
     throw std::logic_error("No link with this name");
   }
-  db.at(from)->links.erase(it);
+  links.erase(it);
 }
 
 void petrov::printLinks(std::istream &is, std::ostream &os, notes_t &db)
@@ -132,7 +136,6 @@ void petrov::printLinks(std::istream &is, std::ostream &os, notes_t &db)
       }
     }
   }
-  os << '\n';
 }
 
 void petrov::countExpired(std::istream &is, std::ostream &os, notes_t &db)
@@ -146,7 +149,7 @@ void petrov::countExpired(std::istream &is, std::ostream &os, notes_t &db)
       ++expired;
     }
   }
-  os << expired << '\n';
+  os << expired;
 }
 
 void petrov::refreshLinks(std::istream &is, std::ostream &, notes_t &db)
@@ -174,11 +177,9 @@ void petrov::cmdLoop(std::istream &is, std::ostream &os, notes_t &db)
     os << "<NO LOOP>";
     return;
   }
-  for (size_t i = 0; i < path.size() - 1; ++i) {
-    os << path[i] << ' ' << path[i + 1];
-    if (i < path.size() - 2) {
-      os << '\n';
-    }
+  os << path[0] << ' ' << path[1];
+  for (size_t i = 1; i < path.size() - 1; ++i) {
+    os << '\n' << path[i] << ' ' << path[i + 1];
   }
 }
 
