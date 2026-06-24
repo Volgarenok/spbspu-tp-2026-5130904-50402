@@ -11,12 +11,13 @@
 
 namespace karpovich
 {
-  struct Note
+  class Note
   {
-    Note(const std::string &name);
+  public:
     std::string name;
     std::vector< std::string > lines;
     std::vector< std::pair< std::string, std::weak_ptr< Note > > > links;
+    Note(const std::string &name);
   };
 
   using NoteMap = std::unordered_map< std::string, std::shared_ptr< Note > >;
