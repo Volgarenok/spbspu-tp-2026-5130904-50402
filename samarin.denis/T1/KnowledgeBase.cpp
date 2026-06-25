@@ -59,3 +59,13 @@ void samarin::KnowledgeBase::mind(const std::string &from, std::ostream &out) co
     out << name << '\n';
   }
 }
+
+void samarin::KnowledgeBase::expired(const std::string &from, std::ostream &out) const
+{
+  out << require(from)->countExpired() << '\n';
+}
+
+void samarin::KnowledgeBase::refresh(const std::string &from)
+{
+  require(from)->refresh();
+}
