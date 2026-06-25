@@ -66,3 +66,9 @@ std::size_t samarin::Note::countExpired() const
 {
   return std::count_if(links_.begin(), links_.end(), std::mem_fn(&std::weak_ptr< Note >::expired));
 }
+
+void samarin::Note::refresh()
+{
+  const auto stale = std::remove_if(links_.begin(), links_.end(), std::mem_fn(&std::weak_ptr< Note >::expired));
+  links_.erase(stale, links_.end());
+}
