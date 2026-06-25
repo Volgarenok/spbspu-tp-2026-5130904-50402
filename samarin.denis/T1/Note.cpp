@@ -61,3 +61,8 @@ std::vector< std::string > samarin::Note::mind() const
   }
   return names;
 }
+
+std::size_t samarin::Note::countExpired() const
+{
+  return std::count_if(links_.begin(), links_.end(), std::mem_fn(&std::weak_ptr< Note >::expired));
+}
