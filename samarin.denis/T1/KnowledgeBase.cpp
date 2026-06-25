@@ -45,3 +45,9 @@ void samarin::KnowledgeBase::link(const std::string &from, const std::string &to
   const std::shared_ptr< Note > &source = require(from);
   source->link(require(to));
 }
+
+void samarin::KnowledgeBase::halt(const std::string &from, const std::string &to)
+{
+  const std::shared_ptr< Note > &source = require(from);
+  source->unlink(require(to));
+}
