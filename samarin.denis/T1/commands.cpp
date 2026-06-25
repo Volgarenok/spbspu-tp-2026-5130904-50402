@@ -13,9 +13,22 @@ namespace {
   using samarin::KnowledgeBase;
   using CommandHandler = std::function< void(KnowledgeBase &, std::istream &, std::ostream &) >;
 
+  std::string readWord(std::istream &in)
+  {
+    std::string word;
+    if (!(in >> word)) {
+      throw std::invalid_argument("expected argument");
+    }
+    return word;
+  }
+
   std::map< std::string, CommandHandler > makeHandlers()
   {
     std::map< std::string, CommandHandler > handlers;
+    handlers["note"] = [](KnowledgeBase &base, std::istream &in, std::ostream &)
+    {
+      base.note(readWord(in));
+    };
     return handlers;
   }
 }
