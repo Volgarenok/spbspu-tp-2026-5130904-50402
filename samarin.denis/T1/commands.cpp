@@ -38,6 +38,14 @@ namespace {
       }
       base.line(name, text);
     };
+    handlers["show"] = [](KnowledgeBase &base, std::istream &in, std::ostream &out)
+    {
+      base.show(readWord(in), out);
+    };
+    handlers["drop"] = [](KnowledgeBase &base, std::istream &in, std::ostream &)
+    {
+      base.drop(readWord(in));
+    };
     return handlers;
   }
 }
