@@ -49,3 +49,15 @@ void samarin::Note::unlink(const std::shared_ptr< Note > &target)
   }
   links_.erase(found);
 }
+
+std::vector< std::string > samarin::Note::mind() const
+{
+  std::vector< std::string > names;
+  for (const std::weak_ptr< Note > &link: links_) {
+    const std::shared_ptr< Note > target = link.lock();
+    if (target) {
+      names.push_back(target->getName());
+    }
+  }
+  return names;
+}
