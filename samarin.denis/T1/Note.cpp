@@ -1,5 +1,10 @@
 #include "Note.hpp"
 
+#include <algorithm>
+#include <cstddef>
+#include <functional>
+#include <stdexcept>
+
 samarin::Note::Note(const std::string &name):
   name_(name)
 {}
@@ -17,4 +22,21 @@ void samarin::Note::addLine(const std::string &line)
 const std::vector< std::string > &samarin::Note::getLines() const
 {
   return lines_;
+}
+
+samarin::Note::LinkList::const_iterator samarin::Note::findLink(const std::shared_ptr< Note > &target) const
+{
+  const auto matches = [&target](const std::weak_ptr< Note > &link)
+  {
+    return link.lock() == target;
+  };
+  return std::find_if(links_.begin(), links_.end(), matches);
+}
+
+void samarin::Note::link(const std::shared_ptr< Note > &target)
+{
+  if (findLink(target) != links_.end()) {
+    throw std::invalid_argument("link already exists");
+  }
+  links_.push_back(target);
 }
