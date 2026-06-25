@@ -46,6 +46,16 @@ namespace {
     {
       base.drop(readWord(in));
     };
+    handlers["link"] = [](KnowledgeBase &base, std::istream &in, std::ostream &)
+    {
+      const std::string from = readWord(in);
+      base.link(from, readWord(in));
+    };
+    handlers["halt"] = [](KnowledgeBase &base, std::istream &in, std::ostream &)
+    {
+      const std::string from = readWord(in);
+      base.halt(from, readWord(in));
+    };
     return handlers;
   }
 }
