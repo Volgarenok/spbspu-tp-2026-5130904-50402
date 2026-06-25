@@ -51,3 +51,11 @@ void samarin::KnowledgeBase::halt(const std::string &from, const std::string &to
   const std::shared_ptr< Note > &source = require(from);
   source->unlink(require(to));
 }
+
+void samarin::KnowledgeBase::mind(const std::string &from, std::ostream &out) const
+{
+  const std::vector< std::string > names = require(from)->mind();
+  for (const std::string &name: names) {
+    out << name << '\n';
+  }
+}
