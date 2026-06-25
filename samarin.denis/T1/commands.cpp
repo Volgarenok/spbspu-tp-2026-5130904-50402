@@ -29,6 +29,15 @@ namespace {
     {
       base.note(readWord(in));
     };
+    handlers["line"] = [](KnowledgeBase &base, std::istream &in, std::ostream &)
+    {
+      const std::string name = readWord(in);
+      std::string text;
+      if (!(in >> std::quoted(text))) {
+        throw std::invalid_argument("expected quoted text");
+      }
+      base.line(name, text);
+    };
     return handlers;
   }
 }
