@@ -25,7 +25,7 @@ bool petrov::findLoop(const std::string &startName, const std::string &currentNa
     if (nextName == startName) {
       return true;
     }
-    if (petrov::findLoop(startName, nextName, depthLeft - 1, db, path)) {
+    if (findLoop(startName, nextName, depthLeft - 1, db, path)) {
       return true;
     }
     path.pop_back();
@@ -173,7 +173,7 @@ void petrov::cmdLoop(std::istream &is, std::ostream &os, notes_t &db)
   db.at(name);
   std::vector< std::string > path;
   path.push_back(name);
-  if (!petrov::findLoop(name, name, n + 1, db, path)) {
+  if (!findLoop(name, name, n + 1, db, path)) {
     os << "<NO LOOP>";
     return;
   }
