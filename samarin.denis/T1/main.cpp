@@ -1,9 +1,9 @@
 #include <iostream>
-#include <string>
+#include "KnowledgeBase.hpp"
+#include "commands.hpp"
 
 int main()
 {
-  std::string command;
-  while (std::cin >> command) {
-  }
+  samarin::KnowledgeBase base;
+  samarin::processCommands(base, std::cin, std::cout);
 }
