@@ -40,3 +40,12 @@ void samarin::Note::link(const std::shared_ptr< Note > &target)
   }
   links_.push_back(target);
 }
+
+void samarin::Note::unlink(const std::shared_ptr< Note > &target)
+{
+  const auto found = findLink(target);
+  if (found == links_.end()) {
+    throw std::invalid_argument("no such link");
+  }
+  links_.erase(found);
+}
