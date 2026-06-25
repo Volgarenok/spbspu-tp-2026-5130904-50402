@@ -33,3 +33,9 @@ void samarin::KnowledgeBase::show(const std::string &name, std::ostream &out) co
     out << line << '\n';
   }
 }
+
+void samarin::KnowledgeBase::drop(const std::string &name)
+{
+  require(name);
+  notes_.erase(name);
+}
