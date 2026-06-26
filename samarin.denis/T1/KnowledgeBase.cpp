@@ -42,6 +42,9 @@ void samarin::KnowledgeBase::drop(const std::string &name)
 
 void samarin::KnowledgeBase::link(const std::string &from, const std::string &to)
 {
+  if (from == to) {
+    throw std::invalid_argument("cannot link a note to itself");
+  }
   const std::shared_ptr< Note > &source = require(from);
   source->link(require(to));
 }
