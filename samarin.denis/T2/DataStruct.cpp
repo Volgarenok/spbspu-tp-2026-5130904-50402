@@ -17,6 +17,10 @@ namespace {
     unsigned long long &ref;
   };
 
+  struct UllOctalIO {
+    unsigned long long &ref;
+  };
+
   std::istream &operator>>(std::istream &in, LabelIO &&dest)
   {
     std::istream::sentry sentry(in);
