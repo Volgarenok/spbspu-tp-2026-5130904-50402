@@ -56,6 +56,18 @@ namespace {
       const std::string from = readWord(in);
       base.halt(from, readWord(in));
     };
+    handlers["mind"] = [](KnowledgeBase &base, std::istream &in, std::ostream &out)
+    {
+      base.mind(readWord(in), out);
+    };
+    handlers["expired"] = [](KnowledgeBase &base, std::istream &in, std::ostream &out)
+    {
+      base.expired(readWord(in), out);
+    };
+    handlers["refresh"] = [](KnowledgeBase &base, std::istream &in, std::ostream &)
+    {
+      base.refresh(readWord(in));
+    };
     return handlers;
   }
 }
