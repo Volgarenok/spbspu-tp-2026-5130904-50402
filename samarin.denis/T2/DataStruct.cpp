@@ -86,6 +86,9 @@ std::istream &samarin::operator>>(std::istream &in, DataStruct &dest)
   }
   const std::size_t fieldCount = 3;
   DataStruct input{};
+  bool hasKey1 = false;
+  bool hasKey2 = false;
+  bool hasKey3 = false;
   in >> DelimiterIO{'('};
   for (std::size_t i = 0; i < fieldCount; ++i) {
     in >> DelimiterIO{':'};
@@ -93,16 +96,22 @@ std::istream &samarin::operator>>(std::istream &in, DataStruct &dest)
     in >> LabelIO{label};
     if (label == "key1") {
       in >> UllLiteralIO{input.key1};
+      hasKey1 = true;
     } else if (label == "key2") {
       in >> UllOctalIO{input.key2};
+      hasKey2 = true;
     } else if (label == "key3") {
       in >> StringIO{input.key3};
+      hasKey3 = true;
     } else {
       in.setstate(std::ios::failbit);
     }
   }
-  if (in) {
+  in >> DelimiterIO{':'} >> DelimiterIO{')'};
+  if (in && hasKey1 && hasKey2 && hasKey3) {
     dest = input;
+  } else {
+    in.setstate(std::ios::failbit);
   }
   return in;
 }
