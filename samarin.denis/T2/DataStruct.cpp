@@ -1,5 +1,6 @@
 #include "DataStruct.hpp"
 
+#include <cctype>
 #include <cstddef>
 #include <istream>
 #include <string>
@@ -25,6 +26,24 @@ namespace {
     in >> dest.ref;
     return in;
   }
+
+  std::istream &operator>>(std::istream &in, UllLiteralIO &&dest)
+  {
+    std::istream::sentry sentry(in);
+    if (!sentry) {
+      return in;
+    }
+    in >> dest.ref;
+    const char suffix[] = {'u', 'l', 'l'};
+    for (const char expected: suffix) {
+      const char received = static_cast< char >(in.get());
+      if (!in || (std::tolower(static_cast< unsigned char >(received)) != expected)) {
+        in.setstate(std::ios::failbit);
+        break;
+      }
+    }
+    return in;
+  }
 }
 
 std::istream &samarin::operator>>(std::istream &in, DataStruct &dest)
@@ -40,7 +59,11 @@ std::istream &samarin::operator>>(std::istream &in, DataStruct &dest)
     in >> DelimiterIO{':'};
     std::string label;
     in >> LabelIO{label};
-    in.setstate(std::ios::failbit);
+    if (label == "key1") {
+      in >> UllLiteralIO{input.key1};
+    } else {
+      in.setstate(std::ios::failbit);
+    }
   }
   if (in) {
     dest = input;
