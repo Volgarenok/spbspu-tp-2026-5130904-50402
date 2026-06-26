@@ -12,6 +12,10 @@ namespace {
     std::string &ref;
   };
 
+  struct UllLiteralIO {
+    unsigned long long &ref;
+  };
+
   std::istream &operator>>(std::istream &in, LabelIO &&dest)
   {
     std::istream::sentry sentry(in);
