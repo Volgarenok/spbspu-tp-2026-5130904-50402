@@ -5,9 +5,11 @@
 #include <istream>
 #include <string>
 #include "DelimiterIO.hpp"
+#include "StreamGuard.hpp"
 
 namespace {
   using samarin::DelimiterIO;
+  using samarin::StreamGuard;
 
   struct LabelIO {
     std::string &ref;
@@ -48,6 +50,17 @@ namespace {
     }
     return in;
   }
+
+  std::istream &operator>>(std::istream &in, UllOctalIO &&dest)
+  {
+    std::istream::sentry sentry(in);
+    if (!sentry) {
+      return in;
+    }
+    StreamGuard guard(in);
+    in >> std::oct >> dest.ref;
+    return in;
+  }
 }
 
 std::istream &samarin::operator>>(std::istream &in, DataStruct &dest)
@@ -65,6 +78,8 @@ std::istream &samarin::operator>>(std::istream &in, DataStruct &dest)
     in >> LabelIO{label};
     if (label == "key1") {
       in >> UllLiteralIO{input.key1};
+    } else if (label == "key2") {
+      in >> UllOctalIO{input.key2};
     } else {
       in.setstate(std::ios::failbit);
     }
