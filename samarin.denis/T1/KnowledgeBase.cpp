@@ -29,8 +29,12 @@ void samarin::KnowledgeBase::line(const std::string &name, const std::string &te
 void samarin::KnowledgeBase::show(const std::string &name, std::ostream &out) const
 {
   const std::shared_ptr< Note > &target = require(name);
-  for (const std::string &line: target->getLines()) {
+  const std::vector< std::string > &lines = target->getLines();
+  for (const std::string &line: lines) {
     out << line << '\n';
+  }
+  if (lines.empty()) {
+    out << '\n';
   }
 }
 
@@ -57,6 +61,9 @@ void samarin::KnowledgeBase::mind(const std::string &from, std::ostream &out) co
   const std::vector< std::string > names = require(from)->mind();
   for (const std::string &name: names) {
     out << name << '\n';
+  }
+  if (names.empty()) {
+    out << '\n';
   }
 }
 
