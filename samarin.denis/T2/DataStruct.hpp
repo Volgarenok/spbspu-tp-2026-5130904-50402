@@ -10,6 +10,10 @@ namespace samarin {
     unsigned long long key2;
     std::string key3;
   };
+
+  std::istream &operator>>(std::istream &in, DataStruct &dest);
+  std::ostream &operator<<(std::ostream &out, const DataStruct &src);
+  bool compareData(const DataStruct &lhs, const DataStruct &rhs);
 }
 
 #endif
