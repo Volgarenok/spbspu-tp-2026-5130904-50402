@@ -2,6 +2,7 @@
 
 #include <cctype>
 #include <cstddef>
+#include <iomanip>
 #include <istream>
 #include <string>
 #include "DelimiterIO.hpp"
@@ -65,6 +66,16 @@ namespace {
     in >> std::oct >> dest.ref;
     return in;
   }
+
+  std::istream &operator>>(std::istream &in, StringIO &&dest)
+  {
+    std::istream::sentry sentry(in);
+    if (!sentry) {
+      return in;
+    }
+    in >> std::quoted(dest.ref);
+    return in;
+  }
 }
 
 std::istream &samarin::operator>>(std::istream &in, DataStruct &dest)
@@ -84,6 +95,8 @@ std::istream &samarin::operator>>(std::istream &in, DataStruct &dest)
       in >> UllLiteralIO{input.key1};
     } else if (label == "key2") {
       in >> UllOctalIO{input.key2};
+    } else if (label == "key3") {
+      in >> StringIO{input.key3};
     } else {
       in.setstate(std::ios::failbit);
     }
