@@ -10,7 +10,7 @@
 #include <limits>
 
 bool petrov::findLoop(const std::string &startName, const std::string &currentName,
-                       size_t depthLeft, notes_t &db, std::vector< std::string > &path)
+    size_t depthLeft, notes_t &db, std::vector< std::string > &path)
 {
   if (depthLeft == 0) {
     return false;
