@@ -16,6 +16,10 @@ namespace samarin {
 
   std::istream &operator>>(std::istream &in, Point &dest);
   std::istream &operator>>(std::istream &in, Polygon &dest);
+
+  double getArea(const Polygon &polygon);
+  bool hasRightAngle(const Polygon &polygon);
+  bool intersects(const Polygon &lhs, const Polygon &rhs);
 }
 
 #endif
