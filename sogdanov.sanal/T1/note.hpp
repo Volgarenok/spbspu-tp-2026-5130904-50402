@@ -11,6 +11,8 @@ namespace sogdanov {
     std::string name;
     std::vector< std::string > lines;
     std::vector< std::weak_ptr< Note > > links;
+
+    Note(const std::string &n);
   };
 
 }
