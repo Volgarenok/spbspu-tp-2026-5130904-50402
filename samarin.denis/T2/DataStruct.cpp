@@ -134,7 +134,7 @@ std::ostream &samarin::operator<<(std::ostream &out, const DataStruct &src)
   }
   StreamGuard guard(out);
   out << "(:key1 " << src.key1 << "ull";
-  out << ":key2 " << std::showbase << std::oct << src.key2;
+  out << ":key2 0" << std::oct << src.key2;
   out << ":key3 " << std::quoted(src.key3);
   out << ":)";
   return out;
