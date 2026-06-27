@@ -10,9 +10,33 @@
 #include "DelimiterIO.hpp"
 
 namespace {
+  struct Frame {
+    samarin::Point min;
+    samarin::Point max;
+  };
+
   long long crossProduct(const samarin::Point &a, const samarin::Point &b)
   {
     return static_cast< long long >(a.x) * b.y - static_cast< long long >(b.x) * a.y;
+  }
+
+  Frame getFrame(const samarin::Polygon &polygon)
+  {
+    const std::vector< samarin::Point > &points = polygon.points;
+    const auto byX = [](const samarin::Point &a, const samarin::Point &b)
+    {
+      return a.x < b.x;
+    };
+    const auto byY = [](const samarin::Point &a, const samarin::Point &b)
+    {
+      return a.y < b.y;
+    };
+    Frame frame{};
+    frame.min.x = std::min_element(points.begin(), points.end(), byX)->x;
+    frame.max.x = std::max_element(points.begin(), points.end(), byX)->x;
+    frame.min.y = std::min_element(points.begin(), points.end(), byY)->y;
+    frame.max.y = std::max_element(points.begin(), points.end(), byY)->y;
+    return frame;
   }
 
   bool restOfLineIsBlank(std::istream &in)
@@ -89,4 +113,12 @@ bool samarin::hasRightAngle(const Polygon &polygon)
     return dot == 0;
   };
   return std::any_of(indices.begin(), indices.end(), rightAt);
+}
+
+bool samarin::intersects(const Polygon &lhs, const Polygon &rhs)
+{
+  const Frame a = getFrame(lhs);
+  const Frame b = getFrame(rhs);
+  return (a.min.x <= b.max.x) && (b.min.x <= a.max.x)
+    && (a.min.y <= b.max.y) && (b.min.y <= a.max.y);
 }
