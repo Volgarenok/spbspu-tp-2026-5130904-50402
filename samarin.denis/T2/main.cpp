@@ -9,6 +9,7 @@ int main()
 {
   using samarin::DataStruct;
   using input_iterator = std::istream_iterator< DataStruct >;
+  using output_iterator = std::ostream_iterator< DataStruct >;
 
   std::vector< DataStruct > data;
   while (!std::cin.eof()) {
@@ -20,4 +21,5 @@ int main()
   }
 
   std::sort(data.begin(), data.end(), samarin::compareData);
+  std::copy(data.begin(), data.end(), output_iterator(std::cout, "\n"));
 }
