@@ -18,4 +18,6 @@ int main()
     }
     std::copy(input_iterator(std::cin), input_iterator(), std::back_inserter(data));
   }
+
+  std::sort(data.begin(), data.end(), samarin::compareData);
 }
