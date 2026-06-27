@@ -42,6 +42,7 @@ void sogdanov::cmd_show(std::istream &in, std::ostream &out, NoteMap &notes)
       out << "\n" << note->lines[i];
     }
   }
+  out << "\n";
 }
 
 void sogdanov::cmd_drop(std::istream &in, std::ostream &, NoteMap &notes)
@@ -97,17 +98,19 @@ void sogdanov::cmd_mind(std::istream &in, std::ostream &out, NoteMap &notes)
     throw std::logic_error("no name");
   }
   NotePtr note = notes.at(name);
-  bool first = true;
+  std::vector< NotePtr > valid_links;
   for (const std::weak_ptr< Note > &w : note->links) {
-    NotePtr target = w.lock();
-    if (target) {
-      if (!first) {
-        out << "\n";
-      }
-      out << target->name;
-      first = false;
+    if (NotePtr target = w.lock()) {
+      valid_links.push_back(target);
     }
   }
+  if (!valid_links.empty()) {
+    out << valid_links[0]->name;
+    for (size_t i = 1; i < valid_links.size(); ++i) {
+      out << "\n" << valid_links[i]->name;
+    }
+  }
+  out << "\n";
 }
 
 void sogdanov::cmd_expired(std::istream &in, std::ostream &out, NoteMap &notes)
@@ -123,7 +126,7 @@ void sogdanov::cmd_expired(std::istream &in, std::ostream &out, NoteMap &notes)
       ++count;
     }
   }
-  out << count;
+  out << count << "\n";
 }
 
 void sogdanov::cmd_refresh(std::istream &in, std::ostream &, NoteMap &notes)
