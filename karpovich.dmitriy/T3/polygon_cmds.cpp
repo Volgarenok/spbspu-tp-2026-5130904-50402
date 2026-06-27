@@ -6,10 +6,12 @@
 #include <map>
 #include <numeric>
 #include <string>
+#include <vector>
+#include "shapes.hpp"
 
 namespace
 {
-
+  using vecp_t = std::vector< karpovich::Polygon >;
   double getArea(const karpovich::Polygon &p)
   {
     return karpovich::calculateArea(p);
@@ -41,9 +43,9 @@ namespace
   }
 
   template< class Pred >
-  void printFilteredSum(std::ostream &out, const std::vector< karpovich::Polygon > &polygons, Pred pred)
+  void printFilteredSum(std::ostream &out, const vecp_t &polygons, Pred pred)
   {
-    std::vector< karpovich::Polygon > filtered;
+    vecp_t filtered;
     std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), pred);
     std::vector< double > areas;
     areas.reserve(filtered.size());
@@ -56,7 +58,7 @@ namespace
     return c == ' ';
   }
 
-  void handleAreaMean(std::ostream &out, const std::vector< karpovich::Polygon > &polygons)
+  void handleAreaMean(std::ostream &out, const vecp_t &polygons)
   {
     if (polygons.empty()) {
       throw std::invalid_argument("invalid");
@@ -68,19 +70,19 @@ namespace
     out << sum / polygons.size() << "\n";
   }
 
-  void handleAreaEven(std::ostream &out, const std::vector< karpovich::Polygon > &polygons)
+  void handleAreaEven(std::ostream &out, const vecp_t &polygons)
   {
     printFilteredSum(out, polygons, isEven);
     out << '\n';
   }
 
-  void handleAreaOdd(std::ostream &out, const std::vector< karpovich::Polygon > &polygons)
+  void handleAreaOdd(std::ostream &out, const vecp_t &polygons)
   {
     printFilteredSum(out, polygons, isOdd);
     out << '\n';
   }
 
-  void handleMaxArea(std::ostream &out, const std::vector< karpovich::Polygon > &polygons)
+  void handleMaxArea(std::ostream &out, const vecp_t &polygons)
   {
     if (polygons.empty()) {
       throw std::invalid_argument("invalid");
@@ -89,7 +91,7 @@ namespace
     out << std::fixed << std::setprecision(1) << karpovich::calculateArea(*it) << "\n";
   }
 
-  void handleMaxVertexes(std::ostream &out, const std::vector< karpovich::Polygon > &polygons)
+  void handleMaxVertexes(std::ostream &out, const vecp_t &polygons)
   {
     if (polygons.empty()) {
       throw std::invalid_argument("invalid");
@@ -98,7 +100,7 @@ namespace
     out << it->points.size() << "\n";
   }
 
-  void handleMinArea(std::ostream &out, const std::vector< karpovich::Polygon > &polygons)
+  void handleMinArea(std::ostream &out, const vecp_t &polygons)
   {
     if (polygons.empty()) {
       throw std::invalid_argument("invalid");
@@ -107,7 +109,7 @@ namespace
     out << std::fixed << std::setprecision(1) << karpovich::calculateArea(*it) << "\n";
   }
 
-  void handleMinVertexes(std::ostream &out, const std::vector< karpovich::Polygon > &polygons)
+  void handleMinVertexes(std::ostream &out, const vecp_t &polygons)
   {
     if (polygons.empty()) {
       throw std::invalid_argument("invalid");
@@ -116,18 +118,91 @@ namespace
     out << it->points.size() << "\n";
   }
 
-  void handleCountEven(std::ostream &out, const std::vector< karpovich::Polygon > &polygons)
+  void handleCountEven(std::ostream &out, const vecp_t &polygons)
   {
     out << std::count_if(polygons.begin(), polygons.end(), isEven) << "\n";
   }
 
-  void handleCountOdd(std::ostream &out, const std::vector< karpovich::Polygon > &polygons)
+  void handleCountOdd(std::ostream &out, const vecp_t &polygons)
   {
     out << std::count_if(polygons.begin(), polygons.end(), isOdd) << "\n";
   }
+
+  void handleContextMinArea(std::ostream &out, vecp_t &polygons, std::vector< vecp_t > &contextStack)
+  {
+    if (polygons.empty()) {
+      throw std::invalid_argument("invalid");
+    }
+    auto it = std::min_element(polygons.begin(), polygons.end(), areaLess);
+    double minArea = karpovich::calculateArea(*it);
+    vecp_t newContext;
+    auto pred = std::bind(std::equal_to< double >(), std::bind(getArea, std::placeholders::_1), minArea);
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(newContext), pred);
+    if (newContext.empty()) {
+      out << "<EMPTY CONTEXT>\n";
+      return;
+    }
+    contextStack.push_back(polygons);
+    polygons = newContext;
+  }
+
+  void handleContextMaxArea(std::ostream &out, vecp_t &polygons, std::vector< vecp_t > &contextStack)
+  {
+    if (polygons.empty()) {
+      throw std::invalid_argument("invalid");
+    }
+    auto it = std::max_element(polygons.begin(), polygons.end(), areaLess);
+    double maxArea = karpovich::calculateArea(*it);
+    vecp_t newContext;
+    auto pred = std::bind(std::equal_to< double >(), std::bind(getArea, std::placeholders::_1), maxArea);
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(newContext), pred);
+    if (newContext.empty()) {
+      out << "<EMPTY CONTEXT>\n";
+      return;
+    }
+    contextStack.push_back(polygons);
+    polygons = newContext;
+  }
+
+  void handleContextEven(std::ostream &out, vecp_t &polygons, std::vector< vecp_t > &contextStack)
+  {
+    vecp_t newContext;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(newContext), isEven);
+    if (newContext.empty()) {
+      out << "<EMPTY CONTEXT>\n";
+      return;
+    }
+    contextStack.push_back(polygons);
+    polygons = newContext;
+  }
+
+  void handleContextOdd(std::ostream &out, vecp_t &polygons, std::vector< vecp_t > &contextStack)
+  {
+    vecp_t newContext;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(newContext), isOdd);
+    if (newContext.empty()) {
+      out << "<EMPTY CONTEXT>\n";
+      return;
+    }
+    contextStack.push_back(polygons);
+    polygons = newContext;
+  }
+
+  void handleContextVertex(std::ostream &out, vecp_t &polygons, std::vector< vecp_t > &contextStack, size_t n)
+  {
+    vecp_t newContext;
+    auto pred = std::bind(hasVertexCount, std::placeholders::_1, n);
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(newContext), pred);
+    if (newContext.empty()) {
+      out << "<EMPTY CONTEXT>\n";
+      return;
+    }
+    contextStack.push_back(polygons);
+    polygons = newContext;
+  }
 }
 
-void karpovich::area(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+void karpovich::area(std::istream &in, std::ostream &out, const vecp_t &polygons)
 {
   IOguard guard(in);
   std::string param;
@@ -137,7 +212,7 @@ void karpovich::area(std::istream &in, std::ostream &out, const std::vector< Pol
 
   out << std::fixed << std::setprecision(1);
 
-  std::map< std::string, void (*)(std::ostream &, const std::vector< Polygon > &) > handlers;
+  std::map< std::string, void (*)(std::ostream &, const vecp_t &) > handlers;
   handlers["MEAN"] = handleAreaMean;
   handlers["EVEN"] = handleAreaEven;
   handlers["ODD"] = handleAreaOdd;
@@ -156,14 +231,14 @@ void karpovich::area(std::istream &in, std::ostream &out, const std::vector< Pol
   out << '\n';
 }
 
-void karpovich::max(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+void karpovich::max(std::istream &in, std::ostream &out, const vecp_t &polygons)
 {
   IOguard guard(in);
   std::string param;
   if (!(in >> param)) {
     throw std::invalid_argument("invalid");
   }
-  std::map< std::string, void (*)(std::ostream &, const std::vector< Polygon > &) > handlers;
+  std::map< std::string, void (*)(std::ostream &, const vecp_t &) > handlers;
   handlers["AREA"] = handleMaxArea;
   handlers["VERTEXES"] = handleMaxVertexes;
   auto it = handlers.find(param);
@@ -173,14 +248,14 @@ void karpovich::max(std::istream &in, std::ostream &out, const std::vector< Poly
   it->second(out, polygons);
 }
 
-void karpovich::min(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+void karpovich::min(std::istream &in, std::ostream &out, const vecp_t &polygons)
 {
   IOguard guard(in);
   std::string param;
   if (!(in >> param)) {
     throw std::invalid_argument("invalid");
   }
-  std::map< std::string, void (*)(std::ostream &, const std::vector< Polygon > &) > handlers;
+  std::map< std::string, void (*)(std::ostream &, const vecp_t &) > handlers;
   handlers["AREA"] = handleMinArea;
   handlers["VERTEXES"] = handleMinVertexes;
 
@@ -191,14 +266,14 @@ void karpovich::min(std::istream &in, std::ostream &out, const std::vector< Poly
   it->second(out, polygons);
 }
 
-void karpovich::count(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+void karpovich::count(std::istream &in, std::ostream &out, const vecp_t &polygons)
 {
   std::string param;
   if (!(in >> param)) {
     throw std::invalid_argument("invalid");
   }
 
-  std::map< std::string, void (*)(std::ostream &, const std::vector< Polygon > &) > handlers;
+  std::map< std::string, void (*)(std::ostream &, const vecp_t &) > handlers;
   handlers["EVEN"] = handleCountEven;
   handlers["ODD"] = handleCountOdd;
 
@@ -214,12 +289,12 @@ void karpovich::count(std::istream &in, std::ostream &out, const std::vector< Po
   out << std::count_if(polygons.begin(), polygons.end(), std::bind(hasVertexCount, std::placeholders::_1, n)) << "\n";
 }
 
-void karpovich::rightshapes(std::istream &, std::ostream &out, const std::vector< Polygon > &polygons)
+void karpovich::rightshapes(std::istream &, std::ostream &out, const vecp_t &polygons)
 {
   out << std::count_if(polygons.begin(), polygons.end(), &karpovich::hasRightAngle) << "\n";
 }
 
-void karpovich::same(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+void karpovich::same(std::istream &in, std::ostream &out, const vecp_t &polygons)
 {
   if (polygons.empty()) {
     throw std::invalid_argument("invalid");
@@ -238,4 +313,47 @@ void karpovich::same(std::istream &in, std::ostream &out, const std::vector< Pol
   }
   auto func = std::bind(&karpovich::isSame, std::placeholders::_1, std::cref(target));
   out << std::count_if(polygons.begin(), polygons.end(), func) << "\n";
+}
+
+void karpovich::context(std::istream &in, std::ostream &out, vecp_t &polygons, std::vector< vecp_t > &contextStack)
+{
+  if (polygons.empty()) {
+    throw std::invalid_argument("invalid");
+  }
+
+  std::string param;
+  if (!(in >> param)) {
+    throw std::invalid_argument("invalid");
+  }
+  std::map< std::string, void (*)(std::ostream &, vecp_t &, std::vector< vecp_t > &) > handlers;
+  handlers["MIN-AREA"] = handleContextMinArea;
+  handlers["MAX-AREA"] = handleContextMaxArea;
+  handlers["EVEN"] = handleContextEven;
+  handlers["ODD"] = handleContextOdd;
+
+  auto it = handlers.find(param);
+  if (it != handlers.end()) {
+    it->second(out, polygons, contextStack);
+    return;
+  }
+
+  size_t n = std::stoul(param);
+  if (n < 3) {
+    throw std::invalid_argument("invalid");
+  }
+  handleContextVertex(out, polygons, contextStack, n);
+}
+
+void karpovich::popcontext(std::istream &, std::ostream &out, std::vector< vecp_t > &contextStack)
+{
+  if (contextStack.empty()) {
+    out << "<COMMON CONTEXT>\n";
+    return;
+  }
+  contextStack.pop_back();
+}
+
+void karpovich::level(std::istream &, std::ostream &out, const std::vector< vecp_t > &contextStack)
+{
+  out << "<LEVEL: " << contextStack.size() << ">\n";
 }

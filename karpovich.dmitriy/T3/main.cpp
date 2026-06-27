@@ -31,13 +31,21 @@ int main(int argc, char **argv)
       file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
+  std::vector< karp::Polygon > currentContext = polygons;
+  std::vector< std::vector< karp::Polygon > > contextStack;
   std::map< std::string, std::function< void() > > commands;
-  commands["RIGHTSHAPES"] = std::bind(karp::rightshapes, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["SAME"] = std::bind(karp::same, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["AREA"] = std::bind(karp::area, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["MAX"] = std::bind(karp::max, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["MIN"] = std::bind(karp::min, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["COUNT"] = std::bind(karp::count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  auto rightshape = std::bind(karp::rightshapes, std::ref(std::cin), std::ref(std::cout), std::cref(currentContext));
+  commands["AREA"] = std::bind(karp::area, std::ref(std::cin), std::ref(std::cout), std::cref(currentContext));
+  commands["MAX"] = std::bind(karp::max, std::ref(std::cin), std::ref(std::cout), std::cref(currentContext));
+  commands["MIN"] = std::bind(karp::min, std::ref(std::cin), std::ref(std::cout), std::cref(currentContext));
+  commands["COUNT"] = std::bind(karp::count, std::ref(std::cin), std::ref(std::cout), std::cref(currentContext));
+  commands["RIGHTSHAPES"] = rightshape;
+  commands["SAME"] = std::bind(karp::same, std::ref(std::cin), std::ref(std::cout), std::cref(currentContext));
+  commands["CONTEXT"] = std::bind(karp::context, std::ref(std::cin), std::ref(std::cout), std::ref(currentContext),
+                                  std::ref(contextStack));
+  commands["POPCONTEXT"] = std::bind(karp::popcontext, std::ref(std::cin), std::ref(std::cout), std::ref(contextStack));
+  commands["LEVEL"] = std::bind(karp::level, std::ref(std::cin), std::ref(std::cout), std::cref(contextStack));
+
   std::string command;
   while (std::cin >> command) {
     try {

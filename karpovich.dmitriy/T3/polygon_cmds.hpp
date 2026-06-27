@@ -11,6 +11,10 @@ namespace karpovich
   void count(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons);
   void rightshapes(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons);
   void same(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons);
+  void context(std::istream &in, std::ostream &out, std::vector< Polygon > &polygons,
+               std::vector< std::vector< Polygon > > &contextStack);
+  void popcontext(std::istream &in, std::ostream &out, std::vector< std::vector< Polygon > > &contextStack);
+  void level(std::istream &in, std::ostream &out, const std::vector< std::vector< Polygon > > &contextStack);
 }
 
 #endif
