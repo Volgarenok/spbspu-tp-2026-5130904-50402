@@ -1,9 +1,9 @@
 #include "operations.hpp"
-#include "note.hpp"
 #include <vector>
 #include <iomanip>
 #include <string>
 #include <unordered_map>
+#include "note.hpp"
 
 void lachugin::addNote(std::istream& in, std::ostream &, notesMap &db)
 {
@@ -14,7 +14,7 @@ void lachugin::addNote(std::istream& in, std::ostream &, notesMap &db)
   {
     throw std::logic_error ("Err: note not exist");
   }
-  auto new_note = std::make_shared<Note>(note);
+  auto new_note = std::make_shared< Note >(note);
   db[note] = new_note;
 }
 
@@ -140,7 +140,7 @@ void lachugin::printLinks(std::istream &in, std::ostream &out, notesMap &db)
     auto sp = it->second->links[i].lock();
     if (sp)
     {
-      out << sp->name << "\n";
+      out << sp->name_ << "\n";
       printed = true;
     }
   }

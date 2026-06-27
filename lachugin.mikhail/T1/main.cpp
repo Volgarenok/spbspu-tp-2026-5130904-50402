@@ -1,12 +1,13 @@
-#include "operations.hpp"
 #include <iostream>
 #include <string>
 #include <stdexcept>
 #include <limits>
+#include "operations.hpp"
 
-int main() {
+int main()
+{
   lachugin::notesMap db;
-  std::unordered_map< std::string, lachugin::cmd_t> cmds;
+  std::unordered_map< std::string, lachugin::cmd_t > cmds;
   cmds["note"] = lachugin::addNote;
   cmds["line"] = lachugin::addLine;
   cmds["show"] = lachugin::showNote;
@@ -25,13 +26,7 @@ int main() {
     {
       cmds.at(cmd)(std::cin, std::cout, db);
     }
-    catch (const std::out_of_range&)
-    {
-      std::cout << "<INVALID COMMAND>\n";
-      auto toignore = std::numeric_limits<std::streamsize>::max();
-      std::cin.ignore(toignore, '\n');
-    }
-    catch (const std::logic_error&)
+    catch (...)
     {
       std::cout << "<INVALID COMMAND>\n";
       auto toignore = std::numeric_limits<std::streamsize>::max();
