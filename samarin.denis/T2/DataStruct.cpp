@@ -46,6 +46,10 @@ namespace {
     if (!sentry) {
       return in;
     }
+    if (!std::isdigit(static_cast< unsigned char >(in.peek()))) {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
     in >> dest.ref;
     const char suffix[] = {'u', 'l', 'l'};
     for (const char expected: suffix) {
