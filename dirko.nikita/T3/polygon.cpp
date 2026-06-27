@@ -1,11 +1,11 @@
 #include "polygon.hpp"
 #include <algorithm>
+#include <delim.hpp>
 #include <functional>
+#include <ioguard.hpp>
 #include <iterator>
 #include <numeric>
 #include <vector>
-#include "../common/delim.hpp"
-#include "../common/ioguard.hpp"
 
 namespace
 {
@@ -62,9 +62,6 @@ std::istream &dirko::operator>>(std::istream &in, Polygon &polygon)
 double dirko::calcArea(const Polygon &polygon)
 {
   size_t n = polygon.points.size();
-  if (n < 3) {
-    return 0.0;
-  }
   std::vector< size_t > idxs(n);
   std::iota(idxs.begin(), idxs.end(), 0);
   std::vector< double > terms(n);
