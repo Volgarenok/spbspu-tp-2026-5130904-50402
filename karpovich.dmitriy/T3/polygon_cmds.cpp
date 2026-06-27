@@ -1,6 +1,7 @@
 #include "polygon_cmds.hpp"
 #include <algorithm>
 #include <functional>
+#include <ioguard.hpp>
 #include <iomanip>
 #include <limits>
 #include <numeric>
@@ -28,16 +29,6 @@ namespace
     return p.points.size() == n;
   }
 
-  bool isDigitChar(char c)
-  {
-    return std::isdigit(c);
-  }
-
-  bool isNumber(const std::string &s)
-  {
-    return !s.empty() && std::all_of(s.begin(), s.end(), isDigitChar);
-  }
-
   bool areaLess(const karpovich::Polygon &a, const karpovich::Polygon &b)
   {
     return karpovich::calculateArea(a) < karpovich::calculateArea(b);
@@ -48,7 +39,7 @@ namespace
     return a.points.size() < b.points.size();
   }
 
-  template < class Pred >
+  template< class Pred >
   void printFilteredSum(std::ostream &out, const std::vector< karpovich::Polygon > &polygons, Pred pred)
   {
     std::vector< karpovich::Polygon > filtered;
@@ -56,7 +47,7 @@ namespace
     std::vector< double > areas;
     areas.reserve(filtered.size());
     std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), getArea);
-    out << std::accumulate(areas.begin(), areas.end(), 0.0, std::plus< double >()) << "\n";
+    out << std::accumulate(areas.begin(), areas.end(), 0.0, std::plus< double >());
   }
 
   bool isSpaceChar(char c)
@@ -67,6 +58,7 @@ namespace
 
 void karpovich::area(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
+  IOguard guard(in);
   std::string param;
   if (!(in >> param)) {
     throw std::invalid_argument("invalid");
@@ -85,21 +77,23 @@ void karpovich::area(std::istream &in, std::ostream &out, const std::vector< Pol
     out << sum / polygons.size() << "\n";
   } else if (param == "EVEN") {
     printFilteredSum(out, polygons, isEven);
+    out << '\n';
   } else if (param == "ODD") {
     printFilteredSum(out, polygons, isOdd);
-  } else if (isNumber(param)) {
+    out << '\n';
+  } else {
     size_t n = std::stoul(param);
     if (n < 3) {
       throw std::invalid_argument("invalid");
     }
     printFilteredSum(out, polygons, std::bind(hasVertexCount, std::placeholders::_1, n));
-  } else {
-    throw std::invalid_argument("invalid");
+    out << '\n';
   }
 }
 
 void karpovich::max(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
+  IOguard guard(in);
   std::string param;
   if (!(in >> param)) {
     throw std::invalid_argument("invalid");
@@ -121,6 +115,7 @@ void karpovich::max(std::istream &in, std::ostream &out, const std::vector< Poly
 
 void karpovich::min(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
+  IOguard guard(in);
   std::string param;
   if (!(in >> param)) {
     throw std::invalid_argument("invalid");
@@ -151,14 +146,13 @@ void karpovich::count(std::istream &in, std::ostream &out, const std::vector< Po
     out << std::count_if(polygons.begin(), polygons.end(), isEven) << "\n";
   } else if (param == "ODD") {
     out << std::count_if(polygons.begin(), polygons.end(), isOdd) << "\n";
-  } else if (isNumber(param)) {
+  } else {
     size_t n = std::stoul(param);
     if (n < 3) {
       throw std::invalid_argument("invalid");
     }
-    out << std::count_if(polygons.begin(), polygons.end(), std::bind(hasVertexCount, std::placeholders::_1, n)) << "\n";
-  } else {
-    throw std::invalid_argument("invalid");
+    auto pred = std::bind(hasVertexCount, std::placeholders::_1, n);
+    out << std::count_if(polygons.begin(), polygons.end(), pred) << "\n";
   }
 }
 
@@ -169,22 +163,20 @@ void karpovich::rightshapes(std::istream &, std::ostream &out, const std::vector
 
 void karpovich::same(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
+  if (polygons.empty()) {
+    throw std::invalid_argument("invalid");
+  }
   Polygon target;
   if (!(in >> target)) {
-    in.clear();
-    in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-    out << "<INVALID COMMAND>\n";
-    return;
+    throw std::invalid_argument("invalid");
   }
   if (target.points.size() < 3) {
-    out << "<INVALID COMMAND>\n";
-    return;
+    throw std::invalid_argument("invalid");
   }
   std::string rest;
   std::getline(in, rest);
   if (!std::all_of(rest.begin(), rest.end(), isSpaceChar)) {
-    out << "<INVALID COMMAND>\n";
-    return;
+    throw std::invalid_argument("invalid");
   }
   auto func = std::bind(&karpovich::isSame, std::placeholders::_1, std::cref(target));
   out << std::count_if(polygons.begin(), polygons.end(), func) << "\n";

@@ -1,12 +1,12 @@
 #include "shapes.hpp"
 #include <algorithm>
+#include <delimiter.hpp>
 #include <functional>
+#include <ioguard.hpp>
 #include <istream>
 #include <iterator>
 #include <numeric>
 #include <vector>
-#include <delimiter.hpp>
-#include <ioguard.hpp>
 
 namespace
 {
@@ -81,9 +81,6 @@ std::istream &karpovich::operator>>(std::istream &in, Polygon &polygon)
 double karpovich::calculateArea(const Polygon &polygon)
 {
   size_t n = polygon.points.size();
-  if (n < 3) {
-    return 0.0;
-  }
   std::vector< size_t > idxs(n);
   std::iota(idxs.begin(), idxs.end(), 0);
   std::vector< double > terms(n);
