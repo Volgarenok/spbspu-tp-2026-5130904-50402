@@ -72,3 +72,21 @@ double samarin::getArea(const Polygon &polygon)
   const long long doubled = std::accumulate(terms.begin(), terms.end(), 0LL);
   return std::abs(static_cast< double >(doubled)) / 2.0;
 }
+
+bool samarin::hasRightAngle(const Polygon &polygon)
+{
+  const std::vector< Point > &points = polygon.points;
+  const std::size_t size = points.size();
+  std::vector< std::size_t > indices(size);
+  std::iota(indices.begin(), indices.end(), static_cast< std::size_t >(0));
+  const auto rightAt = [&points, size](std::size_t i)
+  {
+    const Point &prev = points[(i + size - 1) % size];
+    const Point &cur = points[i];
+    const Point &next = points[(i + 1) % size];
+    const long long dot = static_cast< long long >(prev.x - cur.x) * (next.x - cur.x)
+      + static_cast< long long >(prev.y - cur.y) * (next.y - cur.y);
+    return dot == 0;
+  };
+  return std::any_of(indices.begin(), indices.end(), rightAt);
+}
