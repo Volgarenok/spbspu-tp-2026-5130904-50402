@@ -8,8 +8,9 @@
 int main()
 {
   using data_t = dirko::DataStruct;
-  std::vector< data_t > data;
   using iit_t = std::istream_iterator< data_t >;
+  using oit_t = std::ostream_iterator< data_t >;
+  std::vector< data_t > data;
   while (!std::cin.eof()) {
     std::copy(iit_t{std::cin}, iit_t{}, std::back_inserter(data));
     if (std::cin.fail()) {
@@ -18,6 +19,5 @@ int main()
     }
   }
   std::sort(data.begin(), data.end());
-  using oit_t = std::ostream_iterator< data_t >;
   std::copy(data.begin(), data.end(), oit_t{std::cout, "\n"});
 }

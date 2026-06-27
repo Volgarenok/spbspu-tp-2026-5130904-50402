@@ -9,10 +9,13 @@ std::istream &dirko::operator>>(std::istream &in, LabelIO &&dest)
   if (!sentry) {
     return in;
   }
-  std::string label = "";
-  in >> label;
-  if (in && label != dest.exp) {
-    in.setstate(std::ios::failbit);
+  for (size_t i = 0; i < dest.exp.size(); ++i) {
+    char c = '\0';
+    in >> c;
+    if (!in || c != dest.exp[i]) {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
   }
   return in;
 }
@@ -36,7 +39,7 @@ std::istream &dirko::operator>>(std::istream &in, CompIO &&dest)
   }
   IOguard guard(in);
   double real = 0, imag = 0;
-  in >> DelimIO{'#'} >> DelimIO{'c'} >> DelimIO{'('} >> real >> imag >> DelimIO{')'};
+  in >> LabelIO{"#c("} >> real >> imag >> DelimIO{')'};
   dest.ref = {real, imag};
   return in;
 }
