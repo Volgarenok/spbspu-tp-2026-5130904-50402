@@ -1,8 +1,8 @@
 #include <iostream>
+#include <limits>
 #include <string>
 #include <unordered_map>
-#include <limits>
-#include "commands.hpp"
+#include "note.hpp"
 
 int main()
 {
@@ -18,10 +18,14 @@ int main()
   cmds["mind"] = karpovich::cmdMind;
   cmds["expired"] = karpovich::cmdExpired;
   cmds["refresh"] = karpovich::cmdRefresh;
+  cmds["loop"] = karpovich::cmdLoop;
   std::string cmd;
   while (std::cin >> cmd) {
     try {
       cmds.at(cmd)(std::cin, std::cout, notes);
+      if (cmd == "show" || cmd == "mind" || cmd == "expired" || cmd == "loop") {
+        std::cout << '\n';
+      }
     } catch (const std::exception &) {
       std::cout << "<INVALID COMMAND>\n";
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');

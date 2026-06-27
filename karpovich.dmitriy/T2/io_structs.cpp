@@ -1,6 +1,7 @@
-#include "utils.hpp"
+#include "io_structs.hpp"
 #include <cstdlib>
 #include <delimiter.hpp>
+#include <exception>
 #include <ioguard.hpp>
 #include <iomanip>
 #include <iostream>
@@ -11,10 +12,13 @@ std::istream &karpovich::operator>>(std::istream &in, LabelIO &&dest)
   if (!sentry) {
     return in;
   }
-  std::string label = "";
-  in >> label;
-  if (in && label != dest.exp) {
-    in.setstate(std::ios::failbit);
+  for (size_t i = 0; i < dest.exp.size(); ++i) {
+    char c = '\0';
+    in >> c;
+    if (!in || c != dest.exp[i]) {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
   }
   return in;
 }
@@ -25,22 +29,15 @@ std::istream &karpovich::operator>>(std::istream &in, BinIO &&dest)
   if (!sentry) {
     return in;
   }
-  char c1 = '\0';
-  char c2 = '\0';
-  in >> c1 >> c2;
-  if (!in || c1 != '0' || (c2 != 'b' && c2 != 'B')) {
-    in.setstate(std::ios::failbit);
+  in >> DelimIO{'0'};
+  in >> DelimIO{'b', 'B'};
+  if (!in) {
     return in;
   }
-  char c = '\0';
   std::string numBin;
-  while (in.get(c)) {
-    if (c == '0' || c == '1') {
-      numBin.push_back(c);
-    } else {
-      in.putback(c);
-      break;
-    }
+  bool isOne = false;
+  while (in >> DelimIO{'0', '1', &isOne}) {
+    numBin.push_back(isOne ? '1' : '0');
   }
   if (numBin.empty()) {
     in.setstate(std::ios::failbit);
@@ -48,9 +45,7 @@ std::istream &karpovich::operator>>(std::istream &in, BinIO &&dest)
   }
   try {
     dest.ref = std::stoull(numBin);
-  } catch (const std::out_of_range &) {
-    in.setstate(std::ios::failbit);
-  } catch (const std::invalid_argument &) {
+  } catch (const std::exception &) {
     in.setstate(std::ios::failbit);
   }
   return in;
@@ -86,24 +81,33 @@ std::istream &karpovich::operator>>(std::istream &in, DataStruct &dest)
   bool got1 = false;
   bool got2 = false;
   bool got3 = false;
+  bool consumed = false;
   in >> DelimIO{'('};
   if (!in) {
     return in;
   }
   while ((!got1 || !got2 || !got3) && in) {
+    if (!consumed) {
+      in >> DelimIO{':'};
+    }
+    consumed = false;
     std::string label;
     in >> label;
-    if (label == ":key1" && !got1) {
+    if (label == "key1" && !got1) {
       in >> BinIO{temp.key1};
+      if (!in) {
+        consumed = true;
+        in.clear(in.rdstate() & ~std::ios::failbit);
+      }
       if (in) {
         got1 = true;
       }
-    } else if (label == ":key2" && !got2) {
+    } else if (label == "key2" && !got2) {
       in >> OctIO{temp.key2};
       if (in) {
         got2 = true;
       }
-    } else if (label == ":key3" && !got3) {
+    } else if (label == "key3" && !got3) {
       in >> StringIO{temp.key3};
       if (in) {
         got3 = true;
@@ -112,7 +116,10 @@ std::istream &karpovich::operator>>(std::istream &in, DataStruct &dest)
       in.setstate(std::ios::failbit);
     }
   }
-  in >> DelimIO{':'} >> DelimIO{')'};
+  if (!consumed) {
+    in >> DelimIO{':'};
+  }
+  in >> DelimIO{')'};
   if (in && got1 && got2 && got3) {
     dest = temp;
   } else {

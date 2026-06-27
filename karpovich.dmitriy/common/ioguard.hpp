@@ -7,6 +7,10 @@ namespace karpovich
   {
   public:
     explicit IOguard(std::basic_ios< char > &s);
+    IOguard(const IOguard &) = delete;
+    IOguard &operator=(const IOguard &) = delete;
+    IOguard(IOguard &&) = delete;
+    IOguard &operator=(IOguard &&) = delete;
     ~IOguard();
 
   private:

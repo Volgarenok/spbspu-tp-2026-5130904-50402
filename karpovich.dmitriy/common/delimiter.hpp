@@ -6,7 +6,9 @@ namespace karpovich
 {
   struct DelimIO
   {
-    char exp;
+    char exp1;
+    char exp2 = '\0';
+    bool *matchedSecond = nullptr;
   };
   std::istream &operator>>(std::istream &in, DelimIO &&dest);
 }
