@@ -1,5 +1,6 @@
 #include "commands.hpp"
 
+#include <algorithm>
 #include <iomanip>
 #include <memory>
 #include <stdexcept>
@@ -143,5 +144,64 @@ void sogdanov::cmd_refresh(std::istream &in, std::ostream &, NoteMap &notes)
     } else {
       ++i;
     }
+  }
+}
+
+bool sogdanov::find_loop_dfs(NotePtr current, NotePtr start, int max_edges, int current_edges, std::vector< NotePtr > &path)
+{
+  if (current_edges > 0 && current == start) {
+    return true;
+  }
+  if (current_edges == max_edges) {
+    return false;
+  }
+
+  for (const std::weak_ptr< sogdanov::Note > &w : current->links) {
+    NotePtr next = w.lock();
+    if (!next) {
+      continue;
+    }
+
+    if (next != start) {
+      if (std::find(path.begin(), path.end(), next) != path.end()) {
+        continue;
+      }
+    }
+
+    path.push_back(next);
+
+    if (sogdanov::find_loop_dfs(next, start, max_edges, current_edges + 1, path)) {
+      return true;
+    }
+
+    path.pop_back();
+  }
+
+  return false;
+}
+
+void sogdanov::cmd_loop(std::istream &in, std::ostream &out, NoteMap &notes)
+{
+  std::string name;
+  int n;
+  if (!(in >> name >> n)) {
+    throw std::logic_error("no arguments");
+  }
+
+  NotePtr start_note = notes.at(name);
+  std::vector< NotePtr > path;
+
+  if (find_loop_dfs(start_note, start_note, n + 1, 0, path)) {
+    NotePtr prev = start_note;
+    for (size_t i = 0; i < path.size(); ++i) {
+      if (i > 0) {
+        out << "\n";
+      }
+      out << prev->name << " " << path[i]->name;
+      prev = path[i];
+    }
+    out << "\n";
+  } else {
+    out << "<NO LOOP>\n";
   }
 }
