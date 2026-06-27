@@ -19,6 +19,7 @@ int main()
   cmds["mind"] = sogdanov::cmd_mind;
   cmds["expired"] = sogdanov::cmd_expired;
   cmds["refresh"] = sogdanov::cmd_refresh;
+  cmds["loop"] = sogdanov::cmd_loop;
 
   std::string cmd;
   sogdanov::NoteMap notes;
