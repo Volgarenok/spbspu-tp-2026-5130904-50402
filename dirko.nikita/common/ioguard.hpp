@@ -6,8 +6,12 @@ namespace dirko
   class IOguard
   {
   public:
+    IOguard(const IOguard &) = delete;
+    IOguard(IOguard &&) = delete;
     explicit IOguard(std::basic_ios< char > &s);
     ~IOguard();
+    IOguard &operator=(const IOguard &) = delete;
+    IOguard &operator=(IOguard &&) = delete;
 
   private:
     std::basic_ios< char > &s_;
