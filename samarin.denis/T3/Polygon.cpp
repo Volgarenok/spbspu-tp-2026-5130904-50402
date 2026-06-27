@@ -1,13 +1,20 @@
 #include "Polygon.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <cstddef>
 #include <istream>
 #include <iterator>
+#include <numeric>
 #include <vector>
 #include "DelimiterIO.hpp"
 
 namespace {
+  long long crossProduct(const samarin::Point &a, const samarin::Point &b)
+  {
+    return static_cast< long long >(a.x) * b.y - static_cast< long long >(b.x) * a.y;
+  }
+
   bool restOfLineIsBlank(std::istream &in)
   {
     int next = in.peek();
@@ -54,4 +61,14 @@ std::istream &samarin::operator>>(std::istream &in, Polygon &dest)
     in.setstate(std::ios::failbit);
   }
   return in;
+}
+
+double samarin::getArea(const Polygon &polygon)
+{
+  const std::vector< Point > &points = polygon.points;
+  std::vector< long long > terms(points.size());
+  std::transform(points.begin(), points.end() - 1, points.begin() + 1, terms.begin(), crossProduct);
+  terms.back() = crossProduct(points.back(), points.front());
+  const long long doubled = std::accumulate(terms.begin(), terms.end(), 0LL);
+  return std::abs(static_cast< double >(doubled)) / 2.0;
 }
