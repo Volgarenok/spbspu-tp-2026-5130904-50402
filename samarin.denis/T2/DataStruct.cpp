@@ -68,6 +68,10 @@ namespace {
     if (!sentry) {
       return in;
     }
+    if (in.peek() != '0') {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
     StreamGuard guard(in);
     in >> std::oct >> dest.ref;
     return in;
