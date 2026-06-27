@@ -3,7 +3,9 @@
 #include <cctype>
 #include <cstddef>
 #include <iomanip>
+#include <ios>
 #include <istream>
+#include <ostream>
 #include <string>
 #include "DelimiterIO.hpp"
 #include "StreamGuard.hpp"
@@ -114,4 +116,18 @@ std::istream &samarin::operator>>(std::istream &in, DataStruct &dest)
     in.setstate(std::ios::failbit);
   }
   return in;
+}
+
+std::ostream &samarin::operator<<(std::ostream &out, const DataStruct &src)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry) {
+    return out;
+  }
+  StreamGuard guard(out);
+  out << "(:key1 " << src.key1 << "ull";
+  out << ":key2 " << std::showbase << std::oct << src.key2;
+  out << ":key3 " << std::quoted(src.key3);
+  out << ":)";
+  return out;
 }
