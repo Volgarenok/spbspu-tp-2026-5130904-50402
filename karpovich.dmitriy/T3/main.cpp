@@ -31,20 +31,20 @@ int main(int argc, char **argv)
       file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
-  std::vector< karp::Polygon > currentContext = polygons;
-  std::vector< std::vector< karp::Polygon > > contextStack;
+  std::vector< karp::Polygon > cntx = polygons;
+  std::vector< std::vector< karp::Polygon > > stack;
   std::map< std::string, std::function< void() > > commands;
-  auto rightshape = std::bind(karp::rightshapes, std::ref(std::cin), std::ref(std::cout), std::cref(currentContext));
-  commands["AREA"] = std::bind(karp::area, std::ref(std::cin), std::ref(std::cout), std::cref(currentContext));
-  commands["MAX"] = std::bind(karp::max, std::ref(std::cin), std::ref(std::cout), std::cref(currentContext));
-  commands["MIN"] = std::bind(karp::min, std::ref(std::cin), std::ref(std::cout), std::cref(currentContext));
-  commands["COUNT"] = std::bind(karp::count, std::ref(std::cin), std::ref(std::cout), std::cref(currentContext));
+  auto rightshape = std::bind(karp::rightshapes, std::ref(std::cin), std::ref(std::cout), std::cref(cntx));
+  auto context = std::bind(karp::context, std::ref(std::cin), std::ref(std::cout), std::ref(cntx), std::ref(stack));
+  commands["AREA"] = std::bind(karp::area, std::ref(std::cin), std::ref(std::cout), std::cref(cntx));
+  commands["MAX"] = std::bind(karp::max, std::ref(std::cin), std::ref(std::cout), std::cref(cntx));
+  commands["MIN"] = std::bind(karp::min, std::ref(std::cin), std::ref(std::cout), std::cref(cntx));
+  commands["COUNT"] = std::bind(karp::count, std::ref(std::cin), std::ref(std::cout), std::cref(cntx));
   commands["RIGHTSHAPES"] = rightshape;
-  commands["SAME"] = std::bind(karp::same, std::ref(std::cin), std::ref(std::cout), std::cref(currentContext));
-  commands["CONTEXT"] = std::bind(karp::context, std::ref(std::cin), std::ref(std::cout), std::ref(currentContext),
-                                  std::ref(contextStack));
-  commands["POPCONTEXT"] = std::bind(karp::popcontext, std::ref(std::cin), std::ref(std::cout), std::ref(contextStack));
-  commands["LEVEL"] = std::bind(karp::level, std::ref(std::cin), std::ref(std::cout), std::cref(contextStack));
+  commands["SAME"] = std::bind(karp::same, std::ref(std::cin), std::ref(std::cout), std::cref(cntx));
+  commands["CONTEXT"] = context;
+  commands["POPCONTEXT"] = std::bind(karp::popcontext, std::ref(std::cin), std::ref(std::cout), std::ref(stack));
+  commands["LEVEL"] = std::bind(karp::level, std::ref(std::cin), std::ref(std::cout), std::cref(stack));
 
   std::string command;
   while (std::cin >> command) {
