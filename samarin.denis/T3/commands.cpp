@@ -6,8 +6,10 @@
 #include <functional>
 #include <iomanip>
 #include <istream>
+#include <iterator>
 #include <limits>
 #include <map>
+#include <numeric>
 #include <ostream>
 #include <stdexcept>
 #include <string>
@@ -58,6 +60,45 @@ namespace {
     return static_cast< std::size_t >(value);
   }
 
+  std::vector< double > areasOf(const std::vector< Polygon > &polygons)
+  {
+    std::vector< double > areas(polygons.size());
+    std::transform(polygons.begin(), polygons.end(), areas.begin(), samarin::getArea);
+    return areas;
+  }
+
+  double sumAreaWhere(const std::vector< Polygon > &polygons,
+      const std::function< bool(const Polygon &) > &pred)
+  {
+    std::vector< Polygon > matched;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(matched), pred);
+    const std::vector< double > areas = areasOf(matched);
+    return std::accumulate(areas.begin(), areas.end(), 0.0);
+  }
+
+  void commandArea(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out)
+  {
+    using namespace std::placeholders;
+    const std::string param = readWord(in);
+    double result = 0.0;
+    if (param == "EVEN") {
+      result = sumAreaWhere(polygons, hasEvenVertices);
+    } else if (param == "ODD") {
+      result = sumAreaWhere(polygons, hasOddVertices);
+    } else if (param == "MEAN") {
+      if (polygons.empty()) {
+        throw std::invalid_argument("no polygons for mean");
+      }
+      const std::vector< double > areas = areasOf(polygons);
+      const double total = std::accumulate(areas.begin(), areas.end(), 0.0);
+      result = total / static_cast< double >(polygons.size());
+    } else {
+      const std::size_t count = parseVertexCount(param);
+      result = sumAreaWhere(polygons, std::bind(hasVertexCount, _1, count));
+    }
+    out << result << '\n';
+  }
+
   void commandCount(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out)
   {
     using namespace std::placeholders;
@@ -78,6 +119,7 @@ namespace {
   std::map< std::string, Handler > makeHandlers()
   {
     std::map< std::string, Handler > handlers;
+    handlers["AREA"] = commandArea;
     handlers["COUNT"] = commandCount;
     return handlers;
   }
