@@ -96,13 +96,21 @@ petrov::Polygon petrov::detail::readPolygonParam(std::istream &in)
   if (!in || target.points.empty()) {
     throw std::invalid_argument("invalid");
   }
-
-  std::string rest;
-  std::getline(in, rest);
-  if (!std::all_of(rest.begin(), rest.end(), isSpaceChar)) {
-    throw std::invalid_argument("invalid");
+  while (in) {
+    int next = in.peek();
+    if (next == std::char_traits< char >::eof()) {
+      return target;
+    }
+    if (next == '\n') {
+      in.get();
+      return target;
+    }
+    if (next == ' ') {
+      in.get();
+    } else {
+      throw std::invalid_argument("invalid");
+    }
   }
-
   return target;
 }
 
