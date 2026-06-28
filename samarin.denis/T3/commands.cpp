@@ -140,7 +140,8 @@ namespace {
     out << static_cast< std::size_t >(matched) << '\n';
   }
 
-  void commandMax(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out)
+  void commandExtremum(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out,
+      bool useMax)
   {
     if (polygons.empty()) {
       throw std::invalid_argument("no polygons");
@@ -148,29 +149,16 @@ namespace {
     const std::string param = readWord(in);
     if (param == "AREA") {
       const std::vector< double > areas = areasOf(polygons);
-      out << *std::max_element(areas.begin(), areas.end()) << '\n';
+      const double value = useMax ? *std::max_element(areas.begin(), areas.end())
+        : *std::min_element(areas.begin(), areas.end());
+      out << value << '\n';
     } else if (param == "VERTEXES") {
       const std::vector< std::size_t > counts = vertexCountsOf(polygons);
-      out << *std::max_element(counts.begin(), counts.end()) << '\n';
+      const std::size_t value = useMax ? *std::max_element(counts.begin(), counts.end())
+        : *std::min_element(counts.begin(), counts.end());
+      out << value << '\n';
     } else {
-      throw std::invalid_argument("bad MAX parameter");
-    }
-  }
-
-  void commandMin(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out)
-  {
-    if (polygons.empty()) {
-      throw std::invalid_argument("no polygons");
-    }
-    const std::string param = readWord(in);
-    if (param == "AREA") {
-      const std::vector< double > areas = areasOf(polygons);
-      out << *std::min_element(areas.begin(), areas.end()) << '\n';
-    } else if (param == "VERTEXES") {
-      const std::vector< std::size_t > counts = vertexCountsOf(polygons);
-      out << *std::min_element(counts.begin(), counts.end()) << '\n';
-    } else {
-      throw std::invalid_argument("bad MIN parameter");
+      throw std::invalid_argument("bad extremum parameter");
     }
   }
 
@@ -197,10 +185,11 @@ namespace {
 
   std::map< std::string, Handler > makeHandlers()
   {
+    using namespace std::placeholders;
     std::map< std::string, Handler > handlers;
     handlers["AREA"] = commandArea;
-    handlers["MAX"] = commandMax;
-    handlers["MIN"] = commandMin;
+    handlers["MAX"] = std::bind(commandExtremum, _1, _2, _3, true);
+    handlers["MIN"] = std::bind(commandExtremum, _1, _2, _3, false);
     handlers["COUNT"] = commandCount;
     handlers["RIGHTSHAPES"] = commandRightShapes;
     handlers["INTERSECTIONS"] = commandIntersections;
