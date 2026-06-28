@@ -170,7 +170,7 @@ void dirko::area(std::istream &in, std::ostream &out, const std::vector< Polygon
 
 void dirko::max(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
-  IOguard guard(in);
+  IOguard guard(out);
   std::string param;
   if (!(in >> param)) {
     throw std::invalid_argument("invalid");
@@ -184,7 +184,7 @@ void dirko::max(std::istream &in, std::ostream &out, const std::vector< Polygon 
 
 void dirko::min(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
-  IOguard guard(in);
+  IOguard guard(out);
   std::string param;
   if (!(in >> param)) {
     throw std::invalid_argument("invalid");
