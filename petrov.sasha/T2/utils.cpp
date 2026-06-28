@@ -5,61 +5,60 @@
 #include <ostream>
 
 #include "ioguard.hpp"
-namespace petrov
+
+std::istream &petrov::operator>>(std::istream &in, DelimIO &&dest)
 {
-  std::istream &operator>>(std::istream &in, DelimIO &&dest)
-  {
-    std::istream::sentry sentry(in);
-    if (!sentry) {
-      return in;
-    }
-    char c = '\0';
-    in >> c;
-    if (!in || c != dest.exp) {
-      in.setstate(std::ios::failbit);
-    }
+  std::istream::sentry sentry(in);
+  if (!sentry) {
     return in;
   }
+  char c = '\0';
+  in >> c;
+  if (!in || c != dest.exp) {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
+}
 
-  std::istream &operator>>(std::istream &in, OctIO &&dest)
-  {
-    std::istream::sentry sentry(in);
-    if (!sentry) {
-      return in;
-    }
-    IOGuard guard(in);
-    in >> DelimIO{'0'} >> std::oct >> dest.ref;
+std::istream &petrov::operator>>(std::istream &in, OctIO &&dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry) {
     return in;
   }
+  IOGuard guard(in);
+  in >> DelimIO{'0'} >> std::oct >> dest.ref;
+  return in;
+}
 
-  std::istream &operator>>(std::istream &in, HexIO &&dest)
-  {
-    std::istream::sentry s(in);
-    if (!s) {
-      return in;
-    }
-    char zero = '\0';
-    char x = '\0';
-    in >> zero >> x;
-    if (!in || zero != '0' || (x != 'x' && x != 'X')) {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-    IOGuard guard(in);
-    in >> std::hex >> dest.ref;
+std::istream &petrov::operator>>(std::istream &in, HexIO &&dest)
+{
+  std::istream::sentry s(in);
+  if (!s) {
     return in;
   }
-
-  std::istream &operator>>(std::istream &in, StringIO &&dest)
-  {
-    std::istream::sentry sentry(in);
-    if (!sentry) {
-      return in;
-    }
-    return in >> std::quoted(dest.ref);
+  char zero = '\0';
+  char x = '\0';
+  in >> zero >> x;
+  if (!in || zero != '0' || (x != 'x' && x != 'X')) {
+    in.setstate(std::ios::failbit);
+    return in;
   }
+  IOGuard guard(in);
+  in >> std::hex >> dest.ref;
+  return in;
+}
 
-  std::istream &operator>>(std::istream &in, DataStruct &dest)
+std::istream &petrov::operator>>(std::istream &in, StringIO &&dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry) {
+    return in;
+  }
+  return in >> std::quoted(dest.ref);
+}
+
+std::istream &petrov::operator>>(std::istream &in, DataStruct &dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry) {
@@ -105,39 +104,38 @@ namespace petrov
       in.setstate(std::ios::failbit);
       break;
     }
-  }
-  in >> DelimIO{':'} >> DelimIO{')'};
-  if (in && got1 && got2 && got3) {
-    dest = temp;
-  } else {
-    in.setstate(std::ios::failbit);
-  }
-  return in;
+}
+in >> DelimIO{':'} >> DelimIO{')'};
+if (in && got1 && got2 && got3) {
+  dest = temp;
+} else {
+  in.setstate(std::ios::failbit);
+}
+return in;
 }
 
-  std::ostream &operator<<(std::ostream &out, const DataStruct &src)
-  {
-    std::ostream::sentry sentry(out);
-    if (!sentry) {
-      return out;
-    }
-    IOGuard guard(out);
-    out << "(:" << "key1 ";
-    out << '0' << std::oct << src.key1 << ':';
-    out << "key2 " << "0x" << std::uppercase << std::hex << src.key2 << ':';
-    out << "key3 " << std::quoted(src.key3) << ':' << ')';
+std::ostream &petrov::operator<<(std::ostream &out, const DataStruct &src)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry) {
     return out;
   }
+  IOGuard guard(out);
+  out << "(:" << "key1 ";
+  out << '0' << std::oct << src.key1 << ':';
+  out << "key2 " << "0x" << std::uppercase << std::hex << src.key2 << ':';
+  out << "key3 " << std::quoted(src.key3) << ':' << ')';
+  return out;
+}
 
-  bool operator<(const DataStruct &lhs, const DataStruct &rhs)
-  {
-    if (lhs.key1 != rhs.key1) {
-      return lhs.key1 < rhs.key1;
-    }
-    if (lhs.key2 != rhs.key2) {
-      return lhs.key2 < rhs.key2;
-    }
-    return lhs.key3.length() < rhs.key3.length();
+bool petrov::operator<(const DataStruct &lhs, const DataStruct &rhs)
+{
+  if (lhs.key1 != rhs.key1) {
+    return lhs.key1 < rhs.key1;
   }
+  if (lhs.key2 != rhs.key2) {
+    return lhs.key2 < rhs.key2;
+  }
+  return lhs.key3.length() < rhs.key3.length();
 }
 

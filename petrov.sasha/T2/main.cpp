@@ -17,7 +17,7 @@ int main()
     std::copy(iit_t{std::cin}, iit_t{}, std::back_inserter(data));
     if (std::cin.fail()) {
       std::cin.clear(std::cin.rdstate() & ~std::ios::failbit);
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
   std::sort(data.begin(), data.end());
