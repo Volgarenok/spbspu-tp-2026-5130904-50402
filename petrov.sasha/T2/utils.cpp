@@ -5,20 +5,7 @@
 #include <ostream>
 
 #include "ioguard.hpp"
-
-std::istream &petrov::operator>>(std::istream &in, DelimIO &&dest)
-{
-  std::istream::sentry sentry(in);
-  if (!sentry) {
-    return in;
-  }
-  char c = '\0';
-  in >> c;
-  if (!in || c != dest.exp) {
-    in.setstate(std::ios::failbit);
-  }
-  return in;
-}
+#include "delim_io.hpp"
 
 std::istream &petrov::operator>>(std::istream &in, OctIO &&dest)
 {

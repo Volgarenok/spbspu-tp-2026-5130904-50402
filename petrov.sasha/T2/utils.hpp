@@ -13,11 +13,6 @@ namespace petrov
     std::string key3;
   };
 
-  struct DelimIO
-  {
-    char exp;
-  };
-
   struct OctIO
   {
     unsigned long long &ref;
@@ -33,7 +28,6 @@ namespace petrov
     std::string &ref;
   };
 
-  std::istream &operator>>(std::istream &in, DelimIO &&dest);
   std::istream &operator>>(std::istream &in, OctIO &&dest);
   std::istream &operator>>(std::istream &in, HexIO &&dest);
   std::istream &operator>>(std::istream &in, StringIO &&dest);
@@ -45,4 +39,3 @@ namespace petrov
 }
 
 #endif
-
