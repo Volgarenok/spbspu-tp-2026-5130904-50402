@@ -1,7 +1,9 @@
 #include "commands.hpp"
 #include <algorithm>
 #include <functional>
+#include <ioguard.hpp>
 #include <iomanip>
+#include <map>
 #include <numeric>
 #include <stdexcept>
 #include "polygon.hpp"
@@ -56,17 +58,9 @@ namespace
     const size_t seqLen = static_cast< size_t >(std::distance(start, end));
     return countMaxseq(end, last, sample, std::max(currMax, seqLen));
   }
-}
 
-void saldaev::handleArea(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
-{
-  std::string param;
-  if (!(in >> param)) {
-    throw std::invalid_argument("invalid");
-  }
-  out << std::fixed << std::setprecision(1);
-
-  if (param == "MEAN") {
+  void handleAreaMean(std::ostream &out, const std::vector< saldaev::Polygon > &polygons)
+  {
     if (polygons.empty()) {
       throw std::invalid_argument("invalid");
     }
@@ -75,17 +69,45 @@ void saldaev::handleArea(std::istream &in, std::ostream &out, const std::vector<
     std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), saldaev::calcArea);
     double sum = std::accumulate(areas.begin(), areas.end(), 0.0, std::plus< double >());
     out << sum / polygons.size();
-  } else if (param == "EVEN") {
-    printFilteredSum(out, polygons, isEven);
-  } else if (param == "ODD") {
-    printFilteredSum(out, polygons, isOdd);
-  } else {
-    size_t n = std::stoul(param);
-    if (n < 3) {
-      throw std::invalid_argument("invalid");
-    }
-    printFilteredSum(out, polygons, std::bind(matchVertexies, std::placeholders::_1, n));
   }
+
+  void handleAreaEven(std::ostream &out, const std::vector< saldaev::Polygon > &polygons)
+  {
+    printFilteredSum(out, polygons, isEven);
+  }
+
+  void handleAreaOdd(std::ostream &out, const std::vector< saldaev::Polygon > &polygons)
+  {
+    printFilteredSum(out, polygons, isOdd);
+  }
+}
+
+void saldaev::handleArea(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  std::string param;
+  if (!(in >> param)) {
+    throw std::invalid_argument("invalid");
+  }
+
+  IOguard guard(out);
+  out << std::fixed << std::setprecision(1);
+
+  std::map< std::string, void (*)(std::ostream &, const std::vector< Polygon > &) > handlers;
+  handlers["MEAN"] = handleAreaMean;
+  handlers["EVEN"] = handleAreaEven;
+  handlers["ODD"] = handleAreaOdd;
+
+  auto it = handlers.find(param);
+  if (it != handlers.end()) {
+    it->second(out, polygons);
+    return;
+  }
+
+  size_t n = std::stoul(param);
+  if (n < 3) {
+    throw std::invalid_argument("invalid");
+  }
+  printFilteredSum(out, polygons, std::bind(matchVertexies, std::placeholders::_1, n));
 }
 
 void saldaev::handleMax(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
@@ -100,6 +122,7 @@ void saldaev::handleMax(std::istream &in, std::ostream &out, const std::vector< 
 
   if (param == "AREA") {
     auto it = std::max_element(polygons.begin(), polygons.end(), lessArea);
+    saldaev::IOguard guard(out);
     out << std::fixed << std::setprecision(1) << saldaev::calcArea(*it);
   } else if (param == "VERTEXES") {
     auto it = std::max_element(polygons.begin(), polygons.end(), lessVertex);
@@ -121,6 +144,7 @@ void saldaev::handleMin(std::istream &in, std::ostream &out, const std::vector< 
 
   if (param == "AREA") {
     auto it = std::min_element(polygons.begin(), polygons.end(), lessArea);
+    saldaev::IOguard guard(out);
     out << std::fixed << std::setprecision(1) << calcArea(*it);
   } else if (param == "VERTEXES") {
     auto it = std::min_element(polygons.begin(), polygons.end(), lessVertex);
@@ -167,5 +191,5 @@ void saldaev::handleMexseq(std::istream &in, std::ostream &out, const std::vecto
     throw std::invalid_argument("");
   }
 
-  out << countMaxseq(polygons.begin(), polygons.end(), sample, 0) << '\n';
+  out << countMaxseq(polygons.begin(), polygons.end(), sample, 0);
 }

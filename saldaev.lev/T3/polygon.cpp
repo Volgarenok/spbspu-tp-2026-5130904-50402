@@ -1,11 +1,11 @@
 #include "polygon.hpp"
 #include <algorithm>
+#include <delimiter.hpp>
 #include <functional>
+#include <ioguard.hpp>
 #include <iterator>
 #include <numeric>
 #include <vector>
-#include "../common/delim.hpp"
-#include "../common/ioguard.hpp"
 
 namespace
 {
