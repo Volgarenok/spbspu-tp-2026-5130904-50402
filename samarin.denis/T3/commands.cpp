@@ -20,12 +20,28 @@ namespace {
   using samarin::Polygon;
   using Handler = std::function< void(const std::vector< Polygon > &, std::istream &, std::ostream &) >;
 
+  int skipInlineBlanks(std::istream &in)
+  {
+    int symbol = in.peek();
+    while ((symbol == ' ') || (symbol == '\t')) {
+      in.get();
+      symbol = in.peek();
+    }
+    return symbol;
+  }
+
+  bool atLineEnd(int symbol)
+  {
+    return (symbol == '\n') || (symbol == std::char_traits< char >::eof());
+  }
+
   std::string readWord(std::istream &in)
   {
-    std::string word;
-    if (!(in >> word)) {
+    if (atLineEnd(skipInlineBlanks(in))) {
       throw std::invalid_argument("expected argument");
     }
+    std::string word;
+    in >> word;
     return word;
   }
 
@@ -171,6 +187,9 @@ namespace {
   void commandIntersections(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out)
   {
     using namespace std::placeholders;
+    if (atLineEnd(skipInlineBlanks(in))) {
+      throw std::invalid_argument("expected a polygon");
+    }
     Polygon query;
     if (!(in >> query)) {
       throw std::invalid_argument("expected a polygon");
