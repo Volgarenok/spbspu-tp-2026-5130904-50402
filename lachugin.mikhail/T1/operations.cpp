@@ -114,7 +114,7 @@ void lachugin::printLinks(std::istream &in, std::ostream &out, notesMap &db)
   std::string note;
   in >> note;
 
-  bool printed = false;
+  bool first = true;
 
   auto it = db.find(note);
   if (it == db.end())
@@ -127,13 +127,16 @@ void lachugin::printLinks(std::istream &in, std::ostream &out, notesMap &db)
     auto sp = it->second->links[i].lock();
     if (sp)
     {
-      out << sp->name_ << "\n";
-      printed = true;
+      if (first)
+      {
+        out << sp->name_;
+        first = false;
+      }
+      else
+      {
+        out << "\n" << sp->name_;
+      }
     }
-  }
-  if (!printed)
-  {
-    out << "\n";
   }
 }
 
@@ -159,7 +162,7 @@ void lachugin::allRemovedNotes(std::istream &in, std::ostream &out, notesMap &db
     }
   }
 
-  out << count << "\n";
+  out << count;
 }
 
 void lachugin::linksRemover(std::istream &in, std::ostream &, notesMap &db)

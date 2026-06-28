@@ -2,6 +2,8 @@
 #include <string>
 #include <stdexcept>
 #include <limits>
+#include <unordered_map>
+#include <unordered_set>
 #include "operations.hpp"
 
 int main()
@@ -18,6 +20,13 @@ int main()
   cmds["expired"] = lachugin::allRemovedNotes;
   cmds["refresh"] = lachugin::linksRemover;
 
+  std::unordered_set< std::string > outputCmds =
+  {
+    "show",
+    "mind",
+    "expired"
+  };
+
   std::string cmd;
 
   while (std::cin >> cmd)
@@ -25,12 +34,16 @@ int main()
     try
     {
       cmds.at(cmd)(std::cin, std::cout, db);
-      std::cout << '\n';
+
+      if (outputCmds.count(cmd))
+      {
+        std::cout << '\n';
+      }
     }
     catch (...)
     {
       std::cout << "<INVALID COMMAND>\n";
-      auto toignore = std::numeric_limits<std::streamsize>::max();
+      auto toignore = std::numeric_limits< std::streamsize >::max();
       std::cin.ignore(toignore, '\n');
     }
   }
