@@ -42,9 +42,16 @@ std::istream &petrov::operator>>(std::istream &in, petrov::Polygon &polygon)
     in.setstate(std::ios::failbit);
     return in;
   }
+
   std::vector< Point > points;
   points.reserve(count);
-  std::copy_n(std::istream_iterator< Point >(in), count, std::back_inserter(points));
+  std::generate_n(std::back_inserter(points), count, [&in]()
+    {
+      Point point{0, 0};
+      in >> point;
+      return point;
+    }
+  );
   if (in) {
     polygon.points = std::move(points);
   }
