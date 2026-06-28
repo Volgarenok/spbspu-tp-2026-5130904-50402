@@ -162,6 +162,12 @@ namespace {
     }
   }
 
+  void commandRightShapes(const std::vector< Polygon > &polygons, std::istream &, std::ostream &out)
+  {
+    const auto count = std::count_if(polygons.begin(), polygons.end(), samarin::hasRightAngle);
+    out << static_cast< std::size_t >(count) << '\n';
+  }
+
   std::map< std::string, Handler > makeHandlers()
   {
     std::map< std::string, Handler > handlers;
@@ -169,6 +175,7 @@ namespace {
     handlers["MAX"] = commandMax;
     handlers["MIN"] = commandMin;
     handlers["COUNT"] = commandCount;
+    handlers["RIGHTSHAPES"] = commandRightShapes;
     return handlers;
   }
 }
