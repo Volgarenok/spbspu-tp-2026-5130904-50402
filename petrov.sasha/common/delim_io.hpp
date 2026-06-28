@@ -11,7 +11,7 @@ namespace petrov
     char expected;
   };
 
-  std::istream &operator>>(std::istream &in, DelimIO &&delim)
+  inline std::istream &operator>>(std::istream &in, DelimIO &&delim)
   {
     std::istream::sentry sentry(in);
     if (!sentry) {
