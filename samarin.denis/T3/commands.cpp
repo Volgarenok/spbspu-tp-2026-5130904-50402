@@ -18,7 +18,9 @@
 
 namespace {
   using samarin::Polygon;
-  using Handler = std::function< void(const std::vector< Polygon > &, std::istream &, std::ostream &) >;
+  using PolygonList = std::vector< Polygon >;
+  using Predicate = std::function< bool(const Polygon &) >;
+  using Handler = std::function< void(const PolygonList &, std::istream &, std::ostream &) >;
 
   int skipInlineBlanks(std::istream &in)
   {
@@ -81,30 +83,29 @@ namespace {
     return static_cast< std::size_t >(value);
   }
 
-  std::vector< double > areasOf(const std::vector< Polygon > &polygons)
+  std::vector< double > areasOf(const PolygonList &polygons)
   {
     std::vector< double > areas(polygons.size());
     std::transform(polygons.begin(), polygons.end(), areas.begin(), samarin::getArea);
     return areas;
   }
 
-  std::vector< std::size_t > vertexCountsOf(const std::vector< Polygon > &polygons)
+  std::vector< std::size_t > vertexCountsOf(const PolygonList &polygons)
   {
     std::vector< std::size_t > counts(polygons.size());
     std::transform(polygons.begin(), polygons.end(), counts.begin(), vertexCount);
     return counts;
   }
 
-  double sumAreaWhere(const std::vector< Polygon > &polygons,
-      const std::function< bool(const Polygon &) > &pred)
+  double sumAreaWhere(const PolygonList &polygons, const Predicate &pred)
   {
-    std::vector< Polygon > matched;
+    PolygonList matched;
     std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(matched), pred);
     const std::vector< double > areas = areasOf(matched);
     return std::accumulate(areas.begin(), areas.end(), 0.0);
   }
 
-  std::function< bool(const Polygon &) > vertexPredicate(const std::string &param)
+  Predicate vertexPredicate(const std::string &param)
   {
     using namespace std::placeholders;
     if (param == "EVEN") {
@@ -116,7 +117,7 @@ namespace {
     return std::bind(hasVertexCount, _1, parseVertexCount(param));
   }
 
-  void commandArea(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out)
+  void commandArea(const PolygonList &polygons, std::istream &in, std::ostream &out)
   {
     const std::string param = readWord(in);
     double result = 0.0;
@@ -133,14 +134,7 @@ namespace {
     out << result << '\n';
   }
 
-  void commandCount(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out)
-  {
-    const auto pred = vertexPredicate(readWord(in));
-    const auto matched = std::count_if(polygons.begin(), polygons.end(), pred);
-    out << static_cast< std::size_t >(matched) << '\n';
-  }
-
-  void commandExtremum(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out,
+  void commandExtremum(const PolygonList &polygons, std::istream &in, std::ostream &out,
       bool useMax)
   {
     if (polygons.empty()) {
@@ -162,13 +156,20 @@ namespace {
     }
   }
 
-  void commandRightShapes(const std::vector< Polygon > &polygons, std::istream &, std::ostream &out)
+  void commandCount(const PolygonList &polygons, std::istream &in, std::ostream &out)
+  {
+    const auto pred = vertexPredicate(readWord(in));
+    const auto matched = std::count_if(polygons.begin(), polygons.end(), pred);
+    out << static_cast< std::size_t >(matched) << '\n';
+  }
+
+  void commandRightShapes(const PolygonList &polygons, std::istream &, std::ostream &out)
   {
     const auto count = std::count_if(polygons.begin(), polygons.end(), samarin::hasRightAngle);
     out << static_cast< std::size_t >(count) << '\n';
   }
 
-  void commandIntersections(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out)
+  void commandIntersections(const PolygonList &polygons, std::istream &in, std::ostream &out)
   {
     using namespace std::placeholders;
     if (atLineEnd(skipInlineBlanks(in))) {
@@ -197,7 +198,7 @@ namespace {
   }
 }
 
-void samarin::processCommands(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out)
+void samarin::processCommands(const PolygonList &polygons, std::istream &in, std::ostream &out)
 {
   StreamGuard guard(out);
   out << std::fixed << std::setprecision(1);
