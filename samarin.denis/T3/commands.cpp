@@ -145,11 +145,29 @@ namespace {
     }
   }
 
+  void commandMin(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out)
+  {
+    if (polygons.empty()) {
+      throw std::invalid_argument("no polygons");
+    }
+    const std::string param = readWord(in);
+    if (param == "AREA") {
+      const std::vector< double > areas = areasOf(polygons);
+      out << *std::min_element(areas.begin(), areas.end()) << '\n';
+    } else if (param == "VERTEXES") {
+      const std::vector< std::size_t > counts = vertexCountsOf(polygons);
+      out << *std::min_element(counts.begin(), counts.end()) << '\n';
+    } else {
+      throw std::invalid_argument("bad MIN parameter");
+    }
+  }
+
   std::map< std::string, Handler > makeHandlers()
   {
     std::map< std::string, Handler > handlers;
     handlers["AREA"] = commandArea;
     handlers["MAX"] = commandMax;
+    handlers["MIN"] = commandMin;
     handlers["COUNT"] = commandCount;
     return handlers;
   }
