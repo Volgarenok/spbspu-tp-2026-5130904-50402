@@ -44,6 +44,11 @@ namespace {
     return polygon.points.size() == count;
   }
 
+  std::size_t vertexCount(const Polygon &polygon)
+  {
+    return polygon.points.size();
+  }
+
   std::size_t parseVertexCount(const std::string &token)
   {
     const auto isDigit = [](char symbol)
@@ -65,6 +70,13 @@ namespace {
     std::vector< double > areas(polygons.size());
     std::transform(polygons.begin(), polygons.end(), areas.begin(), samarin::getArea);
     return areas;
+  }
+
+  std::vector< std::size_t > vertexCountsOf(const std::vector< Polygon > &polygons)
+  {
+    std::vector< std::size_t > counts(polygons.size());
+    std::transform(polygons.begin(), polygons.end(), counts.begin(), vertexCount);
+    return counts;
   }
 
   double sumAreaWhere(const std::vector< Polygon > &polygons,
@@ -116,10 +128,28 @@ namespace {
     out << result << '\n';
   }
 
+  void commandMax(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out)
+  {
+    if (polygons.empty()) {
+      throw std::invalid_argument("no polygons");
+    }
+    const std::string param = readWord(in);
+    if (param == "AREA") {
+      const std::vector< double > areas = areasOf(polygons);
+      out << *std::max_element(areas.begin(), areas.end()) << '\n';
+    } else if (param == "VERTEXES") {
+      const std::vector< std::size_t > counts = vertexCountsOf(polygons);
+      out << *std::max_element(counts.begin(), counts.end()) << '\n';
+    } else {
+      throw std::invalid_argument("bad MAX parameter");
+    }
+  }
+
   std::map< std::string, Handler > makeHandlers()
   {
     std::map< std::string, Handler > handlers;
     handlers["AREA"] = commandArea;
+    handlers["MAX"] = commandMax;
     handlers["COUNT"] = commandCount;
     return handlers;
   }
