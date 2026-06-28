@@ -55,6 +55,7 @@ int main(int argc, char **argv)
       std::cin.ignore(streamMax, '\n');
       std::cout << "<INVALID COMMAND>\n";
     }
-  return 0;
   }
+
+  return 0;
 }
