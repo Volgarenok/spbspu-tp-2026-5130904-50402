@@ -168,6 +168,18 @@ namespace {
     out << static_cast< std::size_t >(count) << '\n';
   }
 
+  void commandIntersections(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out)
+  {
+    using namespace std::placeholders;
+    Polygon query;
+    if (!(in >> query)) {
+      throw std::invalid_argument("expected a polygon");
+    }
+    const auto matches = std::bind(samarin::intersects, _1, query);
+    const auto count = std::count_if(polygons.begin(), polygons.end(), matches);
+    out << static_cast< std::size_t >(count) << '\n';
+  }
+
   std::map< std::string, Handler > makeHandlers()
   {
     std::map< std::string, Handler > handlers;
@@ -176,6 +188,7 @@ namespace {
     handlers["MIN"] = commandMin;
     handlers["COUNT"] = commandCount;
     handlers["RIGHTSHAPES"] = commandRightShapes;
+    handlers["INTERSECTIONS"] = commandIntersections;
     return handlers;
   }
 }
