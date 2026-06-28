@@ -8,14 +8,14 @@
 namespace shirokov
 {
   struct Note;
-  using map_t = std::unordered_map< std::string, std::shared_ptr< shirokov::Note > >;
-  using links_t = std::vector< std::pair< std::string, std::weak_ptr< shirokov::Note > > >;
+  using map_t = std::unordered_map< std::string, std::shared_ptr< Note > >;
+  using links_t = std::vector< std::pair< std::string, std::weak_ptr< Note > > >;
 
   struct Note
   {
-    Note() = default;
     std::vector< std::string > entries;
     links_t links;
+    Note() = default;
   };
 
   void note(std::istream& in, std::ostream&, map_t& notes);
