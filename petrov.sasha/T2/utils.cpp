@@ -37,10 +37,9 @@ std::istream &petrov::operator>>(std::istream &in, HexIO &&dest)
   if (!s) {
     return in;
   }
-  char zero = '\0';
   char x = '\0';
-  in >> zero >> x;
-  if (!in || zero != '0' || (x != 'x' && x != 'X')) {
+  in >> DelimIO{'0'} >> x;
+  if (!in || (x != 'x' && x != 'X')) {
     in.setstate(std::ios::failbit);
     return in;
   }
@@ -104,14 +103,14 @@ std::istream &petrov::operator>>(std::istream &in, DataStruct &dest)
       in.setstate(std::ios::failbit);
       break;
     }
-}
-in >> DelimIO{':'} >> DelimIO{')'};
-if (in && got1 && got2 && got3) {
-  dest = temp;
-} else {
-  in.setstate(std::ios::failbit);
-}
-return in;
+  }
+  in >> DelimIO{':'} >> DelimIO{')'};
+  if (in && got1 && got2 && got3) {
+    dest = temp;
+  } else {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
 }
 
 std::ostream &petrov::operator<<(std::ostream &out, const DataStruct &src)
