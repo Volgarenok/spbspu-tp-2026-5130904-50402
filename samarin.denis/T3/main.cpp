@@ -5,6 +5,7 @@
 #include <limits>
 #include <vector>
 #include "Polygon.hpp"
+#include "commands.hpp"
 
 int main(int argc, char **argv)
 {
@@ -28,4 +29,6 @@ int main(int argc, char **argv)
     }
     std::copy(input_iterator(file), input_iterator(), std::back_inserter(polygons));
   }
+
+  samarin::processCommands(polygons, std::cin, std::cout);
 }
