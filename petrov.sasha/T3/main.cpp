@@ -51,13 +51,9 @@ int main(int argc, char **argv)
       std::cout << '\n';
     }
     catch (const std::exception &) {
-      if (std::cin.fail()) {
-        std::cin.clear();
-      }
+      std::cin.clear();
       std::cin.ignore(streamMax, '\n');
       std::cout << "<INVALID COMMAND>\n";
     }
-  }
-
   return 0;
 }
