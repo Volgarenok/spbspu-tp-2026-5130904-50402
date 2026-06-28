@@ -104,16 +104,23 @@ namespace {
     return std::accumulate(areas.begin(), areas.end(), 0.0);
   }
 
-  void commandArea(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out)
+  std::function< bool(const Polygon &) > vertexPredicate(const std::string &param)
   {
     using namespace std::placeholders;
+    if (param == "EVEN") {
+      return hasEvenVertices;
+    }
+    if (param == "ODD") {
+      return hasOddVertices;
+    }
+    return std::bind(hasVertexCount, _1, parseVertexCount(param));
+  }
+
+  void commandArea(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out)
+  {
     const std::string param = readWord(in);
     double result = 0.0;
-    if (param == "EVEN") {
-      result = sumAreaWhere(polygons, hasEvenVertices);
-    } else if (param == "ODD") {
-      result = sumAreaWhere(polygons, hasOddVertices);
-    } else if (param == "MEAN") {
+    if (param == "MEAN") {
       if (polygons.empty()) {
         throw std::invalid_argument("no polygons for mean");
       }
@@ -121,27 +128,16 @@ namespace {
       const double total = std::accumulate(areas.begin(), areas.end(), 0.0);
       result = total / static_cast< double >(polygons.size());
     } else {
-      const std::size_t count = parseVertexCount(param);
-      result = sumAreaWhere(polygons, std::bind(hasVertexCount, _1, count));
+      result = sumAreaWhere(polygons, vertexPredicate(param));
     }
     out << result << '\n';
   }
 
   void commandCount(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out)
   {
-    using namespace std::placeholders;
-    const std::string param = readWord(in);
-    std::size_t result = 0;
-    if (param == "EVEN") {
-      result = static_cast< std::size_t >(std::count_if(polygons.begin(), polygons.end(), hasEvenVertices));
-    } else if (param == "ODD") {
-      result = static_cast< std::size_t >(std::count_if(polygons.begin(), polygons.end(), hasOddVertices));
-    } else {
-      const std::size_t count = parseVertexCount(param);
-      const auto matches = std::bind(hasVertexCount, _1, count);
-      result = static_cast< std::size_t >(std::count_if(polygons.begin(), polygons.end(), matches));
-    }
-    out << result << '\n';
+    const auto pred = vertexPredicate(readWord(in));
+    const auto matched = std::count_if(polygons.begin(), polygons.end(), pred);
+    out << static_cast< std::size_t >(matched) << '\n';
   }
 
   void commandMax(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out)
