@@ -4,8 +4,8 @@
 #include <cmath>
 #include <cstddef>
 #include <istream>
-#include <iterator>
 #include <numeric>
+#include <string>
 #include <vector>
 #include "DelimiterIO.hpp"
 
@@ -39,14 +39,36 @@ namespace {
     return frame;
   }
 
-  bool restOfLineIsBlank(std::istream &in)
+  int skipInlineBlanks(std::istream &in)
   {
     int next = in.peek();
-    while (next == ' ' || next == '\t') {
+    while ((next == ' ') || (next == '\t')) {
       in.get();
       next = in.peek();
     }
+    return next;
+  }
+
+  bool restOfLineIsBlank(std::istream &in)
+  {
+    const int next = skipInlineBlanks(in);
     return (next == '\n') || (next == std::char_traits< char >::eof());
+  }
+
+  bool readLinePoints(std::istream &in, std::size_t count, std::vector< samarin::Point > &dest)
+  {
+    for (std::size_t i = 0; i < count; ++i) {
+      const int next = skipInlineBlanks(in);
+      if ((next == '\n') || (next == std::char_traits< char >::eof())) {
+        return false;
+      }
+      samarin::Point point{0, 0};
+      if (!(in >> point)) {
+        return false;
+      }
+      dest.push_back(point);
+    }
+    return true;
   }
 }
 
@@ -78,8 +100,7 @@ std::istream &samarin::operator>>(std::istream &in, Polygon &dest)
   }
   std::vector< Point > input;
   input.reserve(count);
-  std::copy_n(std::istream_iterator< Point >(in), count, std::back_inserter(input));
-  if (in && (input.size() == count) && restOfLineIsBlank(in)) {
+  if (readLinePoints(in, count, input) && restOfLineIsBlank(in)) {
     dest.points = input;
   } else {
     in.setstate(std::ios::failbit);
