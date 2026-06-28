@@ -14,8 +14,7 @@ void lachugin::addNote(std::istream& in, std::ostream &, notesMap &db)
   {
     throw std::logic_error ("Err: note not exist");
   }
-  auto new_note = std::make_shared< Note >(note);
-  db[note] = new_note;
+  db.insert({note, std::make_shared< Note >(note)});
 }
 
 void lachugin::addLine(std::istream &in, std::ostream &, notesMap &db)
@@ -23,38 +22,26 @@ void lachugin::addLine(std::istream &in, std::ostream &, notesMap &db)
   std::string note;
   in >> note;
 
-  auto it = db.find(note);
-  if (it == db.end())
-  {
-    throw std::logic_error ("Err: note not exist");
-  }
-
   std::string str;
   in >> std::quoted(str);
-  db[note]->lines.push_back(str);
-
+  db.at(note)->lines.push_back(str);
 }
 
-void lachugin::showNote(std::istream &in, std::ostream &out, notesMap &db)
+void lachugin::showNote(std::istream& in, std::ostream& out, notesMap& db)
 {
   std::string note;
   in >> note;
 
-  auto it = db.find(note);
-  if (it == db.end())
+  auto notePtr = db.at(note);
+  if (notePtr->lines.empty())
   {
-    throw std::logic_error ("Err: note not exist");
-  }
-
-  if (it->second->lines.empty())
-  {
-    out << "\n";
     return;
   }
 
-  for (size_t i = 0; i < it->second->lines.size(); ++i)
+  out << notePtr->lines.front();
+  for (size_t i = 1; i < notePtr->lines.size(); ++i)
   {
-    out << it->second->lines[i] << "\n";
+    out << '\n' << notePtr->lines[i];
   }
 }
 

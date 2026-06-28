@@ -25,6 +25,7 @@ int main()
     try
     {
       cmds.at(cmd)(std::cin, std::cout, db);
+      std::cout << '\n';
     }
     catch (...)
     {
