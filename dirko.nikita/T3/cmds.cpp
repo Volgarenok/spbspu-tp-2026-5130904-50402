@@ -147,7 +147,7 @@ void dirko::area(std::istream &in, std::ostream &out, const std::vector< Polygon
     throw std::invalid_argument("invalid");
   }
 
-  IOguard guard(in);
+  IOguard guard(out);
   out << std::fixed << std::setprecision(1);
 
   std::map< std::string, void (*)(std::ostream &, const std::vector< Polygon > &) > handlers;
