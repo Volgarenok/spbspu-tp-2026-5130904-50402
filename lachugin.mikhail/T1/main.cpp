@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-#include <stdexcept>
 #include <limits>
 #include <unordered_map>
 #include <unordered_set>
@@ -19,12 +18,14 @@ int main()
   cmds["halt"] = lachugin::removeLink;
   cmds["expired"] = lachugin::allRemovedNotes;
   cmds["refresh"] = lachugin::linksRemover;
+  cmds["loop"] = lachugin::loop;
 
   std::unordered_set< std::string > outputCmds =
   {
     "show",
     "mind",
-    "expired"
+    "expired",
+    "loop"
   };
 
   std::string cmd;

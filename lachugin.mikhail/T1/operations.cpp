@@ -239,3 +239,26 @@ bool lachugin::dfsLoop(const std::shared_ptr< Note >& start, const std::shared_p
 
   return false;
 }
+
+
+void lachugin::loop(std::istream& in, std::ostream& out, notesMap& db)
+{
+  std::string note;
+  size_t n;
+  in >> note >> n;
+  auto start = db.at(note);
+
+  std::vector< std::shared_ptr< Note > > path;
+  path.push_back(start);
+  if (!dfsLoop(start, start, 0, n, path))
+  {
+    out << "<NO LOOP>";
+    return;
+  }
+
+  out << path.front()->name_ << ' ' << path[1]->name_;
+  for (size_t i = 1; i + 1 < path.size(); ++i)
+  {
+    out << '\n' << path[i]->name_ << ' ' << path[i + 1]->name_;
+  }
+}
