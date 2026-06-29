@@ -128,16 +128,18 @@ std::istream &chernikov::operator>>(std::istream &in, ValueIO &&value)
   {
     std::string token;
     char c;
+
     while (in.get(c) && c != ':')
     {
       token += c;
-      if (c == ')')
-      {
-        break;
-      }
     }
 
-    if (token.size() >= 4 && token[0] == '#' && token[1] == 'c' && token[2] == '(')
+    if (c == ':')
+    {
+      in.unget();
+    }
+
+    if (token.size() >= 5 && token[0] == '#' && token[1] == 'c' && token[2] == '(' && token[token.size() - 1] == ')')
     {
       std::string inner = token.substr(3, token.size() - 4);
       size_t space = inner.find(' ');
@@ -156,13 +158,15 @@ std::istream &chernikov::operator>>(std::istream &in, ValueIO &&value)
   {
     std::string token;
     char c;
+
     while (in.get(c) && c != ':')
     {
       token += c;
-      if (c == ')')
-      {
-        break;
-      }
+    }
+
+    if (c == ':')
+    {
+      in.unget();
     }
 
     if (token.size() >= 3 && token[0] == '(' && token[1] == ':' && token[2] == 'N')
