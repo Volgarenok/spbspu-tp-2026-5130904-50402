@@ -11,7 +11,18 @@ std::istream& shirokov::operator>>(std::istream& in, label&& dest)
   }
   IOguard g(in);
   std::string data;
-  in >> data;
+  for (size_t i = 0; i < 4; ++i)
+  {
+    char c = 0;
+    if (in.get(c))
+    {
+      data += c;
+    }
+    else
+    {
+      break;
+    }
+  }
 
   char space = 0;
   if (in.get(space))
