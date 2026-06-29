@@ -1,0 +1,4 @@
+*.o
+lab
+out/
+*.save
