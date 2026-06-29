@@ -77,6 +77,7 @@ void handle_mind(std::istream &in, std::ostream &out, chernikov::NoteDB &db)
   in >> name;
   if (!db.noteExists(name))
   {
+    out << '\n';
     throw std::logic_error("note not found");
   }
   auto names = db.mindLinks(name);
@@ -95,12 +96,9 @@ void handle_expired(std::istream &in, std::ostream &out, chernikov::NoteDB &db)
     {
       throw std::logic_error("note not found");
     }
-    out << db.expiredCount() << '\n';
+    out << '\n';
   }
-  else
-  {
-    out << db.expiredCount() << '\n';
-  }
+  out << db.expiredCount() << '\n';
 }
 
 void handle_refresh(std::istream &in, std::ostream &, chernikov::NoteDB &db)
