@@ -25,23 +25,6 @@ std::istream& muh::operator>>(std::istream& in, DoubleIO&& d)
   return in;
 }
 
-std::istream& muh::operator>>(std::istream& in, DelimiterIO&& c)
-{
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
-  char b = 0;
-  in >> std::ws;
-  in >> b;
-  if (b != c.exp)
-  {
-    in.setstate(std::ios::failbit);
-  }
-  return in;
-}
-
 std::istream& muh::operator>>(std::istream& in, RatIO&& r)
 {
   std::istream::sentry sentry(in);
