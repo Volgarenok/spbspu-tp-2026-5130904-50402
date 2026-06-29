@@ -60,6 +60,10 @@ namespace chernikov
     {
       return false;
     }
+    if (!noteExists(to))
+    {
+      return false;
+    }
     fromNote->removeLink(to);
     return true;
   }

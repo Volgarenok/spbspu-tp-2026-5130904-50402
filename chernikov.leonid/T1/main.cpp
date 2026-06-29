@@ -65,11 +65,10 @@ void handle_halt(std::istream &in, std::ostream &, chernikov::NoteDB &db)
 {
   std::string from, to;
   in >> from >> to;
-  if (!db.noteExists(from))
+  if (!db.haltLink(from, to))
   {
     throw std::logic_error("cannot halt");
   }
-  db.haltLink(from, to);
 }
 
 void handle_mind(std::istream &in, std::ostream &out, chernikov::NoteDB &db)
@@ -87,13 +86,29 @@ void handle_mind(std::istream &in, std::ostream &out, chernikov::NoteDB &db)
   }
 }
 
-void handle_expired(std::istream &, std::ostream &out, chernikov::NoteDB &db)
+void handle_expired(std::istream &in, std::ostream &out, chernikov::NoteDB &db)
 {
+  std::string name;
+  if (in >> name)
+  {
+    if (!db.noteExists(name))
+    {
+      throw std::logic_error("note not found");
+    }
+  }
   out << db.expiredCount() << '\n';
 }
 
-void handle_refresh(std::istream &, std::ostream &, chernikov::NoteDB &db)
+void handle_refresh(std::istream &in, std::ostream &, chernikov::NoteDB &db)
 {
+  std::string name;
+  if (in >> name)
+  {
+    if (!db.noteExists(name))
+    {
+      throw std::logic_error("note not found");
+    }
+  }
   db.refreshAll();
 }
 
