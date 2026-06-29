@@ -5,6 +5,7 @@
 #include <limits>
 #include <unordered_map>
 #include <functional>
+#include <sstream>
 
 using CommandHandler = void (*)(std::istream &, std::ostream &, chernikov::NoteDB &);
 
@@ -85,14 +86,16 @@ void handle_mind(std::istream &in, std::ostream &out, chernikov::NoteDB &db)
   }
 }
 
-void handle_expired(std::istream &, std::ostream &out, chernikov::NoteDB &db)
+void handle_expired(std::istream &in, std::ostream &out, chernikov::NoteDB &db)
 {
   out << db.expiredCount() << '\n';
+  in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
-void handle_refresh(std::istream &, std::ostream &, chernikov::NoteDB &db)
+void handle_refresh(std::istream &in, std::ostream &, chernikov::NoteDB &db)
 {
   db.refreshAll();
+  in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
 int main()
@@ -110,9 +113,23 @@ int main()
   handlers["expired"] = handle_expired;
   handlers["refresh"] = handle_refresh;
 
-  std::string cmd;
-  while (std::cin >> cmd)
+  std::string line;
+  while (std::getline(std::cin, line))
   {
+    if (line.empty())
+    {
+      continue;
+    }
+
+    std::istringstream iss(line);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd.empty())
+    {
+      continue;
+    }
+
     try
     {
       auto it = handlers.find(cmd);
@@ -120,18 +137,18 @@ int main()
       {
         throw std::out_of_range("unknown command");
       }
-      it->second(std::cin, std::cout, db);
+      it->second(iss, std::cout, db);
     }
     catch (const std::out_of_range &)
     {
       std::cout << "<INVALID COMMAND>\n";
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
     catch (const std::logic_error &)
     {
       std::cout << "<INVALID COMMAND>\n";
     }
   }
+
   if (!std::cin.eof())
   {
     std::cerr << "Bad input\n";
