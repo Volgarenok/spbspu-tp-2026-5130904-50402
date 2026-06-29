@@ -96,12 +96,6 @@ std::istream &lavrentev::operator>>(std::istream &is, DataStruct &obj)
       is.setstate(std::ios::failbit);
       return is;
     }
-
-    is >> colon;
-    if (!is)
-    {
-      return is;
-    }
   }
 
   if (!(hasKey1 && hasKey2 && hasKey3))
@@ -110,6 +104,7 @@ std::istream &lavrentev::operator>>(std::istream &is, DataStruct &obj)
     return is;
   }
 
+  is >> colon;
   is >> closeBracket;
   return is;
 }
@@ -264,11 +259,11 @@ std::istream &lavrentev::operator>>(std::istream &is, StringLit &key3)
 
 std::ostream &lavrentev::operator<<(std::ostream &os, const StringLit &key3)
 {
-  os << '"' << key3.data << '"';
+  os << "key3 \"" << key3.data << '"';
   return os;
 }
 
 bool lavrentev::operator<(const StringLit& lobj, const StringLit& robj)
 {
-  return lobj.data < robj.data ? true : false;
+  return lobj.data.length() < robj.data.length();
 }
