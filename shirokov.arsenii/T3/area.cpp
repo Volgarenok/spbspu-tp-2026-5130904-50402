@@ -12,6 +12,8 @@
 
 namespace
 {
+  template< typename Predicate >
+  double calculateAreaIf(const shirokov::plg_t&, Predicate);
   double getPolygonArea(const shirokov::Polygon&);
   bool isCharDigit(char);
   void areaEven(std::ostream&, const shirokov::plg_t&);
@@ -36,60 +38,72 @@ namespace
     const std::vector< shirokov::Point >& points;
   };
 
-  struct EvenAreaTransformer
+  struct IsEvenVertices
   {
-  public:
-    double operator()(const shirokov::Polygon& p) const
+    bool operator()(const shirokov::Polygon& p) const
     {
-      if (p.points.size() % 2 == 0)
-      {
-        return getPolygonArea(p);
-      }
-      return 0;
+      return p.points.size() % 2 == 0;
     }
   };
 
-  struct OddAreaTransformer
+  struct IsOddVertices
   {
-  public:
-    double operator()(const shirokov::Polygon& p) const
+    bool operator()(const shirokov::Polygon& p) const
     {
-      if (p.points.size() % 2 != 0)
-      {
-        return getPolygonArea(p);
-      }
-      return 0;
+      return p.points.size() % 2 != 0;
     }
   };
 
-  struct NumAreaTransformer
+  struct IsTargetVertices
   {
   public:
-    explicit NumAreaTransformer(size_t targetValue):
+    explicit IsTargetVertices(size_t targetValue):
       target(targetValue)
     {}
 
-    double operator()(const shirokov::Polygon& p) const
+    bool operator()(const shirokov::Polygon& p) const
     {
-      if (p.points.size() == target)
-      {
-        return getPolygonArea(p);
-      }
-      return 0;
+      return p.points.size() == target;
     }
 
   private:
     size_t target;
   };
 
-  struct TotalAreaTransformer
+  struct AlwaysTrue
   {
-  public:
-    double operator()(const shirokov::Polygon& p) const
+    bool operator()(const shirokov::Polygon&) const
     {
-      return getPolygonArea(p);
+      return true;
     }
   };
+
+  template< typename Predicate >
+  struct AreaTransformer
+  {
+  public:
+    explicit AreaTransformer(Predicate predicate):
+      pred(predicate)
+    {}
+
+    double operator()(const shirokov::Polygon& p) const
+    {
+      return pred(p) ? getPolygonArea(p) : 0.0;
+    }
+
+  private:
+    Predicate pred;
+  };
+
+  template< typename Predicate >
+  double calculateAreaIf(const shirokov::plg_t& polygons, Predicate pred)
+  {
+    std::vector< double > areas(polygons.size());
+
+    std::transform(polygons.begin(), polygons.end(), areas.begin(), AreaTransformer< Predicate >(pred));
+
+    return std::accumulate(areas.begin(), areas.end(), 0.0);
+  }
 
   double getPolygonArea(const shirokov::Polygon& p)
   {
@@ -111,16 +125,12 @@ namespace
 
   void areaEven(std::ostream& out, const shirokov::plg_t& polygons)
   {
-    std::vector< double > areas(polygons.size());
-    std::transform(polygons.begin(), polygons.end(), areas.begin(), EvenAreaTransformer{});
-    out << std::accumulate(areas.begin(), areas.end(), 0.0) << "\n";
+    out << calculateAreaIf(polygons, IsEvenVertices{}) << "\n";
   }
 
   void areaOdd(std::ostream& out, const shirokov::plg_t& polygons)
   {
-    std::vector< double > areas(polygons.size());
-    std::transform(polygons.begin(), polygons.end(), areas.begin(), OddAreaTransformer{});
-    out << std::accumulate(areas.begin(), areas.end(), 0.0) << "\n";
+    out << calculateAreaIf(polygons, IsOddVertices{}) << "\n";
   }
 
   void areaMean(std::ostream& out, const shirokov::plg_t& polygons)
@@ -129,16 +139,13 @@ namespace
     {
       throw std::logic_error("MEAN requires at least one polygon in the dataset");
     }
-    std::vector< double > areas(polygons.size());
-    std::transform(polygons.begin(), polygons.end(), areas.begin(), TotalAreaTransformer{});
-    out << (std::accumulate(areas.begin(), areas.end(), 0.0) / static_cast< double >(polygons.size())) << "\n";
+    double totalArea = calculateAreaIf(polygons, AlwaysTrue{});
+    out << (totalArea / static_cast< double >(polygons.size())) << "\n";
   }
 
   void areaNum(std::ostream& out, const shirokov::plg_t& polygons, size_t num)
   {
-    std::vector< double > areas(polygons.size());
-    std::transform(polygons.begin(), polygons.end(), areas.begin(), NumAreaTransformer{num});
-    out << std::accumulate(areas.begin(), areas.end(), 0.0) << "\n";
+    out << calculateAreaIf(polygons, IsTargetVertices{num}) << "\n";
   }
 }
 
