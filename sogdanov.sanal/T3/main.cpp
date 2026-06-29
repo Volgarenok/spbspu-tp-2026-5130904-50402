@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -38,16 +39,16 @@ int main(int argc, char **argv)
   contexts.push_back(polygons);
 
   std::map< std::string, std::function< void() > > commands;
-  commands["AREA"] = std::bind(sog::area, std::ref(std::cin), std::ref(std::cout), std::cref(contexts));
-  commands["MAX"] = std::bind(sog::max, std::ref(std::cin), std::ref(std::cout), std::cref(contexts));
-  commands["MIN"] = std::bind(sog::min, std::ref(std::cin), std::ref(std::cout), std::cref(contexts));
-  commands["COUNT"] = std::bind(sog::count, std::ref(std::cin), std::ref(std::cout), std::cref(contexts));
-  commands["PERMS"] = std::bind(sog::perms, std::ref(std::cin), std::ref(std::cout), std::cref(contexts));
-  commands["MAXSEQ"] = std::bind(sog::maxseq, std::ref(std::cin), std::ref(std::cout), std::cref(contexts));
+  commands["AREA"] = std::bind(&sog::area, std::ref(std::cin), std::ref(std::cout), std::cref(contexts));
+  commands["MAX"] = std::bind(&sog::max, std::ref(std::cin), std::ref(std::cout), std::cref(contexts));
+  commands["MIN"] = std::bind(&sog::min, std::ref(std::cin), std::ref(std::cout), std::cref(contexts));
+  commands["COUNT"] = std::bind(&sog::count, std::ref(std::cin), std::ref(std::cout), std::cref(contexts));
+  commands["PERMS"] = std::bind(&sog::perms, std::ref(std::cin), std::ref(std::cout), std::cref(contexts));
+  commands["MAXSEQ"] = std::bind(&sog::maxseq, std::ref(std::cin), std::ref(std::cout), std::cref(contexts));
 
-  commands["CONTEXT"] = std::bind(sog::context, std::ref(std::cin), std::ref(std::cout), std::ref(contexts));
-  commands["POPCONTEXT"] = std::bind(sog::popcontext, std::ref(std::cin), std::ref(std::cout), std::ref(contexts));
-  commands["LEVEL"] = std::bind(sog::level, std::ref(std::cin), std::ref(std::cout), std::cref(contexts));
+  commands["CONTEXT"] = std::bind(&sog::context, std::ref(std::cin), std::ref(std::cout), std::ref(contexts));
+  commands["POPCONTEXT"] = std::bind(&sog::popcontext, std::ref(std::cin), std::ref(std::cout), std::ref(contexts));
+  commands["LEVEL"] = std::bind(&sog::level, std::ref(std::cin), std::ref(std::cout), std::cref(contexts));
 
   std::string command;
   while (std::cin >> command) {
