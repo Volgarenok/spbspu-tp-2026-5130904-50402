@@ -1,10 +1,10 @@
 #include "note.hpp"
 #include <algorithm>
 
-namespace chernikov {
+namespace chernikov
+{
 
-  Note::Note(std::string name):
-    name_(std::move(name))
+  Note::Note(std::string name) : name_(std::move(name))
   {
   }
 
@@ -21,12 +21,12 @@ namespace chernikov {
     }
   }
 
-  bool Note::addLink(std::shared_ptr< Note > target)
+  bool Note::addLink(std::shared_ptr<Note> target)
   {
-    for (const auto &wp : links_)
+    for (const auto &link : links_)
     {
-      auto sp = wp.lock();
-      if (sp && sp->name_ == target->name_)
+      auto existing = link.lock();
+      if (existing && existing.get() == target.get())
       {
         return false;
       }
@@ -37,23 +37,25 @@ namespace chernikov {
 
   void Note::removeLink(const std::string &targetName)
   {
-    links_.erase(std::remove_if(links_.begin(), links_.end(),
-                                [&targetName](const std::weak_ptr< Note > &wp) {
-                                  auto sp = wp.lock();
-                                  return sp && sp->name_ == targetName;
-                                }),
-                 links_.end());
+    links_.erase(
+        std::remove_if(links_.begin(), links_.end(),
+                       [&targetName](const std::weak_ptr<Note> &wp)
+                       {
+                         auto sp = wp.lock();
+                         return !sp || sp->name() == targetName;
+                       }),
+        links_.end());
   }
 
-  std::vector< std::string > Note::getLinkedNames() const
+  std::vector<std::string> Note::getLinkedNames() const
   {
-    std::vector< std::string > names;
-    for (const auto &wp : links_)
+    std::vector<std::string> names;
+    for (const auto &link : links_)
     {
-      auto sp = wp.lock();
+      auto sp = link.lock();
       if (sp)
       {
-        names.push_back(sp->name_);
+        names.push_back(sp->name());
       }
     }
     return names;
@@ -61,21 +63,23 @@ namespace chernikov {
 
   size_t Note::countExpiredLinks() const
   {
-    return std::count_if(links_.begin(), links_.end(), [](const auto &wp) {
-      return wp.expired();
-    });
+    return std::count_if(links_.begin(), links_.end(),
+                         [](const std::weak_ptr<Note> &wp)
+                         {
+                           return wp.expired();
+                         });
   }
 
   void Note::removeExpiredLinks()
-{
-  links_.erase(
-    std::remove_if(links_.begin(), links_.end(),
-      [](const std::weak_ptr< Note > &wp) {
-        return wp.expired();
-      }),
-    links_.end()
-  );
-}
+  {
+    links_.erase(
+        std::remove_if(links_.begin(), links_.end(),
+                       [](const std::weak_ptr<Note> &wp)
+                       {
+                         return wp.expired();
+                       }),
+        links_.end());
+  }
 
   const std::string &Note::name() const
   {
