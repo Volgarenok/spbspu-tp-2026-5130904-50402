@@ -12,7 +12,7 @@ namespace lavrentev
     std::vector< std::weak_ptr< Note > > ptrs;
     std::string name;
 
-    Note();
+    Note() = default;
     explicit Note(const std::string& n);
   };
 }

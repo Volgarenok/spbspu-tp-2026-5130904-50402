@@ -22,25 +22,18 @@ void lavrentev::note(std::istream &in, std::ostream &, dbTemp &db)
 
 void lavrentev::line(std::istream &in,
   std::ostream &,
-  std::unordered_map< std::string, std::shared_ptr< Note > > &db)
+  dbTemp &db)
 {
   std::string name, text;
   in >> name;
-  try
-  {
-    std::shared_ptr< Note > notePtr = db.at(name);
-    in >> std::quoted(text);
-    notePtr->lines.push_back(text);
-  }
-  catch (const std::out_of_range &)
-  {
-    throw std::logic_error("No such Note");
-  }
+  std::shared_ptr< Note > notePtr = db.at(name);
+  in >> std::quoted(text);
+  notePtr->lines.push_back(text);
 }
 
 void lavrentev::show(std::istream &in,
   std::ostream &out,
-  std::unordered_map< std::string, std::shared_ptr< Note > > &db)
+  dbTemp &db)
 {
   std::string name;
   in >> name;
@@ -67,7 +60,7 @@ void lavrentev::show(std::istream &in,
 
 void lavrentev::drop(std::istream &in,
   std::ostream &,
-  std::unordered_map< std::string, std::shared_ptr< Note > > &db)
+  dbTemp &db)
 {
   std::string name;
   in >> name;
@@ -84,7 +77,7 @@ void lavrentev::drop(std::istream &in,
 
 void lavrentev::link(std::istream &in,
   std::ostream &,
-  std::unordered_map< std::string, std::shared_ptr< Note > > &db)
+  dbTemp &db)
 {
   std::string noteTo, noteFrom;
   in >> noteFrom >> noteTo;
@@ -115,7 +108,7 @@ void lavrentev::link(std::istream &in,
 
 void lavrentev::mind(std::istream &in,
   std::ostream &out,
-  std::unordered_map< std::string, std::shared_ptr< Note > > &db)
+  dbTemp &db)
 {
   std::string name;
   in >> name;
@@ -156,7 +149,7 @@ void lavrentev::mind(std::istream &in,
 
 void lavrentev::halt(std::istream &in,
   std::ostream &,
-  std::unordered_map< std::string, std::shared_ptr< Note > > &db)
+  dbTemp &db)
 {
   std::string noteTo, noteFrom;
   in >> noteFrom >> noteTo;
