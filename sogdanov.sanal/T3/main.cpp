@@ -1,12 +1,13 @@
-#include "Polygon.hpp"
-#include "Commands.hpp"
-#include <iostream>
 #include <fstream>
-#include <iterator>
-#include <map>
 #include <functional>
+#include <iostream>
+#include <iterator>
 #include <limits>
+#include <map>
 #include <string>
+#include <vector>
+#include "Commands.hpp"
+#include "Polygon.hpp"
 
 int main(int argc, char **argv)
 {
@@ -44,6 +45,7 @@ int main(int argc, char **argv)
   while (std::cin >> command) {
     try {
       commands.at(command)();
+      std::cout << '\n';
     } catch (const std::exception&) {
       if (std::cin.fail()) {
         std::cin.clear();
@@ -52,5 +54,4 @@ int main(int argc, char **argv)
       std::cout << "<INVALID COMMAND>\n";
     }
   }
-
 }

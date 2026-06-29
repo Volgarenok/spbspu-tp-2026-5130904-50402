@@ -1,9 +1,9 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
 
-#include "Polygon.hpp"
-#include <vector>
 #include <iosfwd>
+#include <vector>
+#include "Polygon.hpp"
 
 namespace sogdanov {
 

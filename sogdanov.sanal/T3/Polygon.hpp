@@ -1,8 +1,8 @@
 #ifndef POLYGON_HPP
 #define POLYGON_HPP
 
-#include <vector>
 #include <istream>
+#include <vector>
 
 namespace sogdanov {
 
