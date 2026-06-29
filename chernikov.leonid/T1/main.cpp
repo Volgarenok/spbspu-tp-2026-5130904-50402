@@ -35,10 +35,11 @@ void handle_show(std::istream &in, std::ostream &out, chernikov::NoteDB &db)
 {
   std::string name;
   in >> name;
-  if (!db.showNote(name, out))
+  if (!db.noteExists(name))
   {
     throw std::logic_error("note not found");
   }
+  db.showNote(name, out);
 }
 
 void handle_drop(std::istream &in, std::ostream &, chernikov::NoteDB &db)
