@@ -5,9 +5,9 @@
 #include <cmath>
 #include <string>
 
-double chernikov::key2_to_double(const std::pair<long long, unsigned long long> &p)
+double chernikov::key2_to_double(const std::pair< long long, unsigned long long > &p)
 {
-  return static_cast<double>(p.first) / static_cast<double>(p.second);
+  return static_cast< double >(p.first) / static_cast< double >(p.second);
 }
 
 bool chernikov::compare_data(const DataStruct &a, const DataStruct &b)
@@ -58,7 +58,7 @@ std::istream &chernikov::operator>>(std::istream &in, DataStruct &data)
   while (in.good())
   {
     std::string key;
-    char next_char = static_cast<char>(in.peek());
+    char next_char = static_cast< char >(in.peek());
 
     if (next_char == ':')
     {
@@ -94,8 +94,7 @@ std::istream &chernikov::operator>>(std::istream &in, DataStruct &data)
         return in;
       }
       has_key1 = true;
-    }
-    else if (key == "key2")
+    } else if (key == "key2")
     {
       if (has_key2)
       {
@@ -108,8 +107,7 @@ std::istream &chernikov::operator>>(std::istream &in, DataStruct &data)
         return in;
       }
       has_key2 = true;
-    }
-    else if (key == "key3")
+    } else if (key == "key3")
     {
       if (has_key3)
       {
@@ -122,19 +120,17 @@ std::istream &chernikov::operator>>(std::istream &in, DataStruct &data)
         return in;
       }
       has_key3 = true;
-    }
-    else
+    } else
     {
       in.setstate(std::ios::failbit);
       return in;
     }
 
-    next_char = static_cast<char>(in.peek());
+    next_char = static_cast< char >(in.peek());
     if (next_char == ':')
     {
       in >> c;
-    }
-    else
+    } else
     {
       in.setstate(std::ios::failbit);
       return in;

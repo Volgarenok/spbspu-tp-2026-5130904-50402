@@ -6,19 +6,18 @@
 #include <utility>
 #include <string>
 
-namespace chernikov
-{
+namespace chernikov {
 
   struct ComplexIO
   {
-    std::complex<double> &ref_;
-    explicit ComplexIO(std::complex<double> &ref);
+    std::complex< double > &ref_;
+    explicit ComplexIO(std::complex< double > &ref);
   };
 
   struct RationalIO
   {
-    std::pair<long long, unsigned long long> &ref_;
-    explicit RationalIO(std::pair<long long, unsigned long long> &ref);
+    std::pair< long long, unsigned long long > &ref_;
+    explicit RationalIO(std::pair< long long, unsigned long long > &ref);
   };
 
   struct StringIO

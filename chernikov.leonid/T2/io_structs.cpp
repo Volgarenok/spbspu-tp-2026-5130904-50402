@@ -4,15 +4,18 @@
 #include <cstdlib>
 #include <cstring>
 
-chernikov::ComplexIO::ComplexIO(std::complex<double> &ref) : ref_(ref)
+chernikov::ComplexIO::ComplexIO(std::complex< double > &ref):
+  ref_(ref)
 {
 }
 
-chernikov::RationalIO::RationalIO(std::pair<long long, unsigned long long> &ref) : ref_(ref)
+chernikov::RationalIO::RationalIO(std::pair< long long, unsigned long long > &ref):
+  ref_(ref)
 {
 }
 
-chernikov::StringIO::StringIO(std::string &ref) : ref_(ref)
+chernikov::StringIO::StringIO(std::string &ref):
+  ref_(ref)
 {
 }
 
@@ -61,7 +64,7 @@ std::istream &chernikov::operator>>(std::istream &in, ComplexIO &&value)
     return in;
   }
 
-  value.ref_ = std::complex<double>(real, imag);
+  value.ref_ = std::complex< double >(real, imag);
   return in;
 }
 
@@ -169,14 +172,12 @@ std::istream &chernikov::operator>>(std::istream &in, StringIO &&value)
       if (in.get(c))
       {
         value.ref_ += c;
-      }
-      else
+      } else
       {
         in.setstate(std::ios::failbit);
         return in;
       }
-    }
-    else
+    } else
     {
       value.ref_ += c;
     }
