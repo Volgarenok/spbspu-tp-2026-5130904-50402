@@ -46,7 +46,11 @@ void novikov::drop(std::istream &in, std::ostream &, mapNotes &db)
 {
   std::string name;
   in >> name;
-  db.erase(name);
+  auto it = db.find(name);
+  if (it == db.end()) {
+    throw std::logic_error("Note not exist");
+  }
+  db.erase(it);
 }
 
 void novikov::link(std::istream &in, std::ostream &, mapNotes &db)
