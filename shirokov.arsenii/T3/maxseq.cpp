@@ -3,7 +3,6 @@
 #include <iomanip>
 #include <iostream>
 #include <stdexcept>
-#include <string>
 #include <vector>
 #include "IOguard.hpp"
 #include "commands.hpp"
@@ -72,17 +71,16 @@ void shirokov::maxseq(std::istream& in, std::ostream& out, plg_t& polygons)
   Polygon target;
   if (!(in >> target))
   {
-    in.clear();
     throw std::logic_error("Invalid polygon format");
   }
 
-  std::string restOfLine;
-  if (std::getline(in, restOfLine))
+  char ch = 0;
+  while (in.peek() != '\n' && !in.eof())
   {
-    if (std::any_of(restOfLine.begin(), restOfLine.end(), isNotSpace))
+    in.get(ch);
+    if (isNotSpace(ch))
     {
-      in.clear();
-      in.putback('\n');
+      in.setstate(std::ios::failbit);
       throw std::logic_error("Trailing garbage after polygon");
     }
   }
