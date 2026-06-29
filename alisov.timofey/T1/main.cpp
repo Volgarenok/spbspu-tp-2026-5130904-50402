@@ -26,10 +26,6 @@ namespace alisov
   void refresh(std::istream &in, std::ostream &out, NotesMap &notes);
 }
 
-void alisov::halt(std::istream &, std::ostream &, NotesMap &)
-{}
-void alisov::mind(std::istream &, std::ostream &, NotesMap &)
-{}
 void alisov::expired(std::istream &, std::ostream &, NotesMap &)
 {}
 void alisov::refresh(std::istream &, std::ostream &, NotesMap &)
@@ -101,6 +97,46 @@ void alisov::link(std::istream &in, std::ostream &out, NotesMap &notes)
       }
       if (!exists) {
         it_from->second->links.push_back(it_to->second);
+      }
+    }
+  }
+}
+
+void alisov::mind(std::istream &in, std::ostream &out, NotesMap &notes)
+{
+  std::string name;
+  if (in >> name) {
+    auto it = notes.find(name);
+    if (it != notes.end()) {
+      for (const auto &w_ptr : it->second->links) {
+        if (auto s_ptr = w_ptr.lock()) {
+          for (const auto &pair : notes) {
+            if (pair.second == s_ptr) {
+              out << pair.first << "\n";
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+void alisov::halt(std::istream &in, std::ostream &out, NotesMap &notes)
+{
+  std::string from_name, to_name;
+  if (in >> from_name >> to_name) {
+    auto it_from = notes.find(from_name);
+    auto it_to = notes.find(to_name);
+    if (it_from != notes.end() && it_to != notes.end()) {
+      auto &links = it_from->second->links;
+      for (auto it = links.begin(); it != links.end(); ++it) {
+        if (auto s_ptr = it->lock()) {
+          if (s_ptr == it_to->second) {
+            links.erase(it);
+            break;
+          }
+        }
       }
     }
   }
