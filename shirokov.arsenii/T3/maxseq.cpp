@@ -67,9 +67,9 @@ namespace
   }
 }
 
-void shirokov::maxseq(std::istream& in, std::ostream& out, shirokov::plg_t& polygons)
+void shirokov::maxseq(std::istream& in, std::ostream& out, plg_t& polygons)
 {
-  shirokov::Polygon target;
+  Polygon target;
   if (!(in >> target))
   {
     in.clear();
@@ -87,7 +87,7 @@ void shirokov::maxseq(std::istream& in, std::ostream& out, shirokov::plg_t& poly
     }
   }
 
-  shirokov::IOguard g(out);
+  IOguard g(out);
   out << std::fixed << std::setprecision(1);
 
   size_t currentCount = 0;

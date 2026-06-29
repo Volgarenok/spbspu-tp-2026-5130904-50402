@@ -84,7 +84,7 @@ namespace
   }
 }
 
-void shirokov::min(std::istream& in, std::ostream& out, shirokov::plg_t& polygons)
+void shirokov::min(std::istream& in, std::ostream& out, plg_t& polygons)
 {
   std::string subCmd;
   if (!(in >> subCmd))
@@ -92,7 +92,7 @@ void shirokov::min(std::istream& in, std::ostream& out, shirokov::plg_t& polygon
     throw std::logic_error("Missing or unreachable subcommand argument");
   }
 
-  shirokov::IOguard g(out);
+  IOguard g(out);
   out << std::fixed << std::setprecision(1);
 
   if (subCmd == "AREA")

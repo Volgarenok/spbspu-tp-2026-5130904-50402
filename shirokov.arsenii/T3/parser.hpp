@@ -8,7 +8,7 @@ namespace shirokov
 {
   struct PolygonIO
   {
-    shirokov::Polygon& p;
+    Polygon& p;
   };
 
   struct Line

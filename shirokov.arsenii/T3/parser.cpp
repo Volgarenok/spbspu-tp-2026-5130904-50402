@@ -35,10 +35,10 @@ std::istream& shirokov::operator>>(std::istream& in, PolygonIO&& dest)
 
   in >> std::noskipws;
 
-  std::vector< shirokov::Point > temp_points;
+  std::vector< Point > temp_points;
   temp_points.reserve(count);
 
-  std::copy_n(std::istream_iterator< shirokov::Point >(in), count, std::back_inserter(temp_points));
+  std::copy_n(std::istream_iterator< Point >(in), count, std::back_inserter(temp_points));
 
   if (in)
   {
@@ -52,20 +52,20 @@ std::istream& shirokov::operator>>(std::istream& in, Polygon& p)
   return in >> PolygonIO{p};
 }
 
-std::istream& shirokov::operator>>(std::istream& in, shirokov::Line& dest)
+std::istream& shirokov::operator>>(std::istream& in, Line& dest)
 {
   std::getline(in, dest.lineText);
   return in;
 }
 
-shirokov::PolygonLineInserter::PolygonLineInserter(shirokov::plg_t& containerVec):
+shirokov::PolygonLineInserter::PolygonLineInserter(plg_t& containerVec):
   container(containerVec)
 {}
 
-shirokov::PolygonLineInserter& shirokov::PolygonLineInserter::operator=(const shirokov::Line& line)
+shirokov::PolygonLineInserter& shirokov::PolygonLineInserter::operator=(const Line& line)
 {
   std::istringstream iss(line.lineText);
-  shirokov::Polygon poly;
+  Polygon poly;
   if (iss >> poly)
   {
     char ch = 0;
@@ -94,7 +94,7 @@ shirokov::PolygonLineInserter& shirokov::PolygonLineInserter::operator++(int)
 
 shirokov::plg_t shirokov::parse(std::istream& in)
 {
-  shirokov::plg_t data;
+  plg_t data;
   std::copy(std::istream_iterator< Line >(in), std::istream_iterator< Line >(), PolygonLineInserter{data});
   return data;
 }

@@ -64,7 +64,7 @@ namespace
   }
 }
 
-void shirokov::count(std::istream& in, std::ostream& out, shirokov::plg_t& polygons)
+void shirokov::count(std::istream& in, std::ostream& out, plg_t& polygons)
 {
   std::string subCmd;
   if (!(in >> subCmd))
@@ -72,7 +72,7 @@ void shirokov::count(std::istream& in, std::ostream& out, shirokov::plg_t& polyg
     throw std::logic_error("Missing or unreachable subcommand argument");
   }
 
-  shirokov::IOguard g(out);
+  IOguard g(out);
   out << std::fixed << std::setprecision(1);
 
   if (subCmd == "EVEN")

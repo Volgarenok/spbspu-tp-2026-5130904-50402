@@ -34,9 +34,9 @@ namespace
   }
 }
 
-void shirokov::rects(std::istream&, std::ostream& out, shirokov::plg_t& polygons)
+void shirokov::rects(std::istream&, std::ostream& out, plg_t& polygons)
 {
-  shirokov::IOguard g(out);
+  IOguard g(out);
   out << std::fixed << std::setprecision(1);
 
   out << std::count_if(polygons.begin(), polygons.end(), isRectangle) << "\n";

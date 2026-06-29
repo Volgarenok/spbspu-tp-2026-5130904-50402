@@ -7,14 +7,14 @@
 
 namespace shirokov
 {
-  using plg_t = std::vector< shirokov::Polygon >;
+  using plg_t = std::vector< Polygon >;
 
-  void area(std::istream&, std::ostream&, shirokov::plg_t&);
-  void max(std::istream&, std::ostream&, shirokov::plg_t&);
-  void min(std::istream&, std::ostream&, shirokov::plg_t&);
-  void count(std::istream&, std::ostream&, shirokov::plg_t&);
-  void rects(std::istream&, std::ostream&, shirokov::plg_t&);
-  void maxseq(std::istream&, std::ostream&, shirokov::plg_t&);
+  void area(std::istream&, std::ostream&, plg_t&);
+  void max(std::istream&, std::ostream&, plg_t&);
+  void min(std::istream&, std::ostream&, plg_t&);
+  void count(std::istream&, std::ostream&, plg_t&);
+  void rects(std::istream&, std::ostream&, plg_t&);
+  void maxseq(std::istream&, std::ostream&, plg_t&);
 }
 
 #endif
