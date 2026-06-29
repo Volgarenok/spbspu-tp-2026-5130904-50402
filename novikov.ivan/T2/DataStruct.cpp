@@ -6,38 +6,32 @@
 
 std::istream& novikov::operator>>(std::istream& in, DataStruct& dest)
 {
-  IOGuard g(in);
-  while (true)
+  std::istream::sentry s(in);
+  if (!s)
   {
-    std::istream::sentry s(in);
-    if (!s)
-    {
-      return in;
-    }
-    in >> std::noskipws;
-
-    DataStruct input;
-    std::vector< DataType > used;
-    const std::vector< std::string > possibleLabels{"key1", "key2", "key3"};
-
-    in >> sep{'('} >> sep{':'};
-    in >> label{used, possibleLabels} >> key{used, input};
-    in >> sep{':'};
-    in >> label{used, possibleLabels} >> key{used, input};
-    in >> sep{':'};
-    in >> label{used, possibleLabels} >> key{used, input};
-    in >> sep{':'} >> sep{')'};
-
-    if (in)
-    {
-      dest = input;
-      return in;
-    }
-
-    in.clear();
-    auto toIgnore = std::numeric_limits< std::streamsize >::max();
-    in.ignore(toIgnore, '\n');
+    return in;
   }
+  IOGuard g(in);
+  in >> std::noskipws;
+
+  DataStruct input;
+  std::vector< DataType > used;
+  const std::vector< std::string > possibleLabels{"key1", "key2", "key3"};
+
+  in >> sep{'('} >> sep{':'};
+  in >> label{used, possibleLabels} >> key{used, input};
+  in >> sep{':'};
+  in >> label{used, possibleLabels} >> key{used, input};
+  in >> sep{':'};
+  in >> label{used, possibleLabels} >> key{used, input};
+  in >> sep{':'} >> sep{')'};
+
+  if (in)
+  {
+    dest = input;
+  }
+
+  return in;
 }
 
 std::istream& novikov::operator>>(std::istream& in, key&& dest)
@@ -53,7 +47,9 @@ std::istream& novikov::operator>>(std::istream& in, key&& dest)
 
   int count = 0;
   for (auto t : dest.used) {
-    if (t == currentType) count++;
+    if (t == currentType) {
+      ++count;
+    }
   }
   if (count > 1 || currentType == Unknown)
   {
@@ -108,7 +104,6 @@ std::istream& novikov::operator>>(std::istream& in, sep&& dest)
   {
     if (c != dest.exp)
     {
-      in.putback(c);
       in.setstate(std::ios::failbit);
     }
   }
@@ -127,7 +122,6 @@ std::istream& novikov::operator>>(std::istream& in, uncase_sep&& dest)
   {
     if (std::toupper(static_cast< unsigned char >(c)) != std::toupper(static_cast< unsigned char >(dest.exp)))
     {
-      in.putback(c);
       in.setstate(std::ios::failbit);
     }
   }
@@ -142,12 +136,22 @@ std::istream& novikov::operator>>(std::istream& in, label&& dest)
     return in;
   }
 
-  std::string data;
-  if (!std::getline(in, data, ' '))
+  std::string data = "";
+  char c = 0;
+
+  for (size_t i = 0; i < 4; ++i)
   {
-    in.setstate(std::ios::failbit);
-    return in;
+    if (in.get(c))
+    {
+      data += c;
+    }
+    else
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
   }
+
   DataType inputType = DataType::Unknown;
 
   if (data == dest.possibleLabels[0])
