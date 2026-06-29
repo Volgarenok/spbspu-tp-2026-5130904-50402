@@ -21,7 +21,8 @@ void muh::note(std::istream& in, std::ostream&, NoteMap_t& map)
     throw std::logic_error("Note already exist");
   }
   std::shared_ptr< Note > note = std::make_shared< Note >();
-  map.insert({note->name, note});
+  note->name = str;
+  map.insert({str, note});
 }
 
 void muh::line(std::istream& in, std::ostream&, NoteMap_t& map)
