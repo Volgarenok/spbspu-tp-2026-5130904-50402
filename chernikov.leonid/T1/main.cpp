@@ -96,7 +96,6 @@ void handle_expired(std::istream &in, std::ostream &out, chernikov::NoteDB &db)
     {
       throw std::logic_error("note not found");
     }
-    out << '\n';
   }
   out << db.expiredCount() << '\n';
 }
