@@ -89,16 +89,7 @@ std::istream &lavrentev::operator>>(std::istream &is, DataStruct &obj)
         return is;
       }
       hasKey3 = true;
-
-      char quote = 0;
-      is >> quote;
-      if (quote != '"')
-      {
-        is.setstate(std::ios::failbit);
-        return is;
-      }
-
-      std::getline(is, obj.key3, '"');
+      is >> obj.key3;
     }
     else
     {
@@ -123,7 +114,7 @@ std::istream &lavrentev::operator>>(std::istream &is, DataStruct &obj)
   return is;
 }
 
-std::ostream &lavrentev::operator<<(std::ostream &os, Delimiter_t del)
+std::ostream &lavrentev::operator<<(std::ostream &os, const Delimiter_t &del)
 {
   std::ostream::sentry sentry(os);
   if (!sentry)
@@ -135,7 +126,7 @@ std::ostream &lavrentev::operator<<(std::ostream &os, Delimiter_t del)
   return os;
 }
 
-std::ostream &lavrentev::operator<<(std::ostream &os, DataStruct obj)
+std::ostream &lavrentev::operator<<(std::ostream &os, const DataStruct &obj)
 {
   std::ostream::sentry sentry(os);
   if (!sentry)
@@ -145,12 +136,13 @@ std::ostream &lavrentev::operator<<(std::ostream &os, DataStruct obj)
 
   using d_t = Delimiter_t;
   char last = 0;
-  d_t dlmInBracket{'(', last};
-  d_t dlmColon{':', last};
-  d_t dlmOutBracket{')', last};
-  d_t dlmQMark{'"', last};
-  os << dlmInBracket << dlmColon << obj.key1 << dlmColon << obj.key2 << dlmColon << "key3 " << dlmQMark
-     << obj.key3 << dlmQMark << dlmColon << dlmOutBracket;
+
+  d_t openBracket{'(', last};
+  d_t colon{':', last};
+  d_t closeBracket{')', last};
+
+  os << openBracket << colon << obj.key1 << colon << obj.key2
+     << colon << obj.key3 << colon << closeBracket;
   return os;
 }
 
@@ -184,13 +176,11 @@ std::istream &lavrentev::operator>>(std::istream &is, SllLit &key1)
   return is;
 }
 
-std::ostream &lavrentev::operator<<(std::ostream &os, SllLit key1)
+std::ostream &lavrentev::operator<<(std::ostream &os, const SllLit &key1)
 {
   std::ostream::sentry sentry(os);
   if (!sentry)
-  {
     return os;
-  }
 
   os << "key1 " << key1.data << key1.pf;
   return os;
@@ -217,16 +207,14 @@ std::istream &lavrentev::operator>>(std::istream &is, UllOct &key2)
   return is;
 }
 
-std::ostream &lavrentev::operator<<(std::ostream &os, UllOct key2)
+std::ostream &lavrentev::operator<<(std::ostream &os, const UllOct &key2)
 {
   std::ostream::sentry sentry(os);
   if (!sentry)
-  {
     return os;
-  }
 
   IOGuard guard(os);
-  os << "key2 0" << std::oct << key2.data << ":";
+  os << "key2 0" << std::oct << key2.data;
   return os;
 }
 
@@ -258,61 +246,29 @@ bool lavrentev::operator==(const UllOct& lobj, const UllOct& robj)
   return lobj.data == robj.data;
 }
 
-void lavrentev::process(std::istream &is, lavrentev::DataStruct &d)
+std::istream &lavrentev::operator>>(std::istream &is, StringLit &key3)
 {
-  if (!is)
-  {
-    return;
-  }
+  char quote = 0;
+  is >> quote;
 
-  if (is.peek() == 'k')
-  {
-    std::streampos pos = is.tellg();
-
-    SllLit temp1;
-    if (is >> temp1)
-    {
-      d.key1 = temp1;
-      return;
-    }
-
-    is.clear();
-    is.seekg(pos);
-
-    UllOct temp2;
-    if (is >> temp2)
-    {
-      d.key2 = temp2;
-      return;
-    }
-
-    is.clear();
-    is.seekg(pos);
-  }
-
-  std::string key;
-  is >> key;
-  if (key == "key3")
-  {
-    char quote = 0;
-    is >> quote;
-    if (quote != '"')
-    {
-      is.setstate(std::ios::failbit);
-      return;
-    }
-
-    std::getline(is, d.key3, '"');
-
-    char colon = 0;
-    is >> colon;
-    if (colon != ':')
-    {
-      is.setstate(std::ios::failbit);
-    }
-  }
-  else
+  if (!is || quote != '"')
   {
     is.setstate(std::ios::failbit);
+    return is;
   }
+
+  std::getline(is, key3.data, '"');
+
+  return is;
+}
+
+std::ostream &lavrentev::operator<<(std::ostream &os, const StringLit &key3)
+{
+  os << '"' << key3.data << '"';
+  return os;
+}
+
+bool lavrentev::operator<(const StringLit& lobj, const StringLit& robj)
+{
+  return lobj.data < robj.data ? true : false;
 }
