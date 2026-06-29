@@ -198,27 +198,26 @@ std::istream &lavrentev::operator>>(std::istream &is, UllOct &key2)
   {
     return is;
   }
-  std::string key;
-  is >> key;
-  if (key != "key2")
+
+  IOGuard guard(is);
+
+  unsigned long long value = 0;
+  is >> std::oct >> value;
+  if (!is)
+  {
+    return is;
+  }
+
+  char colon = 0;
+  is >> colon;
+
+  if (colon != ':')
   {
     is.setstate(std::ios_base::failbit);
     return is;
   }
-  IOGuard guard(is);
-  unsigned long long value;
-  is >> std::oct >> value;
 
-  char postfix = 0;
-  is >> postfix;
-  if (postfix == ':')
-  {
-    key2 = UllOct{value};
-  }
-  else
-  {
-    is.setstate(std::ios_base::failbit);
-  }
+  key2 = UllOct{value};
   return is;
 }
 
