@@ -8,7 +8,7 @@ void novikov::note(std::istream &in, std::ostream &, mapNotes &db)
 {
   std::string name;
   in >> name;
-  auto new_note = std::make_shared< Note >(name);
+  std::shared_ptr< Note > new_note = std::make_shared< Note >(name);
   auto result = db.insert({name, new_note});
   if (!result.second) {
     throw std::logic_error("Note already exists");
@@ -21,7 +21,7 @@ void novikov::line(std::istream &in, std::ostream &, mapNotes &db)
   in >> name;
   std::string text;
   in >> std::quoted(text);
-  auto &note = db.at(name);
+  std::shared_ptr< Note > &note = db.at(name);
   note->lines.push_back(text);
 }
 
@@ -29,9 +29,9 @@ void novikov::show(std::istream &in, std::ostream &out, mapNotes &db)
 {
   std::string name;
   in >> name;
-  auto &note = db.at(name);
+  std::shared_ptr< Note > &note = db.at(name);
 
-  const auto &lines = note->lines;
+  const std::vector< std::string > &lines = note->lines;
   if (lines.empty()) {
     return;
   }
@@ -46,11 +46,6 @@ void novikov::drop(std::istream &in, std::ostream &, mapNotes &db)
 {
   std::string name;
   in >> name;
-  try {
-    db.at(name);
-  } catch (const std::out_of_range &) {
-    throw std::logic_error("Note not exist");
-  }
   db.erase(name);
 }
 
@@ -60,8 +55,8 @@ void novikov::link(std::istream &in, std::ostream &, mapNotes &db)
   std::string note_to;
   in >> note_from >> note_to;
 
-  auto &note1 = db.at(note_from);
-  auto &note2 = db.at(note_to);
+  std::shared_ptr< Note > &note1 = db.at(note_from);
+  std::shared_ptr< Note > &note2 = db.at(note_to);
 
   for (size_t i = 0; i < note1->links.size(); ++i) {
     if (note1->links[i].lock() == note2) {
@@ -77,8 +72,8 @@ void novikov::halt(std::istream &in, std::ostream &, mapNotes &db)
   std::string note_to;
   in >> note_from >> note_to;
 
-  auto &note1 = db.at(note_from);
-  auto &note2 = db.at(note_to);
+  std::shared_ptr< Note > &note1 = db.at(note_from);
+  std::shared_ptr< Note > &note2 = db.at(note_to);
 
   for (size_t i = 0; i < note1->links.size(); ++i) {
     if (note1->links[i].lock() == note2) {
@@ -93,11 +88,11 @@ void novikov::mind(std::istream &in, std::ostream &out, mapNotes &db)
 {
   std::string name;
   in >> name;
-  auto &note = db.at(name);
+  std::shared_ptr< Note > &note = db.at(name);
 
   bool printed = false;
   for (size_t i = 0; i < note->links.size(); ++i) {
-    auto link = note->links[i].lock();
+    std::shared_ptr< Note > link = note->links[i].lock();
     if (link) {
       if (printed) {
         out << "\n";
@@ -112,11 +107,11 @@ void novikov::expired(std::istream &in, std::ostream &out, mapNotes &db)
 {
   std::string name;
   in >> name;
-  auto &note = db.at(name);
+  std::shared_ptr< Note > &note = db.at(name);
 
   size_t res = 0;
   for (size_t i = 0; i < note->links.size(); ++i) {
-    auto link = note->links[i].lock();
+    std::shared_ptr< Note > link = note->links[i].lock();
     if (!link) {
       ++res;
     }
@@ -128,11 +123,11 @@ void novikov::refresh(std::istream &in, std::ostream &, mapNotes &db)
 {
   std::string name;
   in >> name;
-  auto &note = db.at(name);
+  std::shared_ptr< Note > &note = db.at(name);
 
   size_t i = 0;
   while (i < note->links.size()) {
-    auto link = note->links[i].lock();
+    std::shared_ptr< Note > link = note->links[i].lock();
     if (!link) {
       note->links.erase(note->links.begin() + i);
     } else {
