@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include "IOguard.hpp"
 #include "commands.hpp"
 #include "parser.hpp"
 

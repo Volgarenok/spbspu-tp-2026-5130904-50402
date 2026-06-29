@@ -3,45 +3,12 @@
 #include <iterator>
 #include <sstream>
 #include <vector>
-
-shirokov::IOguard::IOguard(std::basic_ios< char >& s):
-  s_(s),
-  width_(s.width()),
-  precision_(s.precision()),
-  fmt_(s.flags()),
-  fill_(s.fill())
-{}
-
-shirokov::IOguard::~IOguard()
-{
-  s_.width(width_);
-  s_.fill(fill_);
-  s_.precision(precision_);
-  s_.flags(fmt_);
-}
+#include "DelimiterIO.hpp"
+#include "IOguard.hpp"
 
 std::istream& shirokov::operator>>(std::istream& in, Point& pt)
 {
   in >> DelimiterIO{' '} >> DelimiterIO{'('} >> pt.x >> DelimiterIO{';'} >> pt.y >> DelimiterIO{')'};
-  return in;
-}
-
-std::istream& shirokov::operator>>(std::istream& in, DelimiterIO&& dest)
-{
-  std::istream::sentry s(in);
-  if (!s)
-  {
-    return in;
-  }
-  char c = 0;
-  if (in.get(c))
-  {
-    if (c != dest.exp)
-    {
-      in.putback(c);
-      in.setstate(std::ios::failbit);
-    }
-  }
   return in;
 }
 
