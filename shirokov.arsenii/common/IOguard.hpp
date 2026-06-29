@@ -9,6 +9,8 @@ namespace shirokov
   public:
     explicit IOguard(std::basic_ios< char >&);
     ~IOguard();
+    IOguard(IOguard&&) = delete;
+    IOguard(const IOguard&) = delete;
 
   private:
     std::basic_ios< char >& s_;
