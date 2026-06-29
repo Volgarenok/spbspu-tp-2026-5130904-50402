@@ -57,14 +57,14 @@ void lavrentev::countEven(std::istream &, const std::vector< Polygon > &plgs)
 {
   std::vector< Polygon > evenPlgs;
   std::copy_if(plgs.begin(), plgs.end(), std::back_inserter(evenPlgs), isEven);
-  std::cout << evenPlgs.size() << "\n";
+  std::cout << evenPlgs.size();
 }
 
 void lavrentev::countOdd(std::istream &, const std::vector< Polygon > &plgs)
 {
   std::vector< Polygon > oddPlgs;
   std::copy_if(plgs.begin(), plgs.end(), std::back_inserter(oddPlgs), isOdd);
-  std::cout << oddPlgs.size() << "\n";
+  std::cout << oddPlgs.size();
 }
 
 void lavrentev::countVrtxs(const std::vector< Polygon > &plgs, size_t n)
@@ -76,5 +76,5 @@ void lavrentev::countVrtxs(const std::vector< Polygon > &plgs, size_t n)
     std::back_inserter(needPlgs),
     std::bind(isAmount, _1, n)
   );
-  std::cout << needPlgs.size() << "\n";
+  std::cout << needPlgs.size();
 }

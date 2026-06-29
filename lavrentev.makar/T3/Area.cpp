@@ -56,7 +56,7 @@ void lavrentev::areaEven(std::istream &, const std::vector<Polygon> &plgs)
     std::bind(&lavrentev::Polygon::getArea, _1)
   );
   float total = std::accumulate(areas.begin(), areas.end(), 0.0f);
-  std::cout << std::fixed << std::setprecision(1) << total << "\n";
+  std::cout << std::fixed << std::setprecision(1) << total;
 }
 
 void lavrentev::areaOdd(std::istream &, const std::vector< Polygon > &plgs)
@@ -72,7 +72,7 @@ void lavrentev::areaOdd(std::istream &, const std::vector< Polygon > &plgs)
     std::bind(&lavrentev::Polygon::getArea, _1)
   );
   float total = std::accumulate(areas.begin(), areas.end(), 0.0f);
-  std::cout << std::fixed << std::setprecision(1) << total << "\n";
+  std::cout << std::fixed << std::setprecision(1) << total;
 }
 
 void lavrentev::areaMean(std::istream &, const std::vector< Polygon > &plgs)
@@ -90,7 +90,7 @@ void lavrentev::areaMean(std::istream &, const std::vector< Polygon > &plgs)
     std::bind(&lavrentev::Polygon::getArea, _1)
   );
   float total = std::accumulate(areas.begin(), areas.end(), 0.0f);
-  std::cout << std::fixed << std::setprecision(1) << total / areas.size() << "\n";
+  std::cout << std::fixed << std::setprecision(1) << total / areas.size();
 }
 
 void lavrentev::areaVrtxs(const std::vector<Polygon> &plgs, size_t n)
@@ -105,7 +105,7 @@ void lavrentev::areaVrtxs(const std::vector<Polygon> &plgs, size_t n)
   );
   if (needPlgs.empty())
   {
-    std::cout << std::fixed << std::setprecision(1) << 0.0f << "\n";
+    std::cout << std::fixed << std::setprecision(1) << 0.0f;
     return;
   }
   std::vector< float > areas(needPlgs.size());
@@ -116,5 +116,5 @@ void lavrentev::areaVrtxs(const std::vector<Polygon> &plgs, size_t n)
     std::bind(&lavrentev::Polygon::getArea, _1)
   );
   float total = std::accumulate(areas.begin(), areas.end(), 0.0f);
-  std::cout << std::fixed << std::setprecision(1) << total << "\n";
+  std::cout << std::fixed << std::setprecision(1) << total;
 }

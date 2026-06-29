@@ -48,6 +48,7 @@ int main(int argc, char *argv[])
         throw std::logic_error("Unknown command");
       }
       commands[cmd](std::cin, plgs);
+      std::cout << "\n";
     }
     catch (...)
     {

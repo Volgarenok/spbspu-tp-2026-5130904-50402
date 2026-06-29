@@ -43,7 +43,7 @@ void lavrentev::maxArea(std::istream &, const std::vector< Polygon > &plgs)
   );
   if (mp != plgs.end())
   {
-    std::cout << std::fixed << std::setprecision(1) << (*mp).getArea() << "\n";
+    std::cout << std::fixed << std::setprecision(1) << (*mp).getArea();
   }
 }
 
@@ -64,7 +64,7 @@ void lavrentev::maxVrtxs(std::istream &, const std::vector< Polygon > &plgs)
   );
   if (mp != plgs.end())
   {
-    std::cout << (*mp).getSize() << "\n";
+    std::cout << (*mp).getSize();
   }
 }
 
@@ -103,7 +103,7 @@ void lavrentev::minArea(std::istream &, const std::vector< Polygon > &plgs)
   );
   if (mp != plgs.end())
   {
-    std::cout << std::fixed << std::setprecision(1) << (*mp).getArea() << "\n";
+    std::cout << std::fixed << std::setprecision(1) << (*mp).getArea();
   }
 }
 
@@ -124,6 +124,6 @@ void lavrentev::minVrtxs(std::istream &, const std::vector< Polygon > &plgs)
   );
   if (mp != plgs.end())
   {
-    std::cout << (*mp).getSize() << "\n";
+    std::cout << (*mp).getSize();
   }
 }
