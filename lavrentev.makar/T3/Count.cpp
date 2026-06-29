@@ -9,9 +9,9 @@
 
 using namespace std::placeholders;
 
-void lavrentev::count(std::istream &is, const std::vector<Polygon> &plgs)
+void lavrentev::count(std::istream &is, const std::vector< Polygon > &plgs)
 {
-  std::map< std::string, void (*)(std::istream &, const std::vector<Polygon> &) > cmds;
+  std::map< std::string, void (*)(std::istream &, const std::vector< Polygon > &) > cmds;
   cmds["EVEN"] = countEven;
   cmds["ODD"] = countOdd;
   std::string param;
@@ -36,7 +36,7 @@ void lavrentev::count(std::istream &is, const std::vector<Polygon> &plgs)
     unsigned long long result = std::stoull(param, &pos);
     if (pos == param.length())
     {
-      size_t n = static_cast<size_t>(result);
+      size_t n = static_cast< size_t >(result);
       if (n < 3)
       {
         throw std::invalid_argument("Polygon has 3 or more points");
@@ -53,21 +53,21 @@ void lavrentev::count(std::istream &is, const std::vector<Polygon> &plgs)
   }
 }
 
-void lavrentev::countEven(std::istream &, const std::vector<Polygon> &plgs)
+void lavrentev::countEven(std::istream &, const std::vector< Polygon > &plgs)
 {
   std::vector< Polygon > evenPlgs;
   std::copy_if(plgs.begin(), plgs.end(), std::back_inserter(evenPlgs), isEven);
   std::cout << evenPlgs.size() << "\n";
 }
 
-void lavrentev::countOdd(std::istream &, const std::vector<Polygon> &plgs)
+void lavrentev::countOdd(std::istream &, const std::vector< Polygon > &plgs)
 {
   std::vector< Polygon > oddPlgs;
   std::copy_if(plgs.begin(), plgs.end(), std::back_inserter(oddPlgs), isOdd);
   std::cout << oddPlgs.size() << "\n";
 }
 
-void lavrentev::countVrtxs(const std::vector<Polygon> &plgs, size_t n)
+void lavrentev::countVrtxs(const std::vector< Polygon > &plgs, size_t n)
 {
   std::vector< Polygon > needPlgs;
   std::copy_if(

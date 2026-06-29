@@ -8,9 +8,9 @@
 
 using namespace std::placeholders;
 
-void lavrentev::max(std::istream &is, const std::vector<Polygon> &plgs)
+void lavrentev::max(std::istream &is, const std::vector< Polygon > &plgs)
 {
-  std::map< std::string, void (*)(std::istream &, const std::vector<Polygon> &) > cmds;
+  std::map< std::string, void (*)(std::istream &, const std::vector< Polygon > &) > cmds;
   cmds["AREA"] = maxArea;
   cmds["VERTEXES"] = maxVrtxs;
   std::string param;
@@ -26,7 +26,7 @@ void lavrentev::max(std::istream &is, const std::vector<Polygon> &plgs)
   }
 }
 
-void lavrentev::maxArea(std::istream &, const std::vector<Polygon> &plgs)
+void lavrentev::maxArea(std::istream &, const std::vector< Polygon > &plgs)
 {
   if (plgs.empty())
   {
@@ -36,7 +36,7 @@ void lavrentev::maxArea(std::istream &, const std::vector<Polygon> &plgs)
     plgs.begin(),
     plgs.end(),
     std::bind(
-      std::less<float>(),
+      std::less< float >(),
       std::bind(&lavrentev::Polygon::getArea, _1),
       std::bind(&lavrentev::Polygon::getArea, _2)
     )
@@ -47,7 +47,7 @@ void lavrentev::maxArea(std::istream &, const std::vector<Polygon> &plgs)
   }
 }
 
-void lavrentev::maxVrtxs(std::istream &, const std::vector<Polygon> &plgs)
+void lavrentev::maxVrtxs(std::istream &, const std::vector< Polygon > &plgs)
 {
   if (plgs.empty())
   {
@@ -57,7 +57,7 @@ void lavrentev::maxVrtxs(std::istream &, const std::vector<Polygon> &plgs)
     plgs.begin(),
     plgs.end(),
     std::bind(
-      std::less<float>(),
+      std::less< float >(),
       std::bind(&lavrentev::Polygon::getSize, _1),
       std::bind(&lavrentev::Polygon::getSize, _2)
     )
@@ -68,9 +68,9 @@ void lavrentev::maxVrtxs(std::istream &, const std::vector<Polygon> &plgs)
   }
 }
 
-void lavrentev::min(std::istream &is, const std::vector<Polygon> &plgs)
+void lavrentev::min(std::istream &is, const std::vector< Polygon > &plgs)
 {
-  std::map< std::string, void (*)(std::istream &, const std::vector<Polygon> &) > cmds;
+  std::map< std::string, void (*)(std::istream &, const std::vector< Polygon > &) > cmds;
   cmds["AREA"] = minArea;
   cmds["VERTEXES"] = minVrtxs;
   std::string param;
@@ -86,7 +86,7 @@ void lavrentev::min(std::istream &is, const std::vector<Polygon> &plgs)
   }
 }
 
-void lavrentev::minArea(std::istream &, const std::vector<Polygon> &plgs)
+void lavrentev::minArea(std::istream &, const std::vector< Polygon > &plgs)
 {
   if (plgs.empty())
   {
@@ -96,7 +96,7 @@ void lavrentev::minArea(std::istream &, const std::vector<Polygon> &plgs)
     plgs.begin(),
     plgs.end(),
     std::bind(
-      std::less<float>(),
+      std::less< float >(),
       std::bind(&lavrentev::Polygon::getArea, _1),
       std::bind(&lavrentev::Polygon::getArea, _2)
     )
@@ -107,7 +107,7 @@ void lavrentev::minArea(std::istream &, const std::vector<Polygon> &plgs)
   }
 }
 
-void lavrentev::minVrtxs(std::istream &, const std::vector<Polygon> &plgs)
+void lavrentev::minVrtxs(std::istream &, const std::vector< Polygon > &plgs)
 {
   if (plgs.empty())
   {
@@ -117,7 +117,7 @@ void lavrentev::minVrtxs(std::istream &, const std::vector<Polygon> &plgs)
     plgs.begin(),
     plgs.end(),
     std::bind(
-      std::less<float>(),
+      std::less< float >(),
       std::bind(&lavrentev::Polygon::getSize, _1),
       std::bind(&lavrentev::Polygon::getSize, _2)
     )

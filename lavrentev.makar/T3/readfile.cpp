@@ -5,7 +5,7 @@
 #include "readfile.hpp"
 #include "Figures.hpp"
 
-void lavrentev::readfile(std::string name, std::vector<Polygon>& plgs)
+void lavrentev::readfile(std::string name, std::vector< Polygon >& plgs)
 {
   std::ifstream file(name);
   if (!file)
@@ -13,9 +13,9 @@ void lavrentev::readfile(std::string name, std::vector<Polygon>& plgs)
     throw std::runtime_error("File open error");
   }
 
-  std::vector<Polygon> temp{
-    std::istream_iterator<Polygon>(file),
-    std::istream_iterator<Polygon>()
+  std::vector< Polygon > temp{
+    std::istream_iterator< Polygon >(file),
+    std::istream_iterator< Polygon >()
   };
 
   std::remove_copy_if(

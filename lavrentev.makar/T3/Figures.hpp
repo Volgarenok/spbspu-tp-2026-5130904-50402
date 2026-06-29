@@ -16,17 +16,17 @@ namespace lavrentev
   struct Triangle
   {
     static const size_t size = 3;
-    std::vector<Point> points = std::vector<Point>(size);
+    std::vector< Point > points = std::vector< Point >(size);
 
-    Triangle() = default;
-    Triangle(Point a, Point b, Point c) : points{a, b, c} {}
+    Triangle();
+    Triangle(Point a, Point b, Point c);
 
     float getArea() const;
   };
 
   struct Polygon
   {
-    std::vector<Point> points;
+    std::vector< Point > points;
     float getArea() const;
     size_t getSize() const;
     bool isEmpty() const;
@@ -34,7 +34,7 @@ namespace lavrentev
     bool operator==(const Polygon &p) const;
 
   private:
-    static Triangle helpArea(const std::vector<Point> &points, size_t &index);
+    static Triangle helpArea(const std::vector< Point > &points, size_t &index);
   };
 
   struct Delimiter_t
@@ -62,13 +62,10 @@ namespace lavrentev
   std::istream &operator>>(std::istream &is, Point &p);
   std::istream &operator>>(std::istream &is, Delimiter_t &del);
 
-  void maxseq(std::istream &is, const std::vector<Polygon> &plgs);
-  void intersections(std::istream &is, const std::vector<Polygon> &plgs);
-
   bool isEven(Polygon p);
   bool isOdd(Polygon p);
   bool isAmount(Polygon p, size_t n);
-  bool helpMS(int n, const std::vector<Polygon> &plgs, const Polygon &p);
+  bool helpMS(int n, const std::vector< Polygon > &plgs, const Polygon &p);
   char check(std::istream &is, char expected);
   Point readPoint(std::istream* is);
 }
