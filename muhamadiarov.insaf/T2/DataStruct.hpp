@@ -5,6 +5,7 @@
 #include <utility>
 #include <iomanip>
 #include <ioguard.hpp>
+#include <delimiterio.hpp>
 
 namespace muhamadiarov
 {
@@ -32,11 +33,6 @@ namespace muhamadiarov
     std::string& data;
   };
 
-  struct DelimiterIO
-  {
-    char exp;
-  };
-
   enum class Key
   {
     KEY1,
@@ -52,7 +48,6 @@ namespace muhamadiarov
   std::istream& operator>>(std::istream& in, DoubleIO&& d);
   std::istream& operator>>(std::istream& in, RatIO&& r);
   std::istream& operator>>(std::istream& in, StringIO&& s);
-  std::istream& operator>>(std::istream& in, DelimiterIO&& c);
   std::istream& operator>>(std::istream& in, KeyIO&& k);
 
   std::istream& operator>>(std::istream& in, DataStruct& data);
