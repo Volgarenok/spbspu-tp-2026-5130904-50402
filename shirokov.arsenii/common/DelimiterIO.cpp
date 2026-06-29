@@ -14,7 +14,6 @@ std::istream& shirokov::operator>>(std::istream& in, sep&& dest)
   {
     if (c != dest.exp)
     {
-      in.putback(c);
       in.setstate(std::ios::failbit);
     }
   }
