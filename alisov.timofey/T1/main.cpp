@@ -26,8 +26,6 @@ namespace alisov
   void refresh(std::istream &in, std::ostream &out, NotesMap &notes);
 }
 
-void alisov::show(std::istream &, std::ostream &, NotesMap &)
-{}
 void alisov::drop(std::istream &, std::ostream &, NotesMap &)
 {}
 void alisov::link(std::istream &, std::ostream &, NotesMap &)
@@ -60,6 +58,19 @@ void alisov::line(std::istream &in, std::ostream &out, NotesMap &notes)
       auto it = notes.find(name);
       if (it != notes.end()) {
         it->second->lines.push_back(text);
+      }
+    }
+  }
+}
+
+void alisov::show(std::istream &in, std::ostream &out, NotesMap &notes)
+{
+  std::string name;
+  if (in >> name) {
+    auto it = notes.find(name);
+    if (it != notes.end()) {
+      for (const auto &str : it->second->lines) {
+        out << str << "\n";
       }
     }
   }
