@@ -12,14 +12,14 @@ namespace chernikov {
     explicit StringIO(std::string &ref);
   };
 
-  struct DoubleIO
+  struct ValueIO
   {
     double &ref_;
-    explicit DoubleIO(double &ref);
+    explicit ValueIO(double &ref);
   };
 
   std::istream &operator>>(std::istream &in, StringIO &&value);
-  std::istream &operator>>(std::istream &in, DoubleIO &&value);
+  std::istream &operator>>(std::istream &in, ValueIO &&value);
 
 }
 

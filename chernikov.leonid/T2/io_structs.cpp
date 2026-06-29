@@ -2,7 +2,6 @@
 #include <istream>
 #include <string>
 #include <cstdlib>
-#include <cmath>
 #include <cctype>
 
 chernikov::StringIO::StringIO(std::string &ref):
@@ -10,7 +9,7 @@ chernikov::StringIO::StringIO(std::string &ref):
 {
 }
 
-chernikov::DoubleIO::DoubleIO(double &ref):
+chernikov::ValueIO::ValueIO(double &ref):
   ref_(ref)
 {
 }
@@ -57,7 +56,7 @@ std::istream &chernikov::operator>>(std::istream &in, StringIO &&value)
   return in;
 }
 
-std::istream &chernikov::operator>>(std::istream &in, DoubleIO &&value)
+std::istream &chernikov::operator>>(std::istream &in, ValueIO &&value)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -65,8 +64,136 @@ std::istream &chernikov::operator>>(std::istream &in, DoubleIO &&value)
     return in;
   }
 
+  char first = static_cast< char >(in.peek());
+
+  if (first == '"')
+  {
+    std::string str;
+    char c;
+    if (!(in >> c) || c != '"')
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    while (in.get(c))
+    {
+      if (c == '"')
+      {
+        value.ref_ = static_cast< double >(str.length() > 0 ? static_cast< unsigned char >(str[0]) : 0);
+        return in;
+      }
+      if (c == '\\')
+      {
+        if (in.get(c))
+        {
+          str += c;
+        } else
+        {
+          in.setstate(std::ios::failbit);
+          return in;
+        }
+      } else
+      {
+        str += c;
+      }
+    }
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+
+  if (first == '\'')
+  {
+    char c;
+    if (!(in >> c) || c != '\'')
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    if (!(in.get(c)))
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    char ch = c;
+    if (!(in >> c) || c != '\'')
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    value.ref_ = static_cast< double >(ch);
+    return in;
+  }
+
+  if (first == '#')
+  {
+    std::string token;
+    char c;
+    while (in.get(c) && c != ':')
+    {
+      token += c;
+      if (c == ')')
+      {
+        break;
+      }
+    }
+
+    if (token.size() >= 4 && token[0] == '#' && token[1] == 'c' && token[2] == '(')
+    {
+      std::string inner = token.substr(3, token.size() - 4);
+      size_t space = inner.find(' ');
+      if (space != std::string::npos)
+      {
+        double real = std::atof(inner.substr(0, space).c_str());
+        value.ref_ = real;
+        return in;
+      }
+    }
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+
+  if (first == '(')
+  {
+    std::string token;
+    char c;
+    while (in.get(c) && c != ':')
+    {
+      token += c;
+      if (c == ')')
+      {
+        break;
+      }
+    }
+
+    if (token.size() >= 3 && token[0] == '(' && token[1] == ':' && token[2] == 'N')
+    {
+      size_t n_start = 3;
+      size_t n_end = token.find(":D");
+      if (n_end != std::string::npos)
+      {
+        std::string num_str = token.substr(n_start, n_end - n_start);
+        long long num = std::atoll(num_str.c_str());
+
+        size_t d_start = n_end + 2;
+        size_t d_end = token.find(":)", d_start);
+        if (d_end != std::string::npos)
+        {
+          std::string den_str = token.substr(d_start, d_end - d_start);
+          unsigned long long den = std::strtoull(den_str.c_str(), nullptr, 10);
+          if (den != 0)
+          {
+            value.ref_ = static_cast< double >(num) / static_cast< double >(den);
+            return in;
+          }
+        }
+      }
+    }
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+
   std::string token;
-  char c = static_cast< char >(in.peek());
+  char c;
 
   while (in.get(c) && !std::isspace(c) && c != ':')
   {
@@ -94,60 +221,16 @@ std::istream &chernikov::operator>>(std::istream &in, DoubleIO &&value)
   {
     std::string num_str = token.substr(0, token.size() - 1);
     value.ref_ = std::atof(num_str.c_str());
-  } else if (token.size() >= 2 && (token[0] == '0' && (token[1] == 'b' || token[1] == 'B')))
+  } else if (token.size() >= 2 && token[0] == '0' && (token[1] == 'b' || token[1] == 'B'))
   {
     value.ref_ = static_cast< double >(std::strtoull(token.c_str() + 2, nullptr, 2));
-  } else if (token.size() >= 2 && (token[0] == '0' && (token[1] == 'x' || token[1] == 'X')))
+  } else if (token.size() >= 2 && token[0] == '0' && (token[1] == 'x' || token[1] == 'X'))
   {
     value.ref_ = static_cast< double >(std::strtoull(token.c_str() + 2, nullptr, 16));
-  } else if (token.size() >= 1 && token[0] == '0' && token.size() > 1)
+  } else if (token.size() > 1 && token[0] == '0' && token[1] != 'b' && token[1] != 'B' && token[1] != 'x'
+             && token[1] != 'X')
   {
     value.ref_ = static_cast< double >(std::strtoull(token.c_str(), nullptr, 8));
-  } else if (token.size() >= 3 && token[0] == '\'' && token[token.size() - 1] == '\'')
-  {
-    if (token.size() == 3)
-    {
-      value.ref_ = static_cast< double >(token[1]);
-    } else
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-  } else if (token.size() >= 4 && token[0] == '#' && token[1] == 'c' && token[2] == '(')
-  {
-    std::string complex_str = token.substr(3, token.size() - 4);
-    size_t space_pos = complex_str.find(' ');
-    if (space_pos != std::string::npos)
-    {
-      double real = std::atof(complex_str.substr(0, space_pos).c_str());
-      double imag = std::atof(complex_str.substr(space_pos + 1).c_str());
-      value.ref_ = std::sqrt(real * real + imag * imag);
-    } else
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-  } else if (token.size() >= 7 && token[0] == '(' && token[1] == ':' && token[2] == 'N')
-  {
-    size_t n_end = token.find(":D");
-    size_t d_end = token.find(":)", n_end + 2);
-    if (n_end != std::string::npos && d_end != std::string::npos)
-    {
-      long long num = std::atoll(token.substr(3, n_end - 3).c_str());
-      unsigned long long den = std::strtoull(token.substr(n_end + 2, d_end - n_end - 2).c_str(), nullptr, 10);
-      if (den != 0)
-      {
-        value.ref_ = static_cast< double >(num) / static_cast< double >(den);
-      } else
-      {
-        in.setstate(std::ios::failbit);
-        return in;
-      }
-    } else
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
   } else
   {
     value.ref_ = std::atof(token.c_str());

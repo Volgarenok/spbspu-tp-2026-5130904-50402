@@ -76,7 +76,7 @@ std::istream &chernikov::operator>>(std::istream &in, DataStruct &data)
         in.setstate(std::ios::failbit);
         return in;
       }
-      in >> StringIO(data.key1);
+      in >> ValueIO(data.key1);
       if (!in)
       {
         return in;
@@ -89,7 +89,7 @@ std::istream &chernikov::operator>>(std::istream &in, DataStruct &data)
         in.setstate(std::ios::failbit);
         return in;
       }
-      in >> DoubleIO(data.key2);
+      in >> ValueIO(data.key2);
       if (!in)
       {
         return in;
@@ -135,7 +135,7 @@ std::istream &chernikov::operator>>(std::istream &in, DataStruct &data)
 
 std::ostream &chernikov::operator<<(std::ostream &out, const DataStruct &data)
 {
-  out << "(:key1 \"" << data.key1 << "\":"
+  out << "(:key1 " << data.key1 << ":"
       << "key2 " << data.key2 << ":"
       << "key3 \"" << data.key3 << "\":)";
   return out;

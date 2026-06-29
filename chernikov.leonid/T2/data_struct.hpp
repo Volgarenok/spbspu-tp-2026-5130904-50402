@@ -8,7 +8,7 @@ namespace chernikov {
 
   struct DataStruct
   {
-    std::string key1;
+    double key1;
     double key2;
     std::string key3;
   };
