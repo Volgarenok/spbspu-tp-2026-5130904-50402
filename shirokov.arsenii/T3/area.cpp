@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <numeric>
@@ -9,33 +8,16 @@
 #include <vector>
 #include "IOguard.hpp"
 #include "commands.hpp"
+#include "get_area.hpp"
 
 namespace
 {
   template< typename Predicate >
   double calculateAreaIf(const shirokov::plg_t&, Predicate);
-  double getPolygonArea(const shirokov::Polygon&);
   void areaEven(std::ostream&, const shirokov::plg_t&);
   void areaOdd(std::ostream&, const shirokov::plg_t&);
   void areaMean(std::ostream&, const shirokov::plg_t&);
   void areaNum(std::ostream&, const shirokov::plg_t&, size_t);
-
-  struct CrossProductFunctor
-  {
-  public:
-    explicit CrossProductFunctor(const std::vector< shirokov::Point >& pointsVec):
-      points(pointsVec)
-    {}
-
-    double operator()(size_t i) const
-    {
-      size_t next = (i + 1) % points.size();
-      return static_cast< double >(points[i].x * points[next].y - points[next].x * points[i].y);
-    }
-
-  private:
-    const std::vector< shirokov::Point >& points;
-  };
 
   struct IsEvenVertices
   {
@@ -102,19 +84,6 @@ namespace
     std::transform(polygons.begin(), polygons.end(), areas.begin(), AreaTransformer< Predicate >(pred));
 
     return std::accumulate(areas.begin(), areas.end(), 0.0);
-  }
-
-  double getPolygonArea(const shirokov::Polygon& p)
-  {
-    if (p.points.empty())
-    {
-      return 0;
-    }
-    std::vector< size_t > indices(p.points.size());
-    std::iota(indices.begin(), indices.end(), 0);
-    std::vector< double > partialAreas(p.points.size());
-    std::transform(indices.begin(), indices.end(), partialAreas.begin(), CrossProductFunctor{p.points});
-    return std::abs(std::accumulate(partialAreas.begin(), partialAreas.end(), 0.0)) / 2;
   }
 
   void areaEven(std::ostream& out, const shirokov::plg_t& polygons)
