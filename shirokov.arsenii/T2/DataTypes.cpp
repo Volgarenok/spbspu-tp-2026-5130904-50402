@@ -11,6 +11,12 @@ std::istream& shirokov::operator>>(std::istream& in, ull_oct&& dest)
     return in;
   }
   IOguard g(in);
+
+  if (in.peek() != '0')
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
   in >> std::oct >> dest.ref;
   return in;
 }
