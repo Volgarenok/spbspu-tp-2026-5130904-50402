@@ -1,0 +1,37 @@
+#include "get_area.hpp"
+#include <algorithm>
+#include <cstddef>
+#include <numeric>
+
+namespace
+{
+  struct CrossProductFunctor
+  {
+  public:
+    explicit CrossProductFunctor(const std::vector< shirokov::Point >& pointsVec):
+      points(pointsVec)
+    {}
+
+    double operator()(size_t i) const
+    {
+      size_t next = (i + 1) % points.size();
+      return static_cast< double >(points[i].x * points[next].y - points[next].x * points[i].y);
+    }
+
+  private:
+    const std::vector< shirokov::Point >& points;
+  };
+}
+
+double shirokov::getPolygonArea(const Polygon& p)
+{
+  if (p.points.empty())
+  {
+    return 0;
+  }
+  std::vector< size_t > indices(p.points.size());
+  std::iota(indices.begin(), indices.end(), 0);
+  std::vector< double > partialAreas(p.points.size());
+  std::transform(indices.begin(), indices.end(), partialAreas.begin(), CrossProductFunctor{p.points});
+  return std::abs(std::accumulate(partialAreas.begin(), partialAreas.end(), 0.0)) / 2;
+}
