@@ -51,6 +51,11 @@ namespace sogdanov {
       return std::abs(sum) / 2.0;
     }
 
+    bool isAreaEqualFunc(const Polygon& p, double targetArea)
+    {
+      return std::abs(getArea(p) - targetArea) < 1e-5;
+    }
+
     size_t getVerticesCount(const Polygon& p)
     {
       return p.points.size();
@@ -187,14 +192,90 @@ namespace sogdanov {
       }
       out << std::count_if(polygons.begin(), polygons.end(), std::bind(hasVertices, std::placeholders::_1, n));
     }
+
+    void contextMinArea(std::ostream& out, std::vector< std::vector< Polygon > >& contexts)
+    {
+      const std::vector< Polygon >& current = contexts.back();
+      std::vector< double > areas;
+      std::transform(current.begin(), current.end(), std::back_inserter(areas), getArea);
+      const double target = *std::min_element(areas.begin(), areas.end());
+
+      std::vector< Polygon > nextCtx;
+      std::copy_if(current.begin(), current.end(), std::back_inserter(nextCtx),
+        std::bind(isAreaEqualFunc, std::placeholders::_1, target));
+
+      if (nextCtx.empty()) {
+        out << "<EMPTY CONTEXT>\n";
+      }
+      contexts.push_back(nextCtx);
+    }
+
+    void contextMaxArea(std::ostream& out, std::vector< std::vector< Polygon > >& contexts)
+    {
+      const std::vector< Polygon >& current = contexts.back();
+      std::vector< double > areas;
+      std::transform(current.begin(), current.end(), std::back_inserter(areas), getArea);
+      const double target = *std::max_element(areas.begin(), areas.end());
+
+      std::vector< Polygon > nextCtx;
+      std::copy_if(current.begin(), current.end(), std::back_inserter(nextCtx),
+        std::bind(isAreaEqualFunc, std::placeholders::_1, target));
+
+      if (nextCtx.empty()) {
+        out << "<EMPTY CONTEXT>\n";
+      }
+      contexts.push_back(nextCtx);
+    }
+
+    void contextEven(std::ostream& out, std::vector< std::vector< Polygon > >& contexts)
+    {
+      const std::vector< Polygon >& current = contexts.back();
+      std::vector< Polygon > nextCtx;
+      std::copy_if(current.begin(), current.end(), std::back_inserter(nextCtx), isEven);
+
+      if (nextCtx.empty()) {
+        out << "<EMPTY CONTEXT>\n";
+      }
+      contexts.push_back(nextCtx);
+    }
+
+    void contextOdd(std::ostream& out, std::vector< std::vector< Polygon > >& contexts)
+    {
+      const std::vector< Polygon >& current = contexts.back();
+      std::vector< Polygon > nextCtx;
+      std::copy_if(current.begin(), current.end(), std::back_inserter(nextCtx), isOdd);
+
+      if (nextCtx.empty()) {
+        out << "<EMPTY CONTEXT>\n";
+      }
+      contexts.push_back(nextCtx);
+    }
+
+    void contextNum(const std::string& arg, std::ostream& out, std::vector< std::vector< Polygon > >& contexts)
+    {
+      const size_t n = std::stoull(arg);
+      if (n < 3) {
+        throw std::logic_error("Invalid N");
+      }
+      const std::vector< Polygon >& current = contexts.back();
+      std::vector< Polygon > nextCtx;
+      std::copy_if(current.begin(), current.end(), std::back_inserter(nextCtx),
+        std::bind(hasVertices, std::placeholders::_1, n));
+
+      if (nextCtx.empty()) {
+        out << "<EMPTY CONTEXT>\n";
+      }
+      contexts.push_back(nextCtx);
+    }
   }
 }
 
-void sogdanov::area(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+void sogdanov::area(std::istream& in, std::ostream& out, const std::vector< std::vector< Polygon > >& contexts)
 {
   std::string arg;
   in >> arg;
   checkTrailingGarbage(in);
+  const std::vector< Polygon >& polygons = contexts.back();
 
   std::map< std::string, std::function< void(std::ostream&, const std::vector< Polygon >&) > > subcmds;
   subcmds["EVEN"] = areaEven;
@@ -209,11 +290,12 @@ void sogdanov::area(std::istream& in, std::ostream& out, const std::vector< Poly
   }
 }
 
-void sogdanov::max(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+void sogdanov::max(std::istream& in, std::ostream& out, const std::vector< std::vector< Polygon > >& contexts)
 {
   std::string arg;
   in >> arg;
   checkTrailingGarbage(in);
+  const std::vector< Polygon >& polygons = contexts.back();
   if (polygons.empty()) {
     throw std::logic_error("Empty collection");
   }
@@ -230,11 +312,12 @@ void sogdanov::max(std::istream& in, std::ostream& out, const std::vector< Polyg
   }
 }
 
-void sogdanov::min(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+void sogdanov::min(std::istream& in, std::ostream& out, const std::vector< std::vector< Polygon > >& contexts)
 {
   std::string arg;
   in >> arg;
   checkTrailingGarbage(in);
+  const std::vector< Polygon >& polygons = contexts.back();
   if (polygons.empty()) {
     throw std::logic_error("Empty collection");
   }
@@ -251,11 +334,12 @@ void sogdanov::min(std::istream& in, std::ostream& out, const std::vector< Polyg
   }
 }
 
-void sogdanov::count(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+void sogdanov::count(std::istream& in, std::ostream& out, const std::vector< std::vector< Polygon > >& contexts)
 {
   std::string arg;
   in >> arg;
   checkTrailingGarbage(in);
+  const std::vector< Polygon >& polygons = contexts.back();
 
   std::map< std::string, std::function< void(std::ostream&, const std::vector< Polygon >&) > > subcmds;
   subcmds["EVEN"] = countEven;
@@ -269,22 +353,65 @@ void sogdanov::count(std::istream& in, std::ostream& out, const std::vector< Pol
   }
 }
 
-void sogdanov::perms(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+void sogdanov::perms(std::istream& in, std::ostream& out, const std::vector< std::vector< Polygon > >& contexts)
 {
   Polygon target;
   if (!(in >> target)) {
     throw std::logic_error("Invalid polygon");
   }
   checkTrailingGarbage(in);
+  const std::vector< Polygon >& polygons = contexts.back();
   out << std::count_if(polygons.begin(), polygons.end(), std::bind(isPermutation, std::placeholders::_1, target));
 }
 
-void sogdanov::maxseq(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+void sogdanov::maxseq(std::istream& in, std::ostream& out, const std::vector< std::vector< Polygon > >& contexts)
 {
   Polygon target;
   if (!(in >> target)) {
     throw std::logic_error("Invalid polygon");
   }
   checkTrailingGarbage(in);
+  const std::vector< Polygon >& polygons = contexts.back();
   out << countMaxSeq(polygons.begin(), polygons.end(), target, 0);
+}
+
+void sogdanov::context(std::istream& in, std::ostream& out, std::vector< std::vector< Polygon > >& contexts)
+{
+  std::string arg;
+  in >> arg;
+  checkTrailingGarbage(in);
+
+  if (contexts.back().empty()) {
+    throw std::logic_error("Cannot create context from empty");
+  }
+
+  using ContextFunc = std::function< void(std::ostream&, std::vector< std::vector< Polygon > >&) >;
+  std::map< std::string, ContextFunc > subcmds;
+  subcmds["MIN-AREA"] = contextMinArea;
+  subcmds["MAX-AREA"] = contextMaxArea;
+  subcmds["EVEN"] = contextEven;
+  subcmds["ODD"] = contextOdd;
+
+  auto it = subcmds.find(arg);
+  if (it != subcmds.end()) {
+    it->second(out, contexts);
+  } else {
+    contextNum(arg, out, contexts);
+  }
+}
+
+void sogdanov::popcontext(std::istream& in, std::ostream& out, std::vector< std::vector< Polygon > >& contexts)
+{
+  checkTrailingGarbage(in);
+  if (contexts.size() <= 1) {
+    out << "<COMMON CONTEXT>\n";
+  } else {
+    contexts.pop_back();
+  }
+}
+
+void sogdanov::level(std::istream& in, std::ostream& out, const std::vector< std::vector< Polygon > >& contexts)
+{
+  checkTrailingGarbage(in);
+  out << "<LEVEL: " << (contexts.size() - 1) << ">";
 }

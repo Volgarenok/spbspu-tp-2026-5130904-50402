@@ -11,14 +11,15 @@
 
 int main(int argc, char **argv)
 {
-  using iit_t = std::istream_iterator< sogdanov::Polygon >;
+  namespace sog = sogdanov;
+  using iit_t = std::istream_iterator< sog::Polygon >;
 
   if (argc != 2) {
     std::cerr << "Incorrect parameters\n";
     return 1;
   }
 
-  std::vector< sogdanov::Polygon > polygons;
+  std::vector< sog::Polygon > polygons;
   std::ifstream file(argv[1]);
   if (!file) {
     std::cerr << "Error: cannot open file\n";
@@ -33,19 +34,28 @@ int main(int argc, char **argv)
     }
   }
 
+  std::vector< std::vector< sog::Polygon > > contexts;
+  contexts.push_back(polygons);
+
   std::map< std::string, std::function< void() > > commands;
-  commands["AREA"] = std::bind(sogdanov::area, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["MAX"] = std::bind(sogdanov::max, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["MIN"] = std::bind(sogdanov::min, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["COUNT"] = std::bind(sogdanov::count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["PERMS"] = std::bind(sogdanov::perms, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["MAXSEQ"] = std::bind(sogdanov::maxseq, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["AREA"] = std::bind(sog::area, std::ref(std::cin), std::ref(std::cout), std::cref(contexts));
+  commands["MAX"] = std::bind(sog::max, std::ref(std::cin), std::ref(std::cout), std::cref(contexts));
+  commands["MIN"] = std::bind(sog::min, std::ref(std::cin), std::ref(std::cout), std::cref(contexts));
+  commands["COUNT"] = std::bind(sog::count, std::ref(std::cin), std::ref(std::cout), std::cref(contexts));
+  commands["PERMS"] = std::bind(sog::perms, std::ref(std::cin), std::ref(std::cout), std::cref(contexts));
+  commands["MAXSEQ"] = std::bind(sog::maxseq, std::ref(std::cin), std::ref(std::cout), std::cref(contexts));
+  
+  commands["CONTEXT"] = std::bind(sog::context, std::ref(std::cin), std::ref(std::cout), std::ref(contexts));
+  commands["POPCONTEXT"] = std::bind(sog::popcontext, std::ref(std::cin), std::ref(std::cout), std::ref(contexts));
+  commands["LEVEL"] = std::bind(sog::level, std::ref(std::cin), std::ref(std::cout), std::cref(contexts));
 
   std::string command;
   while (std::cin >> command) {
     try {
       commands.at(command)();
-      std::cout << '\n';
+      if ((command != "CONTEXT") && (command != "POPCONTEXT")) {
+        std::cout << '\n';
+      }
     } catch (const std::exception&) {
       if (std::cin.fail()) {
         std::cin.clear();
@@ -54,4 +64,6 @@ int main(int argc, char **argv)
       std::cout << "<INVALID COMMAND>\n";
     }
   }
+
+  return 0;
 }
