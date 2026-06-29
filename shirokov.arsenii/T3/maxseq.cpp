@@ -96,5 +96,5 @@ void shirokov::maxseq(std::istream& in, std::ostream& out, plg_t& polygons)
   std::vector< size_t > dummy(polygons.size());
   std::transform(polygons.begin(), polygons.end(), dummy.begin(), SequenceTracker{target, currentCount, maxCount});
 
-  out << maxCount << "\n";
+  out << maxCount;
 }

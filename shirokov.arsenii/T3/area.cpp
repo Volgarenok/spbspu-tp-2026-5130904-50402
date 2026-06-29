@@ -119,12 +119,12 @@ namespace
 
   void areaEven(std::ostream& out, const shirokov::plg_t& polygons)
   {
-    out << calculateAreaIf(polygons, IsEvenVertices{}) << "\n";
+    out << calculateAreaIf(polygons, IsEvenVertices{});
   }
 
   void areaOdd(std::ostream& out, const shirokov::plg_t& polygons)
   {
-    out << calculateAreaIf(polygons, IsOddVertices{}) << "\n";
+    out << calculateAreaIf(polygons, IsOddVertices{});
   }
 
   void areaMean(std::ostream& out, const shirokov::plg_t& polygons)
@@ -134,12 +134,12 @@ namespace
       throw std::logic_error("MEAN requires at least one polygon in the dataset");
     }
     double totalArea = calculateAreaIf(polygons, AlwaysTrue{});
-    out << (totalArea / static_cast< double >(polygons.size())) << "\n";
+    out << (totalArea / static_cast< double >(polygons.size()));
   }
 
   void areaNum(std::ostream& out, const shirokov::plg_t& polygons, size_t num)
   {
-    out << calculateAreaIf(polygons, IsTargetVertices{num}) << "\n";
+    out << calculateAreaIf(polygons, IsTargetVertices{num});
   }
 }
 

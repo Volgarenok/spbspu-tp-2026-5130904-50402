@@ -39,5 +39,5 @@ void shirokov::rects(std::istream&, std::ostream& out, plg_t& polygons)
   IOguard g(out);
   out << std::fixed << std::setprecision(1);
 
-  out << std::count_if(polygons.begin(), polygons.end(), isRectangle) << "\n";
+  out << std::count_if(polygons.begin(), polygons.end(), isRectangle);
 }

@@ -5,6 +5,7 @@
 #include <numeric>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 #include <vector>
 #include "IOguard.hpp"
 #include "commands.hpp"
@@ -70,7 +71,7 @@ namespace
       throw std::logic_error("AREA requires at least one polygon in the dataset");
     }
     auto it = std::max_element(polygons.begin(), polygons.end(), AreaComparator{});
-    out << getPolygonArea(*it) << "\n";
+    out << getPolygonArea(*it);
   }
 
   void maxVertexes(std::ostream& out, const shirokov::plg_t& polygons)
@@ -80,7 +81,7 @@ namespace
       throw std::logic_error("VERTEXES requires at least one polygon in the dataset");
     }
     auto it = std::max_element(polygons.begin(), polygons.end(), VertexComparator{});
-    out << it->points.size() << "\n";
+    out << it->points.size();
   }
 }
 
@@ -95,13 +96,14 @@ void shirokov::max(std::istream& in, std::ostream& out, plg_t& polygons)
   IOguard g(out);
   out << std::fixed << std::setprecision(1);
 
-  if (subCmd == "AREA")
+  using subCmd_t = void (*)(std::ostream&, const plg_t&);
+  std::unordered_map< std::string, subCmd_t > subCmds;
+  subCmds["AREA"] = maxArea;
+  subCmds["VERTEXES"] = maxVertexes;
+
+  if (subCmds.count(subCmd))
   {
-    maxArea(out, polygons);
-  }
-  else if (subCmd == "VERTEXES")
-  {
-    maxVertexes(out, polygons);
+    subCmds[subCmd](out, polygons);
   }
   else
   {

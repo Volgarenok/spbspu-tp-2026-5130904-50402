@@ -36,6 +36,7 @@ int main(int argc, char* argv[])
     try
     {
       cmds.at(cmd)(std::cin, std::cout, polygons);
+      std::cout << '\n';
     }
     catch (...)
     {
