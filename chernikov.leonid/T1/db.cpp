@@ -2,7 +2,8 @@
 #include "note.hpp"
 #include <algorithm>
 
-namespace chernikov {
+namespace chernikov
+{
 
   bool NoteDB::createNote(const std::string &name)
   {
@@ -10,7 +11,7 @@ namespace chernikov {
     {
       return false;
     }
-    notes_[name] = std::make_shared< Note >(name);
+    notes_[name] = std::make_shared<Note>(name);
     return true;
   }
 
@@ -59,11 +60,15 @@ namespace chernikov {
     {
       return false;
     }
+    if (!noteExists(to))
+    {
+      return false;
+    }
     fromNote->removeLink(to);
     return true;
   }
 
-  std::vector< std::string > NoteDB::mindLinks(const std::string &name) const
+  std::vector<std::string> NoteDB::mindLinks(const std::string &name) const
   {
     auto it = notes_.find(name);
     if (it == notes_.end())
@@ -96,7 +101,7 @@ namespace chernikov {
     return notes_.count(name) > 0;
   }
 
-  std::shared_ptr< Note > NoteDB::findNote(const std::string &name)
+  std::shared_ptr<Note> NoteDB::findNote(const std::string &name)
   {
     auto it = notes_.find(name);
     return (it != notes_.end()) ? it->second : nullptr;

@@ -5,6 +5,7 @@
 #include <limits>
 #include <unordered_map>
 #include <functional>
+#include <sstream>
 
 using CommandHandler = void (*)(std::istream &, std::ostream &, chernikov::NoteDB &);
 
@@ -14,7 +15,7 @@ void handle_note(std::istream &in, std::ostream &, chernikov::NoteDB &db)
   in >> name;
   if (!db.createNote(name))
   {
-    throw std::logic_error("note already exists or invalid");
+    throw std::logic_error("note already exists");
   }
 }
 
@@ -34,10 +35,11 @@ void handle_show(std::istream &in, std::ostream &out, chernikov::NoteDB &db)
 {
   std::string name;
   in >> name;
-  if (!db.showNote(name, out))
+  if (!db.noteExists(name))
   {
     throw std::logic_error("note not found");
   }
+  db.showNote(name, out);
 }
 
 void handle_drop(std::istream &in, std::ostream &, chernikov::NoteDB &db)
@@ -79,19 +81,42 @@ void handle_mind(std::istream &in, std::ostream &out, chernikov::NoteDB &db)
     throw std::logic_error("note not found");
   }
   auto names = db.mindLinks(name);
-  for (const auto &n : names)
+  if (names.empty())
   {
-    out << n << '\n';
+    out << '\n';
+  }
+  else
+  {
+    for (const auto &n : names)
+    {
+      out << n << '\n';
+    }
   }
 }
 
-void handle_expired(std::istream &, std::ostream &out, chernikov::NoteDB &db)
+void handle_expired(std::istream &in, std::ostream &out, chernikov::NoteDB &db)
 {
+  std::string name;
+  if (in >> name)
+  {
+    if (!db.noteExists(name))
+    {
+      throw std::logic_error("note not found");
+    }
+  }
   out << db.expiredCount() << '\n';
 }
 
-void handle_refresh(std::istream &, std::ostream &, chernikov::NoteDB &db)
+void handle_refresh(std::istream &in, std::ostream &, chernikov::NoteDB &db)
 {
+  std::string name;
+  if (in >> name)
+  {
+    if (!db.noteExists(name))
+    {
+      throw std::logic_error("note not found");
+    }
+  }
   db.refreshAll();
 }
 
@@ -99,7 +124,7 @@ int main()
 {
   chernikov::NoteDB db;
 
-  std::unordered_map< std::string, CommandHandler > handlers;
+  std::unordered_map<std::string, CommandHandler> handlers;
   handlers["note"] = handle_note;
   handlers["line"] = handle_line;
   handlers["show"] = handle_show;
@@ -110,9 +135,23 @@ int main()
   handlers["expired"] = handle_expired;
   handlers["refresh"] = handle_refresh;
 
-  std::string cmd;
-  while (std::cin >> cmd)
+  std::string line;
+  while (std::getline(std::cin, line))
   {
+    if (line.empty())
+    {
+      continue;
+    }
+
+    std::istringstream iss(line);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd.empty())
+    {
+      continue;
+    }
+
     try
     {
       auto it = handlers.find(cmd);
@@ -120,16 +159,18 @@ int main()
       {
         throw std::out_of_range("unknown command");
       }
-      it->second(std::cin, std::cout, db);
-    } catch (const std::out_of_range &)
+      it->second(iss, std::cout, db);
+    }
+    catch (const std::out_of_range &)
     {
       std::cout << "<INVALID COMMAND>\n";
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-    } catch (const std::logic_error &)
+    }
+    catch (const std::logic_error &)
     {
       std::cout << "<INVALID COMMAND>\n";
     }
   }
+
   if (!std::cin.eof())
   {
     std::cerr << "Bad input\n";
