@@ -1,4 +1,5 @@
 #include "DelimiterIO.hpp"
+#include "IOguard.hpp"
 
 std::istream& shirokov::operator>>(std::istream& in, sep&& dest)
 {
@@ -7,6 +8,7 @@ std::istream& shirokov::operator>>(std::istream& in, sep&& dest)
   {
     return in;
   }
+  IOguard g(in);
   char c = 0;
   if (in.get(c))
   {
@@ -26,6 +28,7 @@ std::istream& shirokov::operator>>(std::istream& in, uncase_sep&& dest)
   {
     return in;
   }
+  IOguard g(in);
   char c = 0;
   if (in.get(c))
   {

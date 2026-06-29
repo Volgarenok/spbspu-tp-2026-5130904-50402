@@ -1,5 +1,6 @@
 #include "LabelIO.hpp"
 #include <istream>
+#include "IOguard.hpp"
 
 std::istream& shirokov::operator>>(std::istream& in, label&& dest)
 {
@@ -8,6 +9,7 @@ std::istream& shirokov::operator>>(std::istream& in, label&& dest)
   {
     return in;
   }
+  IOguard g(in);
   std::string data;
   in >> data;
 

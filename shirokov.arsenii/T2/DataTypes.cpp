@@ -1,6 +1,7 @@
 #include "DataTypes.hpp"
 #include <istream>
 #include "DelimiterIO.hpp"
+#include "IOguard.hpp"
 
 std::istream& shirokov::operator>>(std::istream& in, ull_oct&& dest)
 {
@@ -9,6 +10,7 @@ std::istream& shirokov::operator>>(std::istream& in, ull_oct&& dest)
   {
     return in;
   }
+  IOguard g(in);
   in >> std::oct >> dest.ref;
   return in;
 }
@@ -20,6 +22,7 @@ std::istream& shirokov::operator>>(std::istream& in, ull_bin&& dest)
   {
     return in;
   }
+  IOguard g(in);
 
   in >> sep{'0'} >> uncase_sep{'b'};
   if (!in)
@@ -67,6 +70,7 @@ std::istream& shirokov::operator>>(std::istream& in, str&& dest)
   {
     return in;
   }
+  IOguard g(in);
   in >> sep{'"'};
   if (!in)
   {

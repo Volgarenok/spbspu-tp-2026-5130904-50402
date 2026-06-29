@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <istream>
 #include "DataTypes.hpp"
+#include "IOguard.hpp"
 
 std::istream& shirokov::operator>>(std::istream& in, key&& dest)
 {
@@ -11,6 +12,7 @@ std::istream& shirokov::operator>>(std::istream& in, key&& dest)
     in.setstate(std::ios::failbit);
     return in;
   }
+  IOguard g(in);
 
   DataType currentType = dest.used.back();
   if (std::count(dest.used.begin(), dest.used.end(), currentType) > 1 || currentType == Unknown)

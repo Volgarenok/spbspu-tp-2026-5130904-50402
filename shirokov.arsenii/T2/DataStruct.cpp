@@ -18,6 +18,7 @@ bool shirokov::compare(const DataStruct& lhs, const DataStruct& rhs)
 
 std::ostream& shirokov::operator<<(std::ostream& out, const DataStruct& src)
 {
+  IOguard g(out);
   std::string bin_str;
   ull temp = src.key2;
   if (temp == 0)
@@ -38,14 +39,14 @@ std::ostream& shirokov::operator<<(std::ostream& out, const DataStruct& src)
 
 std::istream& shirokov::operator>>(std::istream& in, DataStruct& dest)
 {
+  std::istream::sentry s(in);
+  if (!s)
+  {
+    return in;
+  }
   IOguard g(in);
   while (true)
   {
-    std::istream::sentry s(in);
-    if (!s)
-    {
-      return in;
-    }
     in >> std::noskipws;
 
     DataStruct input;
