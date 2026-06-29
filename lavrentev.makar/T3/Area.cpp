@@ -8,8 +8,6 @@
 #include <functional>
 #include "Figures.hpp"
 
-using namespace std::placeholders;
-
 void lavrentev::area(std::istream &is, const std::vector< Polygon > &plgs)
 {
   std::map< std::string, void (*)(std::istream &, const std::vector< Polygon > &) > cmds;
@@ -47,6 +45,7 @@ void lavrentev::area(std::istream &is, const std::vector< Polygon > &plgs)
 
 void lavrentev::areaEven(std::istream &, const std::vector<Polygon> &plgs)
 {
+  using namespace std::placeholders;
   std::vector< Polygon > evenPlgs;
   std::copy_if(plgs.begin(), plgs.end(), std::back_inserter(evenPlgs), isEven);
   std::vector< float > areas(evenPlgs.size());
@@ -62,6 +61,7 @@ void lavrentev::areaEven(std::istream &, const std::vector<Polygon> &plgs)
 
 void lavrentev::areaOdd(std::istream &, const std::vector< Polygon > &plgs)
 {
+  using namespace std::placeholders;
   std::vector< Polygon > oddPlgs;
   std::copy_if(plgs.begin(), plgs.end(), std::back_inserter(oddPlgs), isOdd);
   std::vector< float > areas(oddPlgs.size());
@@ -77,6 +77,7 @@ void lavrentev::areaOdd(std::istream &, const std::vector< Polygon > &plgs)
 
 void lavrentev::areaMean(std::istream &, const std::vector< Polygon > &plgs)
 {
+  using namespace std::placeholders;
   if (plgs.empty())
   {
     throw std::logic_error("No figures");
@@ -94,6 +95,7 @@ void lavrentev::areaMean(std::istream &, const std::vector< Polygon > &plgs)
 
 void lavrentev::areaVrtxs(const std::vector<Polygon> &plgs, size_t n)
 {
+  using namespace std::placeholders;
   std::vector< Polygon > needPlgs;
   std::copy_if(
     plgs.begin(),

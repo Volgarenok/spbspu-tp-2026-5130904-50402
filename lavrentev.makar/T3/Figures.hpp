@@ -2,6 +2,7 @@
 #define FIGURES_HPP
 #include <iostream>
 #include <vector>
+#include "../common/Delimiter.hpp"
 
 namespace lavrentev
 {
@@ -35,12 +36,6 @@ namespace lavrentev
 
   private:
     static Triangle helpArea(const std::vector< Point > &points, size_t &index);
-  };
-
-  struct Delimiter_t
-  {
-    char expected;
-    char &last;
   };
 
   struct PointParser

@@ -1,12 +1,12 @@
 #ifndef READFILE_HPP
 #define READFILE_HPP
-#include <string>
 #include <vector>
+#include <istream>
 #include "Figures.hpp"
 
 namespace lavrentev
 {
-  void readfile(std::string name, std::vector< Polygon > &plgs);
+  void readfile(std::istream &in, std::vector< Polygon > &plgs);
 }
 
 #endif

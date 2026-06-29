@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <map>
 #include <limits>
 #include "Figures.hpp"
@@ -12,19 +13,20 @@ int main(int argc, char *argv[])
 {
   if (argc != 2)
   {
-    std::cerr << "Input processing error" << "\n";
+    std::cerr << "Input processing error\n";
     return 1;
   }
+
   std::vector< lavrentev::Polygon > plgs;
-  try
+
+  std::ifstream file(argv[1]);
+  if (!file.is_open())
   {
-    lavrentev::readfile(argv[1], plgs);
-  }
-  catch (const std::runtime_error &)
-  {
-    std::cerr << "Input processing error" << "\n";
+    std::cerr << "Input processing error\n";
     return 2;
   }
+
+  lavrentev::readfile(file, plgs);
 
   using cmd_t = void (*)(std::istream &in, const std::vector< lavrentev::Polygon > &plgs);
 
@@ -49,7 +51,7 @@ int main(int argc, char *argv[])
     }
     catch (...)
     {
-      std::cout << "<INVALID COMMAND>" << "\n";
+      std::cout << "<INVALID COMMAND>\n";
       std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
