@@ -44,7 +44,7 @@ int main(int argc, char **argv)
   commands["COUNT"] = std::bind(sog::count, std::ref(std::cin), std::ref(std::cout), std::cref(contexts));
   commands["PERMS"] = std::bind(sog::perms, std::ref(std::cin), std::ref(std::cout), std::cref(contexts));
   commands["MAXSEQ"] = std::bind(sog::maxseq, std::ref(std::cin), std::ref(std::cout), std::cref(contexts));
-  
+
   commands["CONTEXT"] = std::bind(sog::context, std::ref(std::cin), std::ref(std::cout), std::ref(contexts));
   commands["POPCONTEXT"] = std::bind(sog::popcontext, std::ref(std::cin), std::ref(std::cout), std::ref(contexts));
   commands["LEVEL"] = std::bind(sog::level, std::ref(std::cin), std::ref(std::cout), std::cref(contexts));
