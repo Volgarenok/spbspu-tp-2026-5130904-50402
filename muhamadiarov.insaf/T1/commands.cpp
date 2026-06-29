@@ -60,7 +60,10 @@ void muh::drop(std::istream& in, std::ostream&, NoteMap_t& map)
   {
     throw std::logic_error("Not name-note");
   }
-  map.erase(str);
+  if (map.erase(str) == 0)
+  {
+    throw std::logic_error("Not find this note");
+  }
 }
 
 void muh::link(std::istream& in, std::ostream&, NoteMap_t& map)
@@ -87,6 +90,10 @@ void muh::halt(std::istream& in, std::ostream&, NoteMap_t& map)
   {
     throw std::logic_error("Not correct arguments");
   }
+  if (map.find(to) == map.end())
+  {
+    throw std::logic_error("Not find note");
+  }
   auto it = map.at(from)->links.begin();
   for (size_t i = 0; i < map.at(from)->links.size(); ++i)
   {
@@ -109,7 +116,10 @@ void muh::mind(std::istream& in, std::ostream& out, NoteMap_t& map)
   }
   if (map.at(name)->links.size() != 0)
   {
-    out << map.at(name)->links[0].first;
+    if (!(map.at(name)->links[0].second.expired()))
+    {
+      out << map.at(name)->links[0].first;
+    }
   }
   for (size_t i = 1; i < map.at(name)->links.size(); ++i)
   {
