@@ -192,3 +192,50 @@ void lachugin::linksRemover(std::istream &in, std::ostream &, notesMap &db)
     }
   }
 }
+
+bool lachugin::dfsLoop(const std::shared_ptr< Note >& start, const std::shared_ptr< Note >& cur,
+    size_t d, size_t max, std::vector< std::shared_ptr< Note > >& path)
+{
+  if (d > max + 1)
+  {
+    return false;
+  }
+
+  for (size_t i = 0; i < cur->links.size(); ++i)
+  {
+    auto next = cur->links[i].lock();
+    if (!next)
+    {
+      continue;
+    }
+    if (next == start)
+    {
+      path.push_back(start);
+      return true;
+    }
+
+    bool used = false;
+    for (size_t j = 0; j < path.size(); ++j)
+    {
+      if (path[j] == next)
+      {
+        used = true;
+        break;
+      }
+    }
+
+    if (used)
+    {
+      continue;
+    }
+    path.push_back(next);
+    if (dfsLoop(start, next, d + 1, max, path))
+    {
+      return true;
+    }
+
+    path.pop_back();
+  }
+
+  return false;
+}

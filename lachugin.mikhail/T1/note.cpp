@@ -5,6 +5,4 @@ namespace lachugin
   {
     name_ = name;
   }
-
-  //Note(const std::string& name): name(name) {}
 }

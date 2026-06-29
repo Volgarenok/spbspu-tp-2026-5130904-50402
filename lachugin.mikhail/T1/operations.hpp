@@ -20,6 +20,10 @@ namespace lachugin
   void removeLink(std::istream&, std::ostream&, notesMap&);
   void allRemovedNotes(std::istream&, std::ostream&, notesMap&);
   void linksRemover(std::istream&, std::ostream&, notesMap&);
+
+  bool dfsLoop(const std::shared_ptr< Note >& start, const std::shared_ptr< Note >& cur,
+    size_t d, size_t max, std::vector< std::shared_ptr< Note > >& path);
+  void loop(std::istream&, std::ostream&, notesMap&);
 }
 
 #endif
