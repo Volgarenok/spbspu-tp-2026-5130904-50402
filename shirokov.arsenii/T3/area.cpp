@@ -6,6 +6,7 @@
 #include <numeric>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 #include <vector>
 #include "IOguard.hpp"
 #include "commands.hpp"
@@ -159,18 +160,15 @@ void shirokov::area(std::istream& in, std::ostream& out, plg_t& polygons)
 
   IOguard g(out);
   out << std::fixed << std::setprecision(1);
+  using subCmd_t = void (*)(std::ostream&, const plg_t&);
+  std::unordered_map< std::string, subCmd_t > subCmds;
+  subCmds["EVEN"] = areaEven;
+  subCmds["ODD"] = areaOdd;
+  subCmds["MEAN"] = areaMean;
 
-  if (subCmd == "EVEN")
+  if (subCmds.count(subCmd))
   {
-    areaEven(out, polygons);
-  }
-  else if (subCmd == "ODD")
-  {
-    areaOdd(out, polygons);
-  }
-  else if (subCmd == "MEAN")
-  {
-    areaMean(out, polygons);
+    subCmds[subCmd](out, polygons);
   }
   else if (std::all_of(subCmd.begin(), subCmd.end(), isCharDigit))
   {
