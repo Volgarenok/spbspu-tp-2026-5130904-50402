@@ -26,8 +26,6 @@ namespace alisov
   void refresh(std::istream &in, std::ostream &out, NotesMap &notes);
 }
 
-void alisov::link(std::istream &, std::ostream &, NotesMap &)
-{}
 void alisov::halt(std::istream &, std::ostream &, NotesMap &)
 {}
 void alisov::mind(std::istream &, std::ostream &, NotesMap &)
@@ -81,6 +79,29 @@ void alisov::drop(std::istream &in, std::ostream &out, NotesMap &notes)
     auto it = notes.find(name);
     if (it != notes.end()) {
       notes.erase(it);
+    }
+  }
+}
+
+void alisov::link(std::istream &in, std::ostream &out, NotesMap &notes)
+{
+  std::string from_name, to_name;
+  if (in >> from_name >> to_name) {
+    auto it_from = notes.find(from_name);
+    auto it_to = notes.find(to_name);
+    if (it_from != notes.end() && it_to != notes.end()) {
+      bool exists = false;
+      for (const auto &w_ptr : it_from->second->links) {
+        if (auto s_ptr = w_ptr.lock()) {
+          if (s_ptr == it_to->second) {
+            exists = true;
+            break;
+          }
+        }
+      }
+      if (!exists) {
+        it_from->second->links.push_back(it_to->second);
+      }
     }
   }
 }
