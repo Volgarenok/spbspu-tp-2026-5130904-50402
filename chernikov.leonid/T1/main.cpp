@@ -77,13 +77,19 @@ void handle_mind(std::istream &in, std::ostream &out, chernikov::NoteDB &db)
   in >> name;
   if (!db.noteExists(name))
   {
-    out << '\n';
     throw std::logic_error("note not found");
   }
   auto names = db.mindLinks(name);
-  for (const auto &n : names)
+  if (names.empty())
   {
-    out << n << '\n';
+    out << '\n';
+  }
+  else
+  {
+    for (const auto &n : names)
+    {
+      out << n << '\n';
+    }
   }
 }
 
