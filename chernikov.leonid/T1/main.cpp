@@ -84,7 +84,6 @@ void handle_mind(std::istream &in, std::ostream &out, chernikov::NoteDB &db)
   {
     out << n << '\n';
   }
-  out << '\n';
 }
 
 void handle_expired(std::istream &in, std::ostream &out, chernikov::NoteDB &db)
@@ -96,8 +95,14 @@ void handle_expired(std::istream &in, std::ostream &out, chernikov::NoteDB &db)
 
 void handle_refresh(std::istream &in, std::ostream &, chernikov::NoteDB &db)
 {
-  std::string dummy;
-  in >> dummy;
+  std::string name;
+  if (in >> name)
+  {
+    if (!db.noteExists(name))
+    {
+      throw std::logic_error("note not found");
+    }
+  }
   db.refreshAll();
 }
 
