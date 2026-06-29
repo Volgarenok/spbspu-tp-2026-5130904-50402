@@ -1,8 +1,7 @@
-#include <fstream>
+#include "readfile.hpp"
 #include <algorithm>
 #include <iterator>
 #include <functional>
-#include "readfile.hpp"
 #include "Figures.hpp"
 
 void lavrentev::readfile(std::istream &in, std::vector< Polygon >& plgs)
