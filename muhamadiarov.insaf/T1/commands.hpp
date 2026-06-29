@@ -1,5 +1,5 @@
-#ifndef ACTION_HPP
-#define ACTION_HPP
+#ifndef COMMANDS_HPP
+#define COMMANDS_HPP
 #include <istream>
 #include <ostream>
 #include <memory>
@@ -12,9 +12,9 @@ namespace muhamadiarov
 {
   struct Note
   {
-    std::string name_;
-    std::vector< std::string > lines_;
-    std::vector< std::pair< std::string, std::weak_ptr< Note > > > links_;
+    std::string name;
+    std::vector< std::string > lines;
+    std::vector< std::pair< std::string, std::weak_ptr< Note > > > links;
   };
 
   using NoteMap_t = std::unordered_map<std::string, std::shared_ptr< Note > >;

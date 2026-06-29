@@ -2,7 +2,7 @@
 #include <string>
 #include <unordered_map>
 #include <limits>
-#include "action.hpp"
+#include "commands.hpp"
 
 int main()
 {
@@ -27,6 +27,10 @@ int main()
     try
     {
       cmds.at(str)(std::cin, std::cout, result);
+      if (str == "show" || str == "mind" || str == "expired")
+      {
+        std::cout << '\n';
+      }
     }
     catch (const std::exception&)
     {
