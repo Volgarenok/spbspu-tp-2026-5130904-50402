@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <IOGuard.hpp>
 
 namespace novikov
 {
@@ -58,20 +59,6 @@ namespace novikov
   {
     std::vector< DataType >& used;
     const std::vector< std::string >& possibleLabels;
-  };
-
-  class IOguard
-  {
-  public:
-    explicit IOguard(std::basic_ios< char >&);
-    ~IOguard();
-
-  private:
-    std::basic_ios< char >& s_;
-    std::streamsize width_;
-    std::streamsize precision_;
-    std::basic_ios< char >::fmtflags fmt_;
-    char fill_;
   };
 
   using sep = DelimiterIO;

@@ -6,7 +6,7 @@
 
 std::istream& novikov::operator>>(std::istream& in, DataStruct& dest)
 {
-  IOguard g(in);
+  IOGuard g(in);
   while (true)
   {
     std::istream::sentry s(in);
@@ -79,7 +79,7 @@ std::istream& novikov::operator>>(std::istream& in, key&& dest)
   return in;
 }
 
-novikov::IOguard::IOguard(std::basic_ios< char >& s):
+novikov::IOGuard::IOGuard(std::basic_ios< char >& s):
     s_(s),
     width_(s.width()),
     precision_(s.precision()),
@@ -87,7 +87,7 @@ novikov::IOguard::IOguard(std::basic_ios< char >& s):
     fill_(s.fill())
 {}
 
-novikov::IOguard::~IOguard()
+novikov::IOGuard::~IOGuard()
 {
   s_.width(width_);
   s_.fill(fill_);
@@ -251,7 +251,7 @@ std::ostream& novikov::operator<<(std::ostream& out, const DataStruct& src)
     return out;
   }
 
-  IOguard g(out);
+  IOGuard g(out);
   out << std::fixed << std::setprecision(1);
 
   out << "(:key1 " << src.key1 << "d";
