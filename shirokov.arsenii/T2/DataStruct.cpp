@@ -1,6 +1,5 @@
 #include "DataStruct.hpp"
 #include <istream>
-#include <limits>
 #include <ostream>
 #include <vector>
 #include "DelimiterIO.hpp"
@@ -64,11 +63,7 @@ std::istream& shirokov::operator>>(std::istream& in, DataStruct& dest)
     if (in)
     {
       dest = input;
-      return in;
     }
-
-    in.clear();
-    auto toIgnore = std::numeric_limits< std::streamsize >::max();
-    in.ignore(toIgnore, '\n');
+    return in;
   }
 }
