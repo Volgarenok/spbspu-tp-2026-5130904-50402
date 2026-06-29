@@ -11,7 +11,7 @@ std::istream& shirokov::operator>>(std::istream& in, Point& pt)
   return in;
 }
 
-std::istream& shirokov::operator>>(std::istream& in, PolygonIO&& dest)
+std::istream& shirokov::operator>>(std::istream& in, Polygon& polygon)
 {
   IOguard g(in);
   std::istream::sentry s(in);
@@ -39,14 +39,9 @@ std::istream& shirokov::operator>>(std::istream& in, PolygonIO&& dest)
 
   if (in)
   {
-    dest.p.points = std::move(temp_points);
+    polygon.points = std::move(temp_points);
   }
   return in;
-}
-
-std::istream& shirokov::operator>>(std::istream& in, Polygon& p)
-{
-  return in >> PolygonIO{p};
 }
 
 shirokov::plg_t shirokov::parse(std::istream& in)
