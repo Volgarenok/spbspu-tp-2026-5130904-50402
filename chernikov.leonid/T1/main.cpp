@@ -93,7 +93,7 @@ int main()
 {
   chernikov::NoteDB db;
 
-  std::unordered_map< std::string, CommandHandler > handlers;
+  std::unordered_map<std::string, CommandHandler> handlers;
   handlers["note"] = handle_note;
   handlers["line"] = handle_line;
   handlers["show"] = handle_show;
@@ -113,11 +113,12 @@ int main()
       if (it == handlers.end())
       {
         std::cout << "<INVALID COMMAND>\n";
-        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         continue;
       }
       it->second(std::cin, std::cout, db);
-    } catch (const std::logic_error &)
+    }
+    catch (const std::logic_error &)
     {
       std::cout << "<INVALID COMMAND>\n";
     }
