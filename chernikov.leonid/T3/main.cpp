@@ -23,12 +23,10 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  std::vector<chernikov::Polygon> polygons;
+  std::vector< chernikov::Polygon > polygons;
 
-  std::copy(
-      std::istream_iterator<chernikov::Polygon>(file),
-      std::istream_iterator<chernikov::Polygon>(),
-      std::back_inserter(polygons));
+  std::copy(std::istream_iterator< chernikov::Polygon >(file), std::istream_iterator< chernikov::Polygon >(),
+            std::back_inserter(polygons));
 
   file.close();
 

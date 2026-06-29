@@ -4,8 +4,7 @@
 #include <iosfwd>
 #include <vector>
 
-namespace chernikov
-{
+namespace chernikov {
 
   struct Point
   {
@@ -20,7 +19,7 @@ namespace chernikov
 
   struct Polygon
   {
-    std::vector<Point> points;
+    std::vector< Point > points;
   };
 
   bool operator==(const Polygon &a, const Polygon &b);

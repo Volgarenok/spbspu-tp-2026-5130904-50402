@@ -5,10 +5,9 @@
 #include <vector>
 #include <string>
 
-namespace chernikov
-{
+namespace chernikov {
 
-  void processCommand(const std::string &line, std::vector<Polygon> &polygons);
+  void processCommand(const std::string &line, std::vector< Polygon > &polygons);
 
 }
 

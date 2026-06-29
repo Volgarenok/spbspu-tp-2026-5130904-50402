@@ -7,8 +7,7 @@
 #include <functional>
 #include <string>
 
-namespace
-{
+namespace {
 
   double getArea(const chernikov::Polygon &p)
   {
@@ -20,18 +19,14 @@ namespace
     return p.points.size();
   }
 
-  void printAreaCommand(const std::vector<chernikov::Polygon> &polygons,
-                        std::function<bool(const chernikov::Polygon &)> filter)
+  void printAreaCommand(const std::vector< chernikov::Polygon > &polygons,
+                        std::function< bool(const chernikov::Polygon &) > filter)
   {
-    std::vector<double> filteredAreas;
-    std::transform(
-        polygons.begin(),
-        polygons.end(),
-        std::back_inserter(filteredAreas),
-        [&filter](const chernikov::Polygon &p)
-        {
-          return filter(p) ? getArea(p) : 0.0;
-        });
+    std::vector< double > filteredAreas;
+    std::transform(polygons.begin(), polygons.end(), std::back_inserter(filteredAreas),
+                   [&filter](const chernikov::Polygon &p) {
+                     return filter(p) ? getArea(p) : 0.0;
+                   });
 
     double total = std::accumulate(filteredAreas.begin(), filteredAreas.end(), 0.0);
     std::cout << std::fixed << std::setprecision(1) << total << "\n";
@@ -47,39 +42,36 @@ namespace
     return n % 2 == 0;
   }
 
-  void handleAreaCommand(const std::vector<chernikov::Polygon> &polygons,
-                         std::istringstream &stream)
+  void handleAreaCommand(const std::vector< chernikov::Polygon > &polygons, std::istringstream &stream)
   {
     std::string subcommand;
     stream >> subcommand;
 
     if (subcommand == "EVEN")
     {
-      if (std::none_of(polygons.begin(), polygons.end(),
-                       [](const chernikov::Polygon &p)
-                       { return isEven(getVertexCount(p)); }))
+      if (std::none_of(polygons.begin(), polygons.end(), [](const chernikov::Polygon &p) {
+            return isEven(getVertexCount(p));
+          }))
       {
         std::cout << "<INVALID COMMAND>\n";
         return;
       }
-      printAreaCommand(polygons,
-                       [](const chernikov::Polygon &p)
-                       { return isEven(getVertexCount(p)); });
-    }
-    else if (subcommand == "ODD")
+      printAreaCommand(polygons, [](const chernikov::Polygon &p) {
+        return isEven(getVertexCount(p));
+      });
+    } else if (subcommand == "ODD")
     {
-      if (std::none_of(polygons.begin(), polygons.end(),
-                       [](const chernikov::Polygon &p)
-                       { return isOdd(getVertexCount(p)); }))
+      if (std::none_of(polygons.begin(), polygons.end(), [](const chernikov::Polygon &p) {
+            return isOdd(getVertexCount(p));
+          }))
       {
         std::cout << "<INVALID COMMAND>\n";
         return;
       }
-      printAreaCommand(polygons,
-                       [](const chernikov::Polygon &p)
-                       { return isOdd(getVertexCount(p)); });
-    }
-    else if (subcommand == "MEAN")
+      printAreaCommand(polygons, [](const chernikov::Polygon &p) {
+        return isOdd(getVertexCount(p));
+      });
+    } else if (subcommand == "MEAN")
     {
       if (polygons.empty())
       {
@@ -87,15 +79,13 @@ namespace
         return;
       }
 
-      std::vector<double> areas;
-      std::transform(polygons.begin(), polygons.end(),
-                     std::back_inserter(areas), getArea);
+      std::vector< double > areas;
+      std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), getArea);
 
       double total = std::accumulate(areas.begin(), areas.end(), 0.0);
-      double mean = total / static_cast<double>(polygons.size());
+      double mean = total / static_cast< double >(polygons.size());
       std::cout << std::fixed << std::setprecision(1) << mean << "\n";
-    }
-    else
+    } else
     {
       int num = 0;
       stream.clear();
@@ -108,26 +98,21 @@ namespace
         return;
       }
 
-      if (std::none_of(polygons.begin(), polygons.end(),
-                       [num](const chernikov::Polygon &p)
-                       {
-                         return static_cast<int>(getVertexCount(p)) == num;
-                       }))
+      if (std::none_of(polygons.begin(), polygons.end(), [num](const chernikov::Polygon &p) {
+            return static_cast< int >(getVertexCount(p)) == num;
+          }))
       {
         std::cout << "<INVALID COMMAND>\n";
         return;
       }
 
-      printAreaCommand(polygons,
-                       [num](const chernikov::Polygon &p)
-                       {
-                         return static_cast<int>(getVertexCount(p)) == num;
-                       });
+      printAreaCommand(polygons, [num](const chernikov::Polygon &p) {
+        return static_cast< int >(getVertexCount(p)) == num;
+      });
     }
   }
 
-  void handleMaxCommand(const std::vector<chernikov::Polygon> &polygons,
-                        std::istringstream &stream)
+  void handleMaxCommand(const std::vector< chernikov::Polygon > &polygons, std::istringstream &stream)
   {
     if (polygons.empty())
     {
@@ -141,29 +126,24 @@ namespace
     if (subcommand == "AREA")
     {
       auto it = std::max_element(polygons.begin(), polygons.end(),
-                                 [](const chernikov::Polygon &a, const chernikov::Polygon &b)
-                                 {
+                                 [](const chernikov::Polygon &a, const chernikov::Polygon &b) {
                                    return getArea(a) < getArea(b);
                                  });
       std::cout << std::fixed << std::setprecision(1) << getArea(*it) << "\n";
-    }
-    else if (subcommand == "VERTEXES")
+    } else if (subcommand == "VERTEXES")
     {
       auto it = std::max_element(polygons.begin(), polygons.end(),
-                                 [](const chernikov::Polygon &a, const chernikov::Polygon &b)
-                                 {
+                                 [](const chernikov::Polygon &a, const chernikov::Polygon &b) {
                                    return getVertexCount(a) < getVertexCount(b);
                                  });
       std::cout << getVertexCount(*it) << "\n";
-    }
-    else
+    } else
     {
       std::cout << "<INVALID COMMAND>\n";
     }
   }
 
-  void handleMinCommand(const std::vector<chernikov::Polygon> &polygons,
-                        std::istringstream &stream)
+  void handleMinCommand(const std::vector< chernikov::Polygon > &polygons, std::istringstream &stream)
   {
     if (polygons.empty())
     {
@@ -177,48 +157,41 @@ namespace
     if (subcommand == "AREA")
     {
       auto it = std::min_element(polygons.begin(), polygons.end(),
-                                 [](const chernikov::Polygon &a, const chernikov::Polygon &b)
-                                 {
+                                 [](const chernikov::Polygon &a, const chernikov::Polygon &b) {
                                    return getArea(a) < getArea(b);
                                  });
       std::cout << std::fixed << std::setprecision(1) << getArea(*it) << "\n";
-    }
-    else if (subcommand == "VERTEXES")
+    } else if (subcommand == "VERTEXES")
     {
       auto it = std::min_element(polygons.begin(), polygons.end(),
-                                 [](const chernikov::Polygon &a, const chernikov::Polygon &b)
-                                 {
+                                 [](const chernikov::Polygon &a, const chernikov::Polygon &b) {
                                    return getVertexCount(a) < getVertexCount(b);
                                  });
       std::cout << getVertexCount(*it) << "\n";
-    }
-    else
+    } else
     {
       std::cout << "<INVALID COMMAND>\n";
     }
   }
 
-  void handleCountCommand(const std::vector<chernikov::Polygon> &polygons,
-                          std::istringstream &stream)
+  void handleCountCommand(const std::vector< chernikov::Polygon > &polygons, std::istringstream &stream)
   {
     std::string subcommand;
     stream >> subcommand;
 
     if (subcommand == "EVEN")
     {
-      auto count = std::count_if(polygons.begin(), polygons.end(),
-                                 [](const chernikov::Polygon &p)
-                                 { return isEven(getVertexCount(p)); });
+      auto count = std::count_if(polygons.begin(), polygons.end(), [](const chernikov::Polygon &p) {
+        return isEven(getVertexCount(p));
+      });
       std::cout << count << "\n";
-    }
-    else if (subcommand == "ODD")
+    } else if (subcommand == "ODD")
     {
-      auto count = std::count_if(polygons.begin(), polygons.end(),
-                                 [](const chernikov::Polygon &p)
-                                 { return isOdd(getVertexCount(p)); });
+      auto count = std::count_if(polygons.begin(), polygons.end(), [](const chernikov::Polygon &p) {
+        return isOdd(getVertexCount(p));
+      });
       std::cout << count << "\n";
-    }
-    else
+    } else
     {
       int num = 0;
       stream.clear();
@@ -231,17 +204,14 @@ namespace
         return;
       }
 
-      auto count = std::count_if(polygons.begin(), polygons.end(),
-                                 [num](const chernikov::Polygon &p)
-                                 {
-                                   return static_cast<int>(getVertexCount(p)) == num;
-                                 });
+      auto count = std::count_if(polygons.begin(), polygons.end(), [num](const chernikov::Polygon &p) {
+        return static_cast< int >(getVertexCount(p)) == num;
+      });
       std::cout << count << "\n";
     }
   }
 
-  void handlePermsCommand(const std::vector<chernikov::Polygon> &polygons,
-                          std::istringstream &stream)
+  void handlePermsCommand(const std::vector< chernikov::Polygon > &polygons, std::istringstream &stream)
   {
     chernikov::Polygon target;
     stream >> target;
@@ -252,16 +222,13 @@ namespace
       return;
     }
 
-    auto count = std::count_if(polygons.begin(), polygons.end(),
-                               [&target](const chernikov::Polygon &p)
-                               {
-                                 return chernikov::isPermutationOf(p, target);
-                               });
+    auto count = std::count_if(polygons.begin(), polygons.end(), [&target](const chernikov::Polygon &p) {
+      return chernikov::isPermutationOf(p, target);
+    });
     std::cout << count << "\n";
   }
 
-  void handleMaxseqCommand(const std::vector<chernikov::Polygon> &polygons,
-                           std::istringstream &stream)
+  void handleMaxseqCommand(const std::vector< chernikov::Polygon > &polygons, std::istringstream &stream)
   {
     chernikov::Polygon target;
     stream >> target;
@@ -275,8 +242,7 @@ namespace
     size_t maxSeq = 0;
     size_t currentSeq = 0;
 
-    auto updateSeq = [&maxSeq, &currentSeq, &target](const chernikov::Polygon &p)
-    {
+    auto updateSeq = [&maxSeq, &currentSeq, &target](const chernikov::Polygon &p) {
       if (p == target)
       {
         ++currentSeq;
@@ -284,8 +250,7 @@ namespace
         {
           maxSeq = currentSeq;
         }
-      }
-      else
+      } else
       {
         currentSeq = 0;
       }
@@ -295,8 +260,7 @@ namespace
     std::cout << maxSeq << "\n";
   }
 
-  void handleRmechoCommand(std::vector<chernikov::Polygon> &polygons,
-                           std::istringstream &stream)
+  void handleRmechoCommand(std::vector< chernikov::Polygon > &polygons, std::istringstream &stream)
   {
     chernikov::Polygon target;
     stream >> target;
@@ -307,7 +271,7 @@ namespace
       return;
     }
 
-    std::vector<chernikov::Polygon> result;
+    std::vector< chernikov::Polygon > result;
     result.reserve(polygons.size());
 
     int removed = 0;
@@ -319,8 +283,7 @@ namespace
       if (isCurrentTarget && !result.empty() && (result.back() == target))
       {
         ++removed;
-      }
-      else
+      } else
       {
         result.push_back(polygons[i]);
       }
@@ -330,13 +293,13 @@ namespace
     std::cout << removed << "\n";
   }
 
-  void handleRectsCommand(const std::vector<chernikov::Polygon> &polygons)
+  void handleRectsCommand(const std::vector< chernikov::Polygon > &polygons)
   {
     auto count = std::count_if(polygons.begin(), polygons.end(), chernikov::isRectangle);
     std::cout << count << "\n";
   }
 
-  void handleRightshapesCommand(const std::vector<chernikov::Polygon> &polygons)
+  void handleRightshapesCommand(const std::vector< chernikov::Polygon > &polygons)
   {
     auto count = std::count_if(polygons.begin(), polygons.end(), chernikov::hasRightAngle);
     std::cout << count << "\n";
@@ -344,7 +307,7 @@ namespace
 
 }
 
-void chernikov::processCommand(const std::string &line, std::vector<Polygon> &polygons)
+void chernikov::processCommand(const std::string &line, std::vector< Polygon > &polygons)
 {
   std::istringstream stream(line);
   std::string command;
@@ -353,40 +316,31 @@ void chernikov::processCommand(const std::string &line, std::vector<Polygon> &po
   if (command == "AREA")
   {
     handleAreaCommand(polygons, stream);
-  }
-  else if (command == "MAX")
+  } else if (command == "MAX")
   {
     handleMaxCommand(polygons, stream);
-  }
-  else if (command == "MIN")
+  } else if (command == "MIN")
   {
     handleMinCommand(polygons, stream);
-  }
-  else if (command == "COUNT")
+  } else if (command == "COUNT")
   {
     handleCountCommand(polygons, stream);
-  }
-  else if (command == "PERMS")
+  } else if (command == "PERMS")
   {
     handlePermsCommand(polygons, stream);
-  }
-  else if (command == "MAXSEQ")
+  } else if (command == "MAXSEQ")
   {
     handleMaxseqCommand(polygons, stream);
-  }
-  else if (command == "RMECHO")
+  } else if (command == "RMECHO")
   {
     handleRmechoCommand(polygons, stream);
-  }
-  else if (command == "RECTS")
+  } else if (command == "RECTS")
   {
     handleRectsCommand(polygons);
-  }
-  else if (command == "RIGHTSHAPES")
+  } else if (command == "RIGHTSHAPES")
   {
     handleRightshapesCommand(polygons);
-  }
-  else
+  } else
   {
     std::cout << "<INVALID COMMAND>\n";
   }
