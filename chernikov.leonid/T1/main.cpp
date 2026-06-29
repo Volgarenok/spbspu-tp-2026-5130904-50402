@@ -65,7 +65,7 @@ void handle_halt(std::istream &in, std::ostream &, chernikov::NoteDB &db)
 {
   std::string from, to;
   in >> from >> to;
-  if (!db.noteExists(from) || !db.noteExists(to))
+  if (!db.noteExists(from))
   {
     throw std::logic_error("cannot halt");
   }
@@ -87,23 +87,13 @@ void handle_mind(std::istream &in, std::ostream &out, chernikov::NoteDB &db)
   }
 }
 
-void handle_expired(std::istream &in, std::ostream &out, chernikov::NoteDB &db)
+void handle_expired(std::istream &, std::ostream &out, chernikov::NoteDB &db)
 {
-  std::string param;
-  if (in >> param)
-  {
-    throw std::logic_error("expired doesn't take parameters");
-  }
   out << db.expiredCount() << '\n';
 }
 
-void handle_refresh(std::istream &in, std::ostream &, chernikov::NoteDB &db)
+void handle_refresh(std::istream &, std::ostream &, chernikov::NoteDB &db)
 {
-  std::string param;
-  if (in >> param)
-  {
-    throw std::logic_error("refresh doesn't take parameters");
-  }
   db.refreshAll();
 }
 
