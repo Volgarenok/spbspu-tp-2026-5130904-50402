@@ -10,7 +10,7 @@ int main()
   using T = muhamadiarov::DataStruct;
   using iit_t = std::istream_iterator< T >;
   using oit_t = std::ostream_iterator< T >;
-  
+
   std::vector< T > data;
   while (!std::cin.eof())
   {
