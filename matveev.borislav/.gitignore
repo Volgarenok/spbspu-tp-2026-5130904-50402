@@ -1,0 +1,6 @@
+*.o
+lab
+a.out
+out/
+*.save
+Makefile
