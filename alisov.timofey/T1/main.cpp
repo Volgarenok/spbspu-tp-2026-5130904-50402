@@ -26,8 +26,6 @@ namespace alisov
   void refresh(std::istream &in, std::ostream &out, NotesMap &notes);
 }
 
-void alisov::line(std::istream &, std::ostream &, NotesMap &)
-{}
 void alisov::show(std::istream &, std::ostream &, NotesMap &)
 {}
 void alisov::drop(std::istream &, std::ostream &, NotesMap &)
@@ -49,6 +47,20 @@ void alisov::note(std::istream &in, std::ostream &out, NotesMap &notes)
   if (in >> name) {
     if (notes.find(name) == notes.end()) {
       notes[name] = std::make_shared< alisov::Note >();
+    }
+  }
+}
+
+void alisov::line(std::istream &in, std::ostream &out, NotesMap &notes)
+{
+  std::string name;
+  if (in >> name) {
+    std::string text;
+    if (in >> std::quoted(text)) {
+      auto it = notes.find(name);
+      if (it != notes.end()) {
+        it->second->lines.push_back(text);
+      }
     }
   }
 }
