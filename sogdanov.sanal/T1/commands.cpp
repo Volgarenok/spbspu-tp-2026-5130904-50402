@@ -43,7 +43,6 @@ void sogdanov::cmd_show(std::istream &in, std::ostream &out, NoteMap &notes)
       out << "\n" << note->lines[i];
     }
   }
-  out << "\n";
 }
 
 void sogdanov::cmd_drop(std::istream &in, std::ostream &, NoteMap &notes)
@@ -111,7 +110,6 @@ void sogdanov::cmd_mind(std::istream &in, std::ostream &out, NoteMap &notes)
       out << "\n" << valid_links[i]->name;
     }
   }
-  out << "\n";
 }
 
 void sogdanov::cmd_expired(std::istream &in, std::ostream &out, NoteMap &notes)
@@ -127,7 +125,7 @@ void sogdanov::cmd_expired(std::istream &in, std::ostream &out, NoteMap &notes)
       ++count;
     }
   }
-  out << count << "\n";
+  out << count;
 }
 
 void sogdanov::cmd_refresh(std::istream &in, std::ostream &, NoteMap &notes)
@@ -147,7 +145,8 @@ void sogdanov::cmd_refresh(std::istream &in, std::ostream &, NoteMap &notes)
   }
 }
 
-bool sogdanov::find_loop_dfs(NotePtr current, NotePtr start, int max_edges, int current_edges, std::vector< NotePtr > &path)
+bool sogdanov::find_loop_dfs(NotePtr current,
+    NotePtr start, int max_edges, int current_edges, std::vector< NotePtr > &path)
 {
   if (current_edges > 0 && current == start) {
     return true;
@@ -200,7 +199,6 @@ void sogdanov::cmd_loop(std::istream &in, std::ostream &out, NoteMap &notes)
       out << prev->name << " " << path[i]->name;
       prev = path[i];
     }
-    out << "\n";
   } else {
     out << "<NO LOOP>\n";
   }

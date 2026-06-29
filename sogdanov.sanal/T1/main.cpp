@@ -26,6 +26,7 @@ int main()
   while (std::cin >> cmd) {
     try {
       cmds.at(cmd)(std::cin, std::cout, notes);
+      std::cout << "\n";
     } catch (const std::logic_error &) {
       std::cout << "<INVALID COMMAND>\n";
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
