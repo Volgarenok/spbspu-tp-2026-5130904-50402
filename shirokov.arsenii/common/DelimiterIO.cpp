@@ -34,7 +34,6 @@ std::istream& shirokov::operator>>(std::istream& in, uncase_sep&& dest)
     if (std::toupper(static_cast< unsigned char >(c)) != std::toupper(static_cast< unsigned char >(dest.exp))
         && (std::tolower(static_cast< unsigned char >(c)) != std::tolower(static_cast< unsigned char >(dest.exp))))
     {
-      in.putback(c);
       in.setstate(std::ios::failbit);
     }
   }
