@@ -8,8 +8,10 @@
 int main()
 {
   using T = lavrentev::DataStruct;
-  std::vector< T > data;
   using in_t = std::istream_iterator< T >;
+  using out_t = std::ostream_iterator< T >;
+
+  std::vector< T > data;
 
   while (std::cin) {
     std::copy(in_t{std::cin}, in_t{}, std::back_inserter(data));
@@ -25,7 +27,5 @@ int main()
   }
 
   std::sort(data.begin(), data.end());
-
-  using out_t = std::ostream_iterator< T >;
   std::copy(data.begin(), data.end(), out_t{std::cout, "\n"});
 }
