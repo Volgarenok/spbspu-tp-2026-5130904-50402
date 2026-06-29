@@ -8,17 +8,6 @@ muh::DataStruct::DataStruct():
   key3()
 {}
 
-void muh::check(std::istream& in, char exc)
-{
-  char c = 0;
-  in >> std::ws;
-  in >> c;
-  if (c != exc)
-  {
-    in.setstate(std::ios::failbit);
-  }
-}
-
 std::istream& muh::operator>>(std::istream& in, DoubleIO&& d)
 {
   std::istream::sentry sentry(in);
@@ -43,7 +32,13 @@ std::istream& muh::operator>>(std::istream& in, DelimiterIO&& c)
   {
     return in;
   }
-  check(in, c.exp);
+  char b = 0;
+  in >> std::ws;
+  in >> b;
+  if (b != c.exp)
+  {
+    in.setstate(std::ios::failbit);
+  }
   return in;
 }
 
@@ -120,6 +115,9 @@ std::istream& muh::operator>>(std::istream& in, DataStruct& data)
     return in;
   }
   in >> DelimiterIO{'('};
+  bool hasKey1 = false;
+  bool hasKey2 = false;
+  bool hasKey3 = false;
   for (size_t i = 0; i < 3; ++i)
   {
     in >> DelimiterIO{':'};
@@ -135,15 +133,30 @@ std::istream& muh::operator>>(std::istream& in, DataStruct& data)
     }
     switch (key)
     {
-      case Key::KEY1:
-        in >> DoubleIO{data.key1};
-        break;
-      case Key::KEY2:
-        in >> RatIO{data.key2};
-        break;
-      case Key::KEY3:
-        in >> StringIO{data.key3};
-        break;
+    case Key::KEY1:
+      if (hasKey1)
+      {
+        in.setstate(std::ios::failbit);
+      }
+      in >> DoubleIO{data.key1};
+      hasKey1 = true;
+      break;
+    case Key::KEY2:
+      if (hasKey2)
+      {
+        in.setstate(std::ios::failbit);
+      }
+      in >> RatIO{data.key2};
+      hasKey2 = true;
+      break;
+    case Key::KEY3:
+      if (hasKey3)
+      {
+        in.setstate(std::ios::failbit);
+      }
+      in >> StringIO{data.key3};
+      hasKey3 = true;
+      break;
     }
   }
   return in >> DelimiterIO{':'} >> DelimiterIO{')'};
@@ -156,6 +169,7 @@ std::ostream& muh::operator<<(std::ostream& out, const DataStruct& data)
   {
     return out;
   }
+  IOguard ioguard(out);
   out << "(:key1 " << std::fixed << std::setprecision(1) << data.key1 << "d";
   out << ":key2 (:N " << data.key2.first << ":D " << data.key2.second << ":)";
   out << ":key3 \"" << data.key3 << "\":)";
