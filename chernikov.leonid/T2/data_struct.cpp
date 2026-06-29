@@ -2,30 +2,18 @@
 #include "io_structs.hpp"
 #include <istream>
 #include <ostream>
-#include <cmath>
 #include <string>
-
-double chernikov::key2_to_double(const std::pair< long long, unsigned long long > &p)
-{
-  return static_cast< double >(p.first) / static_cast< double >(p.second);
-}
 
 bool chernikov::compare_data(const DataStruct &a, const DataStruct &b)
 {
-  double abs_a = std::abs(a.key1);
-  double abs_b = std::abs(b.key1);
-
-  if (abs_a != abs_b)
+  if (a.key1 != b.key1)
   {
-    return abs_a < abs_b;
+    return a.key1 < b.key1;
   }
 
-  double val_a = key2_to_double(a.key2);
-  double val_b = key2_to_double(b.key2);
-
-  if (val_a != val_b)
+  if (a.key2 != b.key2)
   {
-    return val_a < val_b;
+    return a.key2 < b.key2;
   }
 
   return a.key3.length() < b.key3.length();
@@ -88,7 +76,7 @@ std::istream &chernikov::operator>>(std::istream &in, DataStruct &data)
         in.setstate(std::ios::failbit);
         return in;
       }
-      in >> ComplexIO(data.key1);
+      in >> StringIO(data.key1);
       if (!in)
       {
         return in;
@@ -101,7 +89,7 @@ std::istream &chernikov::operator>>(std::istream &in, DataStruct &data)
         in.setstate(std::ios::failbit);
         return in;
       }
-      in >> RationalIO(data.key2);
+      in >> DoubleIO(data.key2);
       if (!in)
       {
         return in;
@@ -147,8 +135,8 @@ std::istream &chernikov::operator>>(std::istream &in, DataStruct &data)
 
 std::ostream &chernikov::operator<<(std::ostream &out, const DataStruct &data)
 {
-  out << "(:key1 #c(" << data.key1.real() << " " << data.key1.imag() << "):"
-      << "key2 (:N " << data.key2.first << ":D " << data.key2.second << ":):"
+  out << "(:key1 \"" << data.key1 << "\":"
+      << "key2 " << data.key2 << ":"
       << "key3 \"" << data.key3 << "\":)";
   return out;
 }

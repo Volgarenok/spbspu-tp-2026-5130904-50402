@@ -2,23 +2,9 @@
 #define IO_STRUCTS_HPP
 
 #include <iosfwd>
-#include <complex>
-#include <utility>
 #include <string>
 
 namespace chernikov {
-
-  struct ComplexIO
-  {
-    std::complex< double > &ref_;
-    explicit ComplexIO(std::complex< double > &ref);
-  };
-
-  struct RationalIO
-  {
-    std::pair< long long, unsigned long long > &ref_;
-    explicit RationalIO(std::pair< long long, unsigned long long > &ref);
-  };
 
   struct StringIO
   {
@@ -26,9 +12,14 @@ namespace chernikov {
     explicit StringIO(std::string &ref);
   };
 
-  std::istream &operator>>(std::istream &in, ComplexIO &&value);
-  std::istream &operator>>(std::istream &in, RationalIO &&value);
+  struct DoubleIO
+  {
+    double &ref_;
+    explicit DoubleIO(double &ref);
+  };
+
   std::istream &operator>>(std::istream &in, StringIO &&value);
+  std::istream &operator>>(std::istream &in, DoubleIO &&value);
 
 }
 
