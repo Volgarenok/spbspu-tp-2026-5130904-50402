@@ -10,7 +10,7 @@ std::istream& muhamadiarov::operator>>(std::istream& in, DelimiterIO&& data)
   char c = ' ';
   in >> std::ws;
   in >> c;
-  if (c != data.exc_)
+  if (c != data.exc)
   {
     in.setstate(std::ios::failbit);
   }

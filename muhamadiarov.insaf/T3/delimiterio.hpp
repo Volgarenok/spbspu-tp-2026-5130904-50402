@@ -1,13 +1,12 @@
 #ifndef DELIMITERIO_HPP
 #define DELIMITERIO_HPP
-
 #include <iostream>
 
 namespace muhamadiarov
 {
   struct DelimiterIO
   {
-    char exc_;
+    char exc;
   };
 
   std::istream& operator>>(std::istream& in, DelimiterIO&& data);
