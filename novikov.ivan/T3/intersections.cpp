@@ -117,10 +117,11 @@ void novikov::intersections(std::istream& in, std::ostream& out, novikov::plg_t&
     throw std::logic_error("Invalid polygon format");
   }
 
-  std::string restOfLine;
-  if (std::getline(in, restOfLine))
+  char ch = 0;
+  while (in.peek() != '\n' && !in.eof())
   {
-    if (std::any_of(restOfLine.begin(), restOfLine.end(), isNotSpace))
+    in.get(ch);
+    if (isNotSpace(ch))
     {
       in.setstate(std::ios::failbit);
       throw std::logic_error("Trailing garbage after polygon");
