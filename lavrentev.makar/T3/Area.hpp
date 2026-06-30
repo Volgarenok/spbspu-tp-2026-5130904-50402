@@ -9,6 +9,9 @@ namespace lavrentev
   void areaOdd(std::istream &, const std::vector< Polygon > &plgs);
   void areaMean(std::istream &, const std::vector< Polygon > &plgs);
   void areaVrtxs(const std::vector< Polygon > &plgs, size_t n);
+
+  template < typename Predicate >
+  void areaIf(const std::vector< Polygon > &plgs, Predicate pred);
 }
 
 #endif

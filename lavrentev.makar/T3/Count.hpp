@@ -10,6 +10,9 @@ namespace lavrentev
   void countEven(std::istream &, const std::vector< Polygon > &plgs);
   void countOdd(std::istream &, const std::vector< Polygon > &plgs);
   void countVrtxs(const std::vector< Polygon > &plgs, size_t n);
+
+  template < typename Predicate >
+  void countIf(const std::vector< Polygon > &plgs, Predicate pred);
 }
 
 #endif

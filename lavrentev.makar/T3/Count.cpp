@@ -53,18 +53,20 @@ void lavrentev::count(std::istream &is, const std::vector< Polygon > &plgs)
   }
 }
 
+template < typename Predicate >
+void countIf(const std::vector< lavrentev::Polygon > &plgs, Predicate pred)
+{
+  std::cout << std::count_if(plgs.begin(), plgs.end(), pred) << "\n";
+}
+
 void lavrentev::countEven(std::istream &, const std::vector< Polygon > &plgs)
 {
-  std::vector< Polygon > evenPlgs;
-  std::copy_if(plgs.begin(), plgs.end(), std::back_inserter(evenPlgs), isEven);
-  std::cout << evenPlgs.size();
+  countIf(plgs, isEven);
 }
 
 void lavrentev::countOdd(std::istream &, const std::vector< Polygon > &plgs)
 {
-  std::vector< Polygon > oddPlgs;
-  std::copy_if(plgs.begin(), plgs.end(), std::back_inserter(oddPlgs), isOdd);
-  std::cout << oddPlgs.size();
+  countIf(plgs, isOdd);
 }
 
 void lavrentev::countVrtxs(const std::vector< Polygon > &plgs, size_t n)

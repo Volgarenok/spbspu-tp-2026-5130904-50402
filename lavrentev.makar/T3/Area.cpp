@@ -43,36 +43,34 @@ void lavrentev::area(std::istream &is, const std::vector< Polygon > &plgs)
   }
 }
 
-void lavrentev::areaEven(std::istream &, const std::vector<Polygon> &plgs)
+template < typename Predicate >
+void areaIf(const std::vector< lavrentev::Polygon > &plgs, Predicate pred)
 {
   using namespace std::placeholders;
-  std::vector< Polygon > evenPlgs;
-  std::copy_if(plgs.begin(), plgs.end(), std::back_inserter(evenPlgs), isEven);
-  std::vector< float > areas(evenPlgs.size());
+
+  std::vector< lavrentev::Polygon > filtered;
+  std::copy_if(plgs.begin(), plgs.end(), std::back_inserter(filtered), pred);
+
+  std::vector< float > areas(filtered.size());
   std::transform(
-    evenPlgs.begin(),
-    evenPlgs.end(),
+    filtered.begin(),
+    filtered.end(),
     areas.begin(),
     std::bind(&lavrentev::Polygon::getArea, _1)
   );
+
   float total = std::accumulate(areas.begin(), areas.end(), 0.0f);
-  std::cout << std::fixed << std::setprecision(1) << total;
+  std::cout << std::fixed << std::setprecision(1) << total << "\n";
+}
+
+void lavrentev::areaEven(std::istream &, const std::vector< Polygon > &plgs)
+{
+  areaIf(plgs, isEven);
 }
 
 void lavrentev::areaOdd(std::istream &, const std::vector< Polygon > &plgs)
 {
-  using namespace std::placeholders;
-  std::vector< Polygon > oddPlgs;
-  std::copy_if(plgs.begin(), plgs.end(), std::back_inserter(oddPlgs), isOdd);
-  std::vector< float > areas(oddPlgs.size());
-  std::transform(
-    oddPlgs.begin(),
-    oddPlgs.end(),
-    areas.begin(),
-    std::bind(&lavrentev::Polygon::getArea, _1)
-  );
-  float total = std::accumulate(areas.begin(), areas.end(), 0.0f);
-  std::cout << std::fixed << std::setprecision(1) << total;
+  areaIf(plgs, isOdd);
 }
 
 void lavrentev::areaMean(std::istream &, const std::vector< Polygon > &plgs)
