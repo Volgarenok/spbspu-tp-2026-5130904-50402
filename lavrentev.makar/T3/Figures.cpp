@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iostream>
 #include <functional>
+#include <limits>
 #include "Figures.hpp"
 
 using namespace std::placeholders;
