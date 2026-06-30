@@ -69,5 +69,44 @@ std::istream &alisov::operator>>(std::istream &in, DataStruct &dest)
     in.setstate(std::ios_base::failbit);
     return in;
   }
+
+  double k1 = 0.0;
+  double k2 = 0.0;
+  std::string k3 = "";
+  bool has_k1 = false, has_k2 = false, has_k3 = false;
+
+  for (size_t i = 0; i < 3; ++i) {
+    std::string key = "";
+    in >> c;
+    if (c != 'k') {
+      in.setstate(std::ios_base::failbit);
+      return in;
+    }
+    key += c;
+    in >> c;
+    if (c != 'e') {
+      in.setstate(std::ios_base::failbit);
+      return in;
+    }
+    key += c;
+    in >> c;
+    if (c != 'y') {
+      in.setstate(std::ios_base::failbit);
+      return in;
+    }
+    key += c;
+    in >> c;
+    if (c != '1' && c != '2' && c != '3') {
+      in.setstate(std::ios_base::failbit);
+      return in;
+    }
+    key += c;
+
+    in >> c;
+    if (c != ' ') {
+      in.setstate(std::ios_base::failbit);
+      return in;
+    }
+  }
   return in;
 }
