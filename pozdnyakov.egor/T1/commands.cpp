@@ -3,180 +3,175 @@
 #include <iomanip>
 #include <stdexcept>
 
-namespace pozdnyakov
+namespace
 {
-
-  std::string readWord(std::istream &in)
+  bool isExpired(const std::weak_ptr< pozdnyakov::Note > &w)
   {
-    std::string s;
-    if (!(in >> s)) {
-      in.clear();
-      throw std::logic_error("read word error");
-    }
-    return s;
+    return w.expired();
+  }
+}
+
+void pozdnyakov::cmdNote(std::istream &in, std::ostream &, pozdnyakov::Database &db)
+{
+  std::string name;
+  in >> name;
+  if (in.fail()) {
+    throw std::logic_error("invalid input");
   }
 
-  std::string readQuoted(std::istream &in)
-  {
-    std::string s;
-    if (!(in >> std::quoted(s))) {
-      in.clear();
-      throw std::logic_error("read quoted error");
-    }
-    return s;
+  std::pair< pozdnyakov::Database::iterator, bool > res = db.emplace(name, std::make_shared< pozdnyakov::Note >(name));
+  if (!res.second) {
+    throw std::logic_error("note already exists");
+  }
+}
+
+void pozdnyakov::cmdLine(std::istream &in, std::ostream &, pozdnyakov::Database &db)
+{
+  std::string name;
+  std::string text;
+  in >> name >> std::quoted(text);
+  if (in.fail()) {
+    throw std::logic_error("invalid input");
   }
 
-  void cmdNote(std::istream &in, std::ostream &, Database &db)
-  {
-    auto name = readWord(in);
-    if (db.count(name)) {
-      throw std::logic_error("note already exists");
-    }
-    db[name] = std::make_shared< Note >(name);
+  db.at(name)->lines.push_back(text);
+}
+
+void pozdnyakov::cmdShow(std::istream &in, std::ostream &out, pozdnyakov::Database &db)
+{
+  std::string name;
+  in >> name;
+  if (in.fail()) {
+    throw std::logic_error("invalid input");
   }
 
-  void cmdLine(std::istream &in, std::ostream &, Database &db)
-  {
-    auto name = readWord(in);
-    auto text = readQuoted(in);
+  const std::vector< std::string > &lines = db.at(name)->lines;
 
-    auto it = db.find(name);
-    if (it == db.end()) {
-      throw std::logic_error("note not found");
+  if (!lines.empty()) {
+    out << lines.front();
+    for (size_t i = 1; i < lines.size(); ++i) {
+      out << "\n" << lines[i];
     }
-    it->second->lines.push_back(text);
+  }
+  out << "\n";
+}
+
+void pozdnyakov::cmdDrop(std::istream &in, std::ostream &, pozdnyakov::Database &db)
+{
+  std::string name;
+  in >> name;
+  if (in.fail()) {
+    throw std::logic_error("invalid input");
   }
 
-  void cmdShow(std::istream &in, std::ostream &out, Database &db)
-  {
-    auto name = readWord(in);
+  db.at(name);
+  db.erase(name);
+}
 
-    auto it = db.find(name);
-    if (it == db.end()) {
-      throw std::logic_error("note not found");
+void pozdnyakov::cmdLink(std::istream &in, std::ostream &, pozdnyakov::Database &db)
+{
+  std::string from;
+  std::string to;
+  in >> from >> to;
+  if (in.fail()) {
+    throw std::logic_error("invalid input");
+  }
+
+  std::shared_ptr< pozdnyakov::Note > pf = db.at(from);
+  std::shared_ptr< pozdnyakov::Note > pt = db.at(to);
+
+  for (const std::weak_ptr< pozdnyakov::Note > &w : pf->links) {
+    if (w.lock() == pt) {
+      throw std::logic_error("already linked");
     }
+  }
+  pf->links.push_back(pt);
+}
 
-    if (it->second->lines.empty()) {
-      out << "\n";
-    } else {
-      for (const auto &line : it->second->lines) {
-        out << line << "\n";
+void pozdnyakov::cmdMind(std::istream &in, std::ostream &out, pozdnyakov::Database &db)
+{
+  std::string from;
+  in >> from;
+  if (in.fail()) {
+    throw std::logic_error("invalid input");
+  }
+
+  std::shared_ptr< pozdnyakov::Note > pf = db.at(from);
+
+  auto it = pf->links.begin();
+  while (it != pf->links.end() && it->expired()) {
+    ++it;
+  }
+
+  if (it != pf->links.end()) {
+    std::shared_ptr< pozdnyakov::Note > p = it->lock();
+    out << p->name;
+    ++it;
+
+    for (; it != pf->links.end(); ++it) {
+      std::shared_ptr< pozdnyakov::Note > nextP = it->lock();
+      if (nextP) {
+        out << "\n" << nextP->name;
       }
     }
   }
+  out << "\n";
+}
 
-  void cmdDrop(std::istream &in, std::ostream &, Database &db)
-  {
-    auto name = readWord(in);
-
-    auto it = db.find(name);
-    if (it == db.end()) {
-      throw std::logic_error("note not found");
-    }
-    db.erase(it);
+void pozdnyakov::cmdHalt(std::istream &in, std::ostream &, pozdnyakov::Database &db)
+{
+  std::string from;
+  std::string to;
+  in >> from >> to;
+  if (in.fail()) {
+    throw std::logic_error("invalid input");
   }
 
-  void cmdLink(std::istream &in, std::ostream &, Database &db)
-  {
-    auto from = readWord(in);
-    auto to = readWord(in);
+  std::shared_ptr< pozdnyakov::Note > pf = db.at(from);
+  std::shared_ptr< pozdnyakov::Note > pt = db.at(to);
 
-    auto it_from = db.find(from);
-    auto it_to = db.find(to);
-    if (it_from == db.end() || it_to == db.end()) {
-      throw std::logic_error("note not found");
-    }
-
-    auto pf = it_from->second;
-    auto pt = it_to->second;
-
-    for (const auto &w : pf->links) {
-      if (w.lock() == pt) {
-        throw std::logic_error("already linked");
-      }
-    }
-    pf->links.push_back(pt);
-  }
-
-  void cmdMind(std::istream &in, std::ostream &out, Database &db)
-  {
-    auto from = readWord(in);
-
-    auto it_from = db.find(from);
-    if (it_from == db.end()) {
-      throw std::logic_error("note not found");
-    }
-
-    bool printed = false;
-    for (const auto &w : it_from->second->links) {
-      if (auto p = w.lock()) {
-        out << p->name << "\n";
-        printed = true;
-      }
-    }
-
-    if (!printed) {
-      out << "\n";
+  bool found = false;
+  for (auto it = pf->links.begin(); it != pf->links.end(); ++it) {
+    if (it->lock() == pt) {
+      pf->links.erase(it);
+      found = true;
+      break;
     }
   }
 
-  void cmdHalt(std::istream &in, std::ostream &, Database &db)
-  {
-    auto from = readWord(in);
-    auto to = readWord(in);
+  if (!found) {
+    throw std::logic_error("link not found");
+  }
+}
 
-    auto it_from = db.find(from);
-    auto it_to = db.find(to);
-    if (it_from == db.end() || it_to == db.end()) {
-      throw std::logic_error("note not found");
-    }
-
-    auto pf = it_from->second;
-    auto pt = it_to->second;
-
-    auto it = std::remove_if(pf->links.begin(), pf->links.end(), [&](const std::weak_ptr< Note > &w) {
-      return w.lock() == pt;
-    });
-
-    if (it == pf->links.end()) {
-      throw std::logic_error("link not found");
-    }
-    pf->links.erase(it, pf->links.end());
+void pozdnyakov::cmdExpired(std::istream &in, std::ostream &out, pozdnyakov::Database &db)
+{
+  std::string from;
+  in >> from;
+  if (in.fail()) {
+    throw std::logic_error("invalid input");
   }
 
-  void cmdExpired(std::istream &in, std::ostream &out, Database &db)
-  {
-    auto from = readWord(in);
+  std::shared_ptr< pozdnyakov::Note > pf = db.at(from);
 
-    auto it = db.find(from);
-    if (it == db.end()) {
-      throw std::logic_error("note not found");
+  int count = 0;
+  for (const std::weak_ptr< pozdnyakov::Note > &w : pf->links) {
+    if (w.expired()) {
+      count++;
     }
+  }
+  out << count << "\n";
+}
 
-    int count = 0;
-    for (const auto &w : it->second->links) {
-      if (w.expired()) {
-        count++;
-      }
-    }
-    out << count << "\n";
+void pozdnyakov::cmdRefresh(std::istream &in, std::ostream &, pozdnyakov::Database &db)
+{
+  std::string from;
+  in >> from;
+  if (in.fail()) {
+    throw std::logic_error("invalid input");
   }
 
-  void cmdRefresh(std::istream &in, std::ostream &, Database &db)
-  {
-    auto from = readWord(in);
+  std::shared_ptr< pozdnyakov::Note > pf = db.at(from);
 
-    auto it = db.find(from);
-    if (it == db.end()) {
-      throw std::logic_error("note not found");
-    }
-
-    auto &lnks = it->second->links;
-    lnks.erase(std::remove_if(lnks.begin(), lnks.end(),
-      [](const std::weak_ptr< Note > &w) {
-        return w.expired();
-      }),
-      lnks.end());
-  }
-
+  pf->links.erase(std::remove_if(pf->links.begin(), pf->links.end(), isExpired), pf->links.end());
 }
