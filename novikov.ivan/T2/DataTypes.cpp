@@ -1,7 +1,7 @@
 #include "DataTypes.hpp"
 #include <istream>
-#include "IOGuard.hpp"
-#include "DelimiterIO.hpp"
+#include <IOGuard.hpp>
+#include <DelimiterIO.hpp>
 
 std::istream& novikov::operator>>(std::istream& in, dbl_lit&& dest)
 {

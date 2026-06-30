@@ -1,6 +1,6 @@
 #include "LabelIO.hpp"
 #include <istream>
-#include "IOGuard.hpp"
+#include <IOGuard.hpp>
 
 std::istream& novikov::operator>>(std::istream& in, label&& dest)
 {

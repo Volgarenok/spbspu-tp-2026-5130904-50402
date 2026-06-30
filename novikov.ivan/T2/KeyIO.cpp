@@ -1,7 +1,7 @@
 #include "KeyIO.hpp"
 #include <algorithm>
 #include <istream>
-#include "IOGuard.hpp"
+#include <IOGuard.hpp>
 #include "DataTypes.hpp"
 
 std::istream& novikov::operator>>(std::istream& in, key&& dest)
