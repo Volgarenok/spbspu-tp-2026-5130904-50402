@@ -26,11 +26,6 @@ namespace alisov
   void refresh(std::istream &in, std::ostream &out, NotesMap &notes);
 }
 
-void alisov::expired(std::istream &, std::ostream &, NotesMap &)
-{}
-void alisov::refresh(std::istream &, std::ostream &, NotesMap &)
-{}
-
 void alisov::note(std::istream &in, std::ostream &out, NotesMap &notes)
 {
   std::string name;
@@ -137,6 +132,33 @@ void alisov::halt(std::istream &in, std::ostream &out, NotesMap &notes)
             break;
           }
         }
+      }
+    }
+  }
+}
+
+void alisov::expired(std::istream &in, std::ostream &out, NotesMap &notes)
+{
+  size_t count = 0;
+  for (const auto &pair : notes) {
+    for (const auto &w_ptr : pair.second->links) {
+      if (w_ptr.expired()) {
+        ++count;
+      }
+    }
+  }
+  out << count << "\n";
+}
+
+void alisov::refresh(std::istream &in, std::ostream &out, NotesMap &notes)
+{
+  for (auto &pair : notes) {
+    auto &links = pair.second->links;
+    for (auto it = links.begin(); it != links.end();) {
+      if (it->expired()) {
+        it = links.erase(it);
+      } else {
+        ++it;
       }
     }
   }
