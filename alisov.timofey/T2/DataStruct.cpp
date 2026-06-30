@@ -84,7 +84,6 @@ std::ostream &alisov::operator<<(std::ostream &out, const DataStruct &src)
   out << ":key3 " << std::quoted(src.key3) << ":)";
   return out;
 }
-
 std::istream &alisov::operator>>(std::istream &in, DataStruct &dest)
 {
   std::istream::sentry guard(in);
