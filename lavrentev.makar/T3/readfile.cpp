@@ -1,20 +1,26 @@
 #include "readfile.hpp"
-#include <algorithm>
-#include <iterator>
-#include <functional>
+#include <fstream>
+#include <limits>
+#include <vector>
 #include "Figures.hpp"
 
-void lavrentev::readfile(std::istream &in, std::vector< Polygon >& plgs)
+void lavrentev::readfile(std::ifstream& file, std::vector< Polygon >& plgs)
 {
-  std::vector< Polygon > temp{
-    std::istream_iterator< Polygon >(in),
-    std::istream_iterator< Polygon >()
-  };
-
-  std::remove_copy_if(
-    temp.begin(),
-    temp.end(),
-    std::back_inserter(plgs),
-    std::mem_fn(&Polygon::isEmpty)
-  );
+  while (!file.eof())
+  {
+    Polygon plg;
+    if (file >> plg)
+    {
+      plgs.push_back(plg);
+    }
+    else
+    {
+      if (file.eof())
+      {
+        break;
+      }
+      file.clear();
+      file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    }
+  }
 }

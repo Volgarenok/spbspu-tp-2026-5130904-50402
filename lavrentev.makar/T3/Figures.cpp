@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <iostream>
 #include <functional>
-#include <limits>
 #include "Figures.hpp"
 
 using namespace std::placeholders;
@@ -103,9 +102,7 @@ std::istream& lavrentev::operator>>(std::istream& is, Polygon& plg)
   size_t n = 0;
   if (!(is >> n) || n < 3)
   {
-    is.clear();
-    is.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-    plg.points.clear();
+    is.setstate(std::ios_base::failbit);
     return is;
   }
 
@@ -129,7 +126,7 @@ std::istream& lavrentev::operator>>(std::istream& is, Polygon& plg)
 
   if (!success)
   {
-    plg.points.clear();
+    is.setstate(std::ios_base::failbit);
   }
   else
   {
