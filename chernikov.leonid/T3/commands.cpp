@@ -297,7 +297,7 @@ void chernikov::count(std::istream &in, std::ostream &out, const std::vector< Po
 void chernikov::perms(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
   Polygon target;
-  if (!(in >> target))
+  if (!(in >> target) || target.points.empty())
   {
     throw std::invalid_argument("invalid");
   }
@@ -307,7 +307,7 @@ void chernikov::perms(std::istream &in, std::ostream &out, const std::vector< Po
 void chernikov::echo(std::istream &in, std::ostream &out, std::vector< Polygon > &polygons)
 {
   Polygon target;
-  if (!(in >> target))
+  if (!(in >> target) || target.points.empty())
   {
     throw std::invalid_argument("invalid");
   }
@@ -317,7 +317,7 @@ void chernikov::echo(std::istream &in, std::ostream &out, std::vector< Polygon >
 void chernikov::maxseq(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
   Polygon target;
-  if (!(in >> target))
+  if (!(in >> target) || target.points.empty())
   {
     throw std::invalid_argument("invalid");
   }
@@ -327,7 +327,7 @@ void chernikov::maxseq(std::istream &in, std::ostream &out, const std::vector< P
 void chernikov::rmecho(std::istream &in, std::ostream &out, std::vector< Polygon > &polygons)
 {
   Polygon target;
-  if (!(in >> target))
+  if (!(in >> target) || target.points.empty())
   {
     throw std::invalid_argument("invalid");
   }
