@@ -95,5 +95,32 @@ std::istream &chernikov::operator>>(std::istream &in, StringIO &&dest)
     return in;
   }
 
-  return in >> std::quoted(dest.ref);
+  in >> DelimIO{'"'};
+
+  dest.ref.clear();
+  char c = '\0';
+  while (in.get(c) && c != '"')
+  {
+    if (c == '\\')
+    {
+      if (in.get(c))
+      {
+        dest.ref += c;
+      } else
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+    } else
+    {
+      dest.ref += c;
+    }
+  }
+
+  if (c != '"')
+  {
+    in.setstate(std::ios::failbit);
+  }
+
+  return in;
 }
