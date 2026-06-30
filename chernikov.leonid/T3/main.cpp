@@ -1,18 +1,15 @@
 #include <algorithm>
 #include <fstream>
-#include <functional>
 #include <iostream>
 #include <iterator>
 #include <limits>
-#include <map>
+#include <sstream>
 #include <string>
 #include <vector>
 #include "commands.hpp"
 
 int main(int argc, char **argv)
 {
-  using iit_t = std::istream_iterator< chernikov::Polygon >;
-
   if (argc != 2)
   {
     std::cerr << "Incorrect parameters\n";
@@ -29,7 +26,8 @@ int main(int argc, char **argv)
 
   while (!file.eof())
   {
-    std::copy(iit_t(file), iit_t(), std::back_inserter(polygons));
+    std::copy(std::istream_iterator< chernikov::Polygon >(file), std::istream_iterator< chernikov::Polygon >(),
+              std::back_inserter(polygons));
     if (!file)
     {
       file.clear();
@@ -37,31 +35,51 @@ int main(int argc, char **argv)
     }
   }
 
-  std::map< std::string, std::function< void() > > commands;
-  commands["AREA"] = std::bind(chernikov::area, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["MAX"] = std::bind(chernikov::max, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["MIN"] = std::bind(chernikov::min, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["COUNT"] = std::bind(chernikov::count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["RECTS"] = std::bind(chernikov::rects, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["RIGHTSHAPES"] =
-      std::bind(chernikov::rightshapes, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["PERMS"] = std::bind(chernikov::perms, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["ECHO"] = std::bind(chernikov::echo, std::ref(std::cin), std::ref(std::cout), std::ref(polygons));
-
-  std::string command;
-  while (std::cin >> command)
+  std::string line;
+  while (std::getline(std::cin, line))
   {
+    if (line.empty())
+    {
+      continue;
+    }
+
+    std::istringstream stream(line);
+    std::string command;
+    stream >> command;
+
     try
     {
-      commands.at(command)();
+      if (command == "AREA")
+      {
+        chernikov::area(stream, std::cout, polygons);
+      } else if (command == "MAX")
+      {
+        chernikov::max(stream, std::cout, polygons);
+      } else if (command == "MIN")
+      {
+        chernikov::min(stream, std::cout, polygons);
+      } else if (command == "COUNT")
+      {
+        chernikov::count(stream, std::cout, polygons);
+      } else if (command == "RECTS")
+      {
+        chernikov::rects(stream, std::cout, polygons);
+      } else if (command == "RIGHTSHAPES")
+      {
+        chernikov::rightshapes(stream, std::cout, polygons);
+      } else if (command == "PERMS")
+      {
+        chernikov::perms(stream, std::cout, polygons);
+      } else if (command == "ECHO")
+      {
+        chernikov::echo(stream, std::cout, polygons);
+      } else
+      {
+        std::cout << "<INVALID COMMAND>";
+      }
       std::cout << '\n';
     } catch (const std::exception &)
     {
-      if (std::cin.fail())
-      {
-        std::cin.clear();
-      }
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       std::cout << "<INVALID COMMAND>\n";
     }
   }
