@@ -84,7 +84,7 @@ void novikov::mind(std::istream& in, std::ostream& out, novikov::map_t& notes)
   in >> noteFrom;
   std::shared_ptr< Note > fromPtr = notes.at(noteFrom);
   std::vector< std::string > linkIds;
-  for (const auto& pair : fromPtr->links)
+  for (const std::pair< std::string, std::weak_ptr< novikov::Note > >& pair : fromPtr->links)
   {
     if (pair.second.lock())
     {
@@ -107,7 +107,7 @@ void novikov::expired(std::istream& in, std::ostream& out, novikov::map_t& notes
   in >> noteFrom;
   std::shared_ptr< Note > fromPtr = notes.at(noteFrom);
   size_t k = 0;
-  for (const auto& pair : fromPtr->links)
+  for (const std::pair< std::string, std::weak_ptr< novikov::Note > >& pair : fromPtr->links)
   {
     if (!pair.second.lock())
     {
@@ -123,7 +123,7 @@ void novikov::refresh(std::istream& in, std::ostream&, novikov::map_t& notes)
   in >> noteFrom;
   std::shared_ptr< Note > fromPtr = notes.at(noteFrom);
   novikov::links_t newLinksVec;
-  for (auto pair : fromPtr->links)
+  for (std::pair< std::string, std::weak_ptr< novikov::Note > > pair : fromPtr->links)
   {
     if (pair.second.lock())
     {
