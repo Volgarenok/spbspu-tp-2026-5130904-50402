@@ -1,36 +1,18 @@
 #include <algorithm>
-#include <cmath>
 #include <iomanip>
 #include <iostream>
-#include <numeric>
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include "commands.hpp"
 #include "IOGuard.hpp"
+#include "getArea.hpp"
 
 namespace
 {
-  double getPolygonArea(const novikov::Polygon&);
   void maxArea(std::ostream&, const novikov::plg_t&);
   void maxVertexes(std::ostream&, const novikov::plg_t&);
-
-  struct CrossProductFunctor
-  {
-  public:
-    explicit CrossProductFunctor(const std::vector< novikov::Point >& pointsVec):
-        points(pointsVec)
-    {}
-
-    double operator()(size_t i) const
-    {
-      size_t next = (i + 1) % points.size();
-      return static_cast< double >(points[i].x * points[next].y - points[next].x * points[i].y);
-    }
-
-  private:
-    const std::vector< novikov::Point >& points;
-  };
 
   struct AreaComparator
   {
@@ -50,19 +32,6 @@ namespace
     }
   };
 
-  double getPolygonArea(const novikov::Polygon& p)
-  {
-    if (p.points.empty())
-    {
-      return 0;
-    }
-    std::vector< size_t > indices(p.points.size());
-    std::iota(indices.begin(), indices.end(), 0);
-    std::vector< double > partialAreas(p.points.size());
-    std::transform(indices.begin(), indices.end(), partialAreas.begin(), CrossProductFunctor{p.points});
-    return std::abs(std::accumulate(partialAreas.begin(), partialAreas.end(), 0.0)) / 2;
-  }
-
   void maxArea(std::ostream& out, const novikov::plg_t& polygons)
   {
     if (polygons.empty())
@@ -70,7 +39,7 @@ namespace
       throw std::logic_error("AREA requires at least one polygon in the dataset");
     }
     auto it = std::max_element(polygons.begin(), polygons.end(), AreaComparator{});
-    out << getPolygonArea(*it) << "\n";
+    out << getPolygonArea(*it);
   }
 
   void maxVertexes(std::ostream& out, const novikov::plg_t& polygons)
@@ -80,7 +49,7 @@ namespace
       throw std::logic_error("VERTEXES requires at least one polygon in the dataset");
     }
     auto it = std::max_element(polygons.begin(), polygons.end(), VertexComparator{});
-    out << it->points.size() << "\n";
+    out << it->points.size();
   }
 }
 
@@ -95,16 +64,17 @@ void novikov::max(std::istream& in, std::ostream& out, novikov::plg_t& polygons)
   novikov::IOGuard g(out);
   out << std::fixed << std::setprecision(1);
 
-  if (subCmd == "AREA")
+  using subCmd_t = void (*)(std::ostream&, const plg_t&);
+  std::unordered_map< std::string, subCmd_t > subCmds;
+  subCmds["AREA"] = maxArea;
+  subCmds["VERTEXES"] = maxVertexes;
+
+  if (subCmds.count(subCmd))
   {
-    maxArea(out, polygons);
-  }
-  else if (subCmd == "VERTEXES")
-  {
-    maxVertexes(out, polygons);
+    subCmds[subCmd](out, polygons);
   }
   else
   {
-    throw std::logic_error("Unrecognized subcommand");
+    throw std::logic_error("Invalid subcommand");
   }
 }

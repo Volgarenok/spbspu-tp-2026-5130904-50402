@@ -92,5 +92,5 @@ void novikov::same(std::istream& in, std::ostream& out, novikov::plg_t& polygons
   novikov::IOGuard g(out);
   out << std::fixed << std::setprecision(1);
 
-  out << std::count_if(polygons.begin(), polygons.end(), SamePredicate{target}) << "\n";
+  out << std::count_if(polygons.begin(), polygons.end(), SamePredicate{target});
 }

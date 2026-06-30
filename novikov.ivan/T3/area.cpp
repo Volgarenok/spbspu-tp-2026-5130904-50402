@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <numeric>
@@ -9,33 +8,16 @@
 #include <unordered_map>
 #include "commands.hpp"
 #include "IOGuard.hpp"
+#include "getArea.hpp"
 
 namespace
 {
   template< typename Predicate >
   double calculateAreaIf(const novikov::plg_t&, Predicate);
-  double getPolygonArea(const novikov::Polygon&);
   void areaEven(std::ostream&, const novikov::plg_t&);
   void areaOdd(std::ostream&, const novikov::plg_t&);
   void areaMean(std::ostream&, const novikov::plg_t&);
   void areaNum(std::ostream&, const novikov::plg_t&, size_t);
-
-  struct CrossProductFunctor
-  {
-  public:
-    explicit CrossProductFunctor(const std::vector< novikov::Point >& pointsVec):
-        points(pointsVec)
-    {}
-
-    double operator()(size_t i) const
-    {
-      size_t next = (i + 1) % points.size();
-      return static_cast< double >(points[i].x * points[next].y - points[next].x * points[i].y);
-    }
-
-  private:
-    const std::vector< novikov::Point >& points;
-  };
 
   struct IsEvenVertices
   {
@@ -102,27 +84,14 @@ namespace
     return std::accumulate(areas.begin(), areas.end(), 0.0);
   }
 
-  double getPolygonArea(const novikov::Polygon& p)
-  {
-    if (p.points.empty())
-    {
-      return 0;
-    }
-    std::vector< size_t > indices(p.points.size());
-    std::iota(indices.begin(), indices.end(), 0);
-    std::vector< double > partialAreas(p.points.size());
-    std::transform(indices.begin(), indices.end(), partialAreas.begin(), CrossProductFunctor{p.points});
-    return std::abs(std::accumulate(partialAreas.begin(), partialAreas.end(), 0.0)) / 2;
-  }
-
   void areaEven(std::ostream& out, const novikov::plg_t& polygons)
   {
-    out << calculateAreaIf(polygons, IsEvenVertices{}) << "\n";
+    out << calculateAreaIf(polygons, IsEvenVertices{});
   }
 
   void areaOdd(std::ostream& out, const novikov::plg_t& polygons)
   {
-    out << calculateAreaIf(polygons, IsOddVertices{}) << "\n";
+    out << calculateAreaIf(polygons, IsOddVertices{});
   }
 
   void areaMean(std::ostream& out, const novikov::plg_t& polygons)
@@ -132,12 +101,12 @@ namespace
       throw std::logic_error("MEAN requires at least one polygon in the dataset");
     }
     double totalArea = calculateAreaIf(polygons, AlwaysTrue{});
-    out << (totalArea / static_cast< double >(polygons.size())) << "\n";
+    out << (totalArea / static_cast< double >(polygons.size()));
   }
 
   void areaNum(std::ostream& out, const novikov::plg_t& polygons, size_t num)
   {
-    out << calculateAreaIf(polygons, IsTargetVertices{num}) << "\n";
+    out << calculateAreaIf(polygons, IsTargetVertices{num});
   }
 }
 

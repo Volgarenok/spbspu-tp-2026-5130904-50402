@@ -132,5 +132,5 @@ void novikov::intersections(std::istream& in, std::ostream& out, novikov::plg_t&
   novikov::IOGuard g(out);
   out << std::fixed << std::setprecision(1);
 
-  out << std::count_if(polygons.begin(), polygons.end(), IntersectionsPredicate{target}) << "\n";
+  out << std::count_if(polygons.begin(), polygons.end(), IntersectionsPredicate{target});
 }
