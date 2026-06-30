@@ -71,11 +71,7 @@ std::ostream &alisov::operator<<(std::ostream &out, const DataStruct &src)
       exp_val = exp_val.substr(start);
     }
 
-    if (exp_val.length() < 2) {
-      out << "0" << exp_val;
-    } else {
-      out << exp_val;
-    }
+    out << exp_val;
   } else {
     out << sci_str;
   }
@@ -84,6 +80,7 @@ std::ostream &alisov::operator<<(std::ostream &out, const DataStruct &src)
   out << ":key3 " << std::quoted(src.key3) << ":)";
   return out;
 }
+
 std::istream &alisov::operator>>(std::istream &in, DataStruct &dest)
 {
   std::istream::sentry guard(in);
