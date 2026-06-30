@@ -2,6 +2,28 @@
 #include <iomanip>
 #include <sstream>
 
+namespace alisov
+{
+  struct Delimiter
+  {
+    char expected;
+  };
+
+  std::istream &operator>>(std::istream &in, Delimiter &&dest)
+  {
+    std::istream::sentry guard(in);
+    if (!guard) {
+      return in;
+    }
+    char c = 0;
+    in >> c;
+    if (c != dest.expected) {
+      in.setstate(std::ios_base::failbit);
+    }
+    return in;
+  }
+}
+
 bool alisov::operator<(const DataStruct &lhs, const DataStruct &rhs)
 {
   if (lhs.key1 != rhs.key1) {
@@ -70,17 +92,9 @@ std::istream &alisov::operator>>(std::istream &in, DataStruct &dest)
     return in;
   }
 
-  char c = 0;
-  in >> c;
-  if (c != '(') {
-    in.setstate(std::ios_base::failbit);
+  in >> Delimiter{'('} >> Delimiter{':'};
+  if (!in)
     return in;
-  }
-  in >> c;
-  if (c != ':') {
-    in.setstate(std::ios_base::failbit);
-    return in;
-  }
 
   double k1 = 0.0;
   double k2 = 0.0;
@@ -89,6 +103,9 @@ std::istream &alisov::operator>>(std::istream &in, DataStruct &dest)
 
   for (size_t i = 0; i < 3; ++i) {
     std::string key = "";
+    char c = 0;
+
+    // Аккуратно читаем имя ключа "keyX" без пробелов
     in >> c;
     if (c != 'k') {
       in.setstate(std::ios_base::failbit);
@@ -114,12 +131,6 @@ std::istream &alisov::operator>>(std::istream &in, DataStruct &dest)
     }
     key += c;
 
-    in >> c;
-    if (c != ' ') {
-      in.setstate(std::ios_base::failbit);
-      return in;
-    }
-
     if (key == "key1") {
       if (!(in >> k1))
         return in;
@@ -134,25 +145,20 @@ std::istream &alisov::operator>>(std::istream &in, DataStruct &dest)
         return in;
       has_k2 = true;
     } else if (key == "key3") {
+      in >> std::ws;
       if (!(in >> std::quoted(k3)))
         return in;
       has_k3 = true;
     }
 
-    in >> c;
-    if (c != ':') {
-      in.setstate(std::ios_base::failbit);
+    in >> Delimiter{':'};
+    if (!in)
       return in;
-    }
   }
 
-  in >> c;
-  if (c != ')') {
-    in.setstate(std::ios_base::failbit);
-    return in;
-  }
+  in >> Delimiter{')'};
 
-  if (has_k1 && has_k2 && has_k3) {
+  if (in && has_k1 && has_k2 && has_k3) {
     dest.key1 = k1;
     dest.key2 = k2;
     dest.key3 = k3;
