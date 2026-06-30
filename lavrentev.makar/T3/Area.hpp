@@ -36,7 +36,7 @@ void lavrentev::areaIf(const std::vector< lavrentev::Polygon > &plgs, Predicate 
   );
 
   float total = std::accumulate(areas.begin(), areas.end(), 0.0f);
-  std::cout << std::fixed << std::setprecision(1) << total << "\n";
+  std::cout << std::fixed << std::setprecision(1) << total;
 }
 
 #endif
