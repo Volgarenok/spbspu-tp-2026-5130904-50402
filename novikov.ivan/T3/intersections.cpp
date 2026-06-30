@@ -7,6 +7,7 @@
 #include <vector>
 #include "commands.hpp"
 #include "Parser.hpp"
+#include "IOGuard.hpp"
 
 namespace
 {
@@ -23,14 +24,16 @@ namespace
   int orientation(novikov::Point p, novikov::Point q, novikov::Point r)
   {
     long long val = 1LL * (q.y - p.y) * (r.x - q.x) - 1LL * (q.x - p.x) * (r.y - q.y);
-    if (val == 0) return 0;
+    if (val == 0) {
+      return 0;
+    }
     return (val > 0) ? 1 : 2;
   }
 
   bool onSegment(novikov::Point p, novikov::Point q, novikov::Point r)
   {
-    return q.x <= std::max(p.x, r.x) && q.x >= std::min(p.x, r.x) &&
-           q.y <= std::max(p.y, r.y) && q.y >= std::min(p.y, r.y);
+    return q.x <= std::max(p.x, r.x) && q.x >= std::min(p.x, r.x)
+        && q.y <= std::max(p.y, r.y) && q.y >= std::min(p.y, r.y);
   }
 
   bool intersectsEdges(Edge e1, Edge e2)
@@ -59,7 +62,8 @@ namespace
     for (size_t i = 0, j = n - 1; i < n; j = i++)
     {
       if (((poly.points[i].y > p.y) != (poly.points[j].y > p.y)) &&
-          (p.x < 1.0 * (poly.points[j].x - poly.points[i].x) * (p.y - poly.points[i].y) / (poly.points[j].y - poly.points[i].y) + poly.points[i].x))
+          (p.x < 1.0 * (poly.points[j].x - poly.points[i].x) * (p.y - poly.points[i].y)
+              / (poly.points[j].y - poly.points[i].y) + poly.points[i].x))
       {
         inside = !inside;
       }

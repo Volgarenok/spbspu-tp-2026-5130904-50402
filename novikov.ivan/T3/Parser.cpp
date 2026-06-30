@@ -3,45 +3,12 @@
 #include <iterator>
 #include <vector>
 #include <sstream>
-
-novikov::IOGuard::IOGuard(std::basic_ios< char >& s):
-    s_(s),
-    width_(s.width()),
-    precision_(s.precision()),
-    fmt_(s.flags()),
-    fill_(s.fill())
-{}
-
-novikov::IOGuard::~IOGuard()
-{
-  s_.width(width_);
-  s_.fill(fill_);
-  s_.precision(precision_);
-  s_.flags(fmt_);
-}
+#include "IOGuard.hpp"
+#include "DelimiterIO.hpp"
 
 std::istream& novikov::operator>>(std::istream& in, Point& pt)
 {
   in >> DelimiterIO{' '} >> DelimiterIO{'('} >> pt.x >> DelimiterIO{';'} >> pt.y >> DelimiterIO{')'};
-  return in;
-}
-
-std::istream& novikov::operator>>(std::istream& in, DelimiterIO&& dest)
-{
-  std::istream::sentry s(in);
-  if (!s)
-  {
-    return in;
-  }
-  char c = 0;
-  if (in.get(c))
-  {
-    if (c != dest.exp)
-    {
-      in.putback(c);
-      in.setstate(std::ios::failbit);
-    }
-  }
   return in;
 }
 

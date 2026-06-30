@@ -7,6 +7,7 @@
 #include <vector>
 #include "commands.hpp"
 #include "Parser.hpp"
+#include "IOGuard.hpp"
 
 namespace
 {
@@ -15,7 +16,8 @@ namespace
     return std::isspace(static_cast< unsigned char >(c)) == 0;
   }
 
-  bool checkShift(const std::vector< novikov::Point >& a, const std::vector< novikov::Point >& b, size_t shift, int dx, int dy)
+  using pvec = std::vector< novikov::Point >;
+  bool checkShift(const pvec& a, const pvec& b, size_t shift, int dx, int dy)
   {
     size_t n = a.size();
     for (size_t i = 0; i < n; ++i)
@@ -34,7 +36,7 @@ namespace
   {
   public:
     explicit SamePredicate(const novikov::Polygon& target):
-        targetPoly(target)
+      targetPoly(target)
     {}
 
     bool operator()(const novikov::Polygon& p) const
