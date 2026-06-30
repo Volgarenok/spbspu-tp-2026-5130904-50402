@@ -74,7 +74,6 @@ void novikov::same(std::istream& in, std::ostream& out, novikov::plg_t& polygons
   novikov::Polygon target;
   if (!(in >> target))
   {
-    in.clear();
     throw std::logic_error("Invalid polygon format");
   }
 
@@ -83,8 +82,7 @@ void novikov::same(std::istream& in, std::ostream& out, novikov::plg_t& polygons
   {
     if (std::any_of(restOfLine.begin(), restOfLine.end(), isNotSpace))
     {
-      in.clear();
-      in.putback('\n');
+      in.setstate(std::ios::failbit);
       throw std::logic_error("Trailing garbage after polygon");
     }
   }
