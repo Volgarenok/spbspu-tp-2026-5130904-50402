@@ -20,6 +20,7 @@ namespace pozdnyakov
   void cmdHalt(std::istream &in, std::ostream &out, Database &db);
   void cmdExpired(std::istream &in, std::ostream &out, Database &db);
   void cmdRefresh(std::istream &in, std::ostream &out, Database &db);
+  void cmdLoop(std::istream &in, std::ostream &out, Database &db);
 
 }
 

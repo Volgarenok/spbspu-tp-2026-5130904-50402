@@ -19,19 +19,19 @@ int main()
     {"mind", pozdnyakov::cmdMind},
     {"halt", pozdnyakov::cmdHalt},
     {"expired", pozdnyakov::cmdExpired},
-    {"refresh", pozdnyakov::cmdRefresh}
+    {"refresh", pozdnyakov::cmdRefresh},
+    {"loop", pozdnyakov::cmdLoop}
   };
 
   std::string cmd;
   while (std::cin >> cmd) {
     try {
       cmds.at(cmd)(std::cin, std::cout, db);
+      std::cout << "\n";
     } catch (const std::exception &) {
       std::cout << "<INVALID COMMAND>\n";
-      if (std::cin.fail()) {
-        std::cin.clear();
-        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      }
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
 
