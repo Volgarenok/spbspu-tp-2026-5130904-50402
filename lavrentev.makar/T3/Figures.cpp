@@ -100,39 +100,48 @@ std::istream& lavrentev::operator>>(std::istream& is, Polygon& plg)
   }
 
   size_t n = 0;
-  if (!(is >> n) || n < 3)
+  if (!(is >> n))
   {
-    is.setstate(std::ios_base::failbit);
+    plg.points.clear();
+    return is;
+  }
+
+  if (n < 3)
+  {
+    is.clear();
+    is.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    plg.points.clear();
     return is;
   }
 
   std::string line;
-  std::getline(is, line);
+  if (!std::getline(is, line))
+  {
+    plg.points.clear();
+    return is;
+  }
+
+  if (static_cast< size_t >(std::count(line.begin(), line.end(), '(')) != n)
+  {
+    if (is.fail() && !is.eof()) { is.clear(); }
+    plg.points.clear();
+    return is;
+  }
 
   std::vector< Point > temp(n);
   bool success = true;
   size_t pos = 0;
 
-  PointParser parser(line, pos, success);
-  std::generate_n(temp.begin(), n, parser);
+  std::generate_n(temp.begin(), n, PointParser(line, pos, success));
 
-  if (success)
+  if (!success || line.find_first_not_of(" \t\r\n", pos) != std::string::npos)
   {
-    if (line.find_first_not_of(" \t\r", pos) != std::string::npos)
-    {
-      success = false;
-    }
+    if (is.fail() && !is.eof()) { is.clear(); }
+    plg.points.clear();
+    return is;
   }
 
-  if (!success)
-  {
-    is.setstate(std::ios_base::failbit);
-  }
-  else
-  {
-    plg.points = std::move(temp);
-  }
-
+  plg.points = std::move(temp);
   return is;
 }
 

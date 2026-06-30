@@ -11,7 +11,10 @@ void lavrentev::readfile(std::ifstream& file, std::vector< Polygon >& plgs)
     Polygon plg;
     if (file >> plg)
     {
-      plgs.push_back(plg);
+      if (!plg.isEmpty())
+      {
+        plgs.push_back(plg);
+      }
     }
     else
     {
