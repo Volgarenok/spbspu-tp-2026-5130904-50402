@@ -10,6 +10,9 @@ namespace chernikov {
     int x, y;
   };
 
+  bool operator<(const Point &a, const Point &b);
+  bool operator==(const Point &a, const Point &b);
+
   struct Polygon
   {
     std::vector< Point > points;

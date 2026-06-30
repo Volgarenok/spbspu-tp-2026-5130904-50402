@@ -1,11 +1,25 @@
 #include "geometry.hpp"
-#include <algorithm>
-#include <functional>
 #include "delim.hpp"
 #include "ioguard.hpp"
+#include <algorithm>
+#include <functional>
 #include <iterator>
 #include <numeric>
 #include <set>
+
+bool chernikov::operator<(const Point &a, const Point &b)
+{
+  if (a.x != b.x)
+  {
+    return a.x < b.x;
+  }
+  return a.y < b.y;
+}
+
+bool chernikov::operator==(const Point &a, const Point &b)
+{
+  return a.x == b.x && a.y == b.y;
+}
 
 namespace {
   double crossTerm(const std::vector< chernikov::Point > &pts, size_t i, size_t n)
