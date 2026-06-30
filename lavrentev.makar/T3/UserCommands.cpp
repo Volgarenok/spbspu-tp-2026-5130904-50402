@@ -33,7 +33,7 @@ void lavrentev::maxseq(std::istream &is, const std::vector< Polygon > &plgs)
 
   size_t result = (it == checks.rend()) ? 0 : checks.size() - std::distance(checks.rbegin(), it);
 
-  std::cout << result << "\n";
+  std::cout << result;
 }
 
 int lavrentev::orient(const Point& a, const Point& b, const Point& c)
@@ -214,5 +214,5 @@ void lavrentev::intersections(std::istream& is, const std::vector< Polygon >& pl
     )
   );
 
-  std::cout << count << "\n";
+  std::cout << count;
 }
