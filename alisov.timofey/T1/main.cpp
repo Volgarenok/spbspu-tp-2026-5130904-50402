@@ -1,81 +1,11 @@
-#include <iostream>
-#include <string>
-#include <ostream>
-#include <string>
-#include <unordered_map>
-#include <vector>
-
-namespace alisov
-{
-  struct Note
-  {
-    std::vector< std::string > lines;
-    std::vector< std::string > links;
-  };
-
-  void note(std::istream &in, std::ostream &out,
-            std::unordered_map< std::string, alisov::Note > notes);
-  void line(std::istream &in, std::ostream &out,
-            std::unordered_map< std::string, alisov::Note > notes);
-  void show(std::istream &in, std::ostream &out,
-            std::unordered_map< std::string, alisov::Note > notes);
-  void drop(std::istream &in, std::ostream &out,
-            std::unordered_map< std::string, alisov::Note > notes);
-  void link(std::istream &in, std::ostream &out,
-            std::unordered_map< std::string, alisov::Note > notes);
-  void halt(std::istream &in, std::ostream &out,
-            std::unordered_map< std::string, alisov::Note > notes);
-  void mind(std::istream &in, std::ostream &out,
-            std::unordered_map< std::string, alisov::Note > notes);
-  void expired(std::istream &in, std::ostream &out,
-               std::unordered_map< std::string, alisov::Note > notes);
-  void refresh(std::istream &in, std::ostream &out,
-               std::unordered_map< std::string, alisov::Note > notes);
-}
-
-void note(std::istream &in, std::ostream &out,
-          std::unordered_map< std::string, alisov::Note > notes)
-{
-}
-void line(std::istream &in, std::ostream &out,
-          std::unordered_map< std::string, alisov::Note > notes)
-{
-}
-void show(std::istream &in, std::ostream &out,
-          std::unordered_map< std::string, alisov::Note > notes)
-{
-}
-void drop(std::istream &in, std::ostream &out,
-          std::unordered_map< std::string, alisov::Note > notes)
-{
-}
-void link(std::istream &in, std::ostream &out,
-          std::unordered_map< std::string, alisov::Note > notes)
-{
-}
-void halt(std::istream &in, std::ostream &out,
-          std::unordered_map< std::string, alisov::Note > notes)
-{
-}
-void mind(std::istream &in, std::ostream &out,
-          std::unordered_map< std::string, alisov::Note > notes)
-{
-}
-void expired(std::istream &in, std::ostream &out,
-             std::unordered_map< std::string, alisov::Note > notes)
-{
-}
-void refresh(std::istream &in, std::ostream &out,
-             std::unordered_map< std::string, alisov::Note > notes)
-{
-}
+#include "Note.hpp"
 
 int main()
 {
-  std::unordered_map< std::string, alisov::Note > notes;
-  using cmd1 =
-      void (*)(std::istream &, std::ostream &, std::unordered_map< std::string, alisov::Note >);
+  alisov::NotesMap notes;
+  using cmd1 = void (*)(std::istream &, std::ostream &, alisov::NotesMap &);
   std::unordered_map< std::string, cmd1 > cmds;
+
   cmds["note"] = alisov::note;
   cmds["line"] = alisov::line;
   cmds["show"] = alisov::show;
@@ -87,20 +17,13 @@ int main()
   cmds["refresh"] = alisov::refresh;
 
   std::string cmd;
-  while (std::cin >> cmd)
-  {
-    try
-    {
+  while (std::cin >> cmd) {
+    try {
       cmds.at(cmd)(std::cin, std::cout, notes);
-    }
-    catch (std::out_of_range &e)
-    {
+    } catch (const std::out_of_range &) {
       std::cout << "Invalid command\n";
-    }
-    if (!std::cin.eof())
-    {
-      std::cerr << "Bad input\n";
-      return 1;
+      std::string dummy;
+      std::getline(std::cin, dummy);
     }
   }
 }
