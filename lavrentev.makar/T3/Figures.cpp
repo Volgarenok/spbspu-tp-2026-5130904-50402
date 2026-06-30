@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <iostream>
 #include <functional>
-#include <limits>
+#include <iterator>
 #include "Figures.hpp"
 
 using namespace std::placeholders;
@@ -110,7 +110,7 @@ std::istream& lavrentev::operator>>(std::istream& is, Polygon& plg)
   std::vector< Point > temp;
   temp.reserve(n);
 
-  std::copy_n(std::istream_iterator< Point >(is), n, std::back_inserter(temp));
+  std::copy_n(std::istream_iterator< lavrentev::Point >(is), n, std::back_inserter(temp));
 
   if (is)
   {
