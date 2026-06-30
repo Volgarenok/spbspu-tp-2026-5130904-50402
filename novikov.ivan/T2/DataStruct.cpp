@@ -1,7 +1,10 @@
 #include "DataStruct.hpp"
-#include <algorithm>
-#include <cctype>
-#include <iomanip>
+#include <iostream>
+#include <vector>
+#include <IOGuard.hpp>
+#include <DelimiterIO.hpp>
+#include "LabelIO.hpp"
+#include "KeyIO.hpp"
 
 std::istream& novikov::operator>>(std::istream& in, DataStruct& dest)
 {
