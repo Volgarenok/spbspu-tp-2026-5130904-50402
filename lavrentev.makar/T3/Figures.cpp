@@ -103,43 +103,24 @@ std::istream& lavrentev::operator>>(std::istream& is, Polygon& plg)
   size_t n = 0;
   if (!(is >> n) || n < 3)
   {
-    is.clear();
-    is.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-    is.putback('\n');
-    plg.points.clear();
+    is.setstate(std::ios::failbit);
     return is;
   }
 
-  std::string line;
-  if (!std::getline(is, line))
+  std::vector< Point > temp;
+  temp.reserve(n);
+
+  std::copy_n(std::istream_iterator< Point >(is), n, std::back_inserter(temp));
+
+  if (is)
+  {
+    plg.points = std::move(temp);
+  }
+  else
   {
     plg.points.clear();
-    return is;
   }
 
-  if (static_cast< size_t >(std::count(line.begin(), line.end(), '(')) != n)
-  {
-    is.clear();
-    is.putback('\n');
-    plg.points.clear();
-    return is;
-  }
-
-  std::vector< Point > temp(n);
-  bool success = true;
-  size_t pos = 0;
-
-  std::generate_n(temp.begin(), n, PointParser(line, pos, success));
-
-  if (!success || line.find_first_not_of(" \t\r\n", pos) != std::string::npos)
-  {
-    is.clear();
-    is.putback('\n');
-    plg.points.clear();
-    return is;
-  }
-
-  plg.points = std::move(temp);
   return is;
 }
 
