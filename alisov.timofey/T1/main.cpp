@@ -14,6 +14,7 @@ namespace alisov
   };
 
   using NotesMap = std::unordered_map< std::string, std::shared_ptr< alisov::Note > >;
+
   void note(std::istream &in, std::ostream &out, NotesMap &notes);
   void line(std::istream &in, std::ostream &out, NotesMap &notes);
   void show(std::istream &in, std::ostream &out, NotesMap &notes);
