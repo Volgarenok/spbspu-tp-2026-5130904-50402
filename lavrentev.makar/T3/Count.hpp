@@ -2,6 +2,7 @@
 #define COUNT_HPP
 #include <iostream>
 #include <istream>
+#include <algorithm>
 #include "Figures.hpp"
 
 namespace lavrentev

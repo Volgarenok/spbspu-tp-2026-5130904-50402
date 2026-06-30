@@ -3,6 +3,9 @@
 #include "Figures.hpp"
 #include <numeric>
 #include <iomanip>
+#include <algorithm>
+#include <functional>
+#include <iterator>
 
 namespace lavrentev
 {
