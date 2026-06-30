@@ -1,0 +1,68 @@
+#ifndef FIGURES_HPP
+#define FIGURES_HPP
+#include <iostream>
+#include <vector>
+#include "../common/Delimiter.hpp"
+
+namespace lavrentev
+{
+  struct Point
+  {
+    int x, y;
+
+    bool operator==(const Point &p) const;
+    bool operator<(const Point &other) const;
+  };
+
+  struct Triangle
+  {
+    static const size_t size = 3;
+    std::vector< Point > points = std::vector< Point >(size);
+
+    Triangle();
+    Triangle(Point a, Point b, Point c);
+
+    float getArea() const;
+  };
+
+  struct Polygon
+  {
+    std::vector< Point > points;
+    float getArea() const;
+    size_t getSize() const;
+    bool isEmpty() const;
+
+    bool operator==(const Polygon &p) const;
+
+  private:
+    static Triangle helpArea(const std::vector< Point > &points, size_t &index);
+  };
+
+  struct PointParser
+  {
+    const std::string& line;
+    size_t& pos;
+    bool& success;
+
+    PointParser(const std::string& l, size_t& p, bool& s):
+      line(l),
+      pos(p),
+      success(s)
+    {}
+
+    Point operator()();
+  };
+
+  std::istream &operator>>(std::istream &is, Polygon &plg);
+  std::istream &operator>>(std::istream &is, Point &p);
+  std::istream &operator>>(std::istream &is, Delimiter_t &del);
+
+  bool isEven(Polygon p);
+  bool isOdd(Polygon p);
+  bool isAmount(Polygon p, size_t n);
+  bool helpMS(int n, const std::vector< Polygon > &plgs, const Polygon &p);
+  char check(std::istream &is, char expected);
+  Point readPoint(std::istream* is);
+}
+
+#endif
