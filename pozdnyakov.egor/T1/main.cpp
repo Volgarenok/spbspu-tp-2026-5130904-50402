@@ -11,14 +11,14 @@ int main()
 
   using cmd_t = void (*)(std::istream &, std::ostream &, pozdnyakov::Database &);
   std::unordered_map< std::string, cmd_t > cmds = {
-    {"note", pozdnyakov::cmdNote}, 
-    {"line", pozdnyakov::cmdLine},       
+    {"note", pozdnyakov::cmdNote},
+    {"line", pozdnyakov::cmdLine},
     {"show", pozdnyakov::cmdShow},
-    {"drop", pozdnyakov::cmdDrop}, 
-    {"link", pozdnyakov::cmdLink},       
+    {"drop", pozdnyakov::cmdDrop},
+    {"link", pozdnyakov::cmdLink},
     {"mind", pozdnyakov::cmdMind},
-    {"halt", pozdnyakov::cmdHalt}, 
-    {"expired", pozdnyakov::cmdExpired}, 
+    {"halt", pozdnyakov::cmdHalt},
+    {"expired", pozdnyakov::cmdExpired},
     {"refresh", pozdnyakov::cmdRefresh}
   };
 
