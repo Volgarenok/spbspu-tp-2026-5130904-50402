@@ -47,5 +47,6 @@ std::ostream &alisov::operator<<(std::ostream &out, const DataStruct &src)
   }
 
   out.flags(flags);
+  out << ":key3 " << std::quoted(src.key3) << ":)";
   return out;
 }
