@@ -1,37 +1,30 @@
 #include "data_struct.hpp"
 #include "io_structs.hpp"
-#include <istream>
-#include <ostream>
 #include <cmath>
+#include <iomanip>
+#include <iostream>
 #include <string>
 
-double chernikov::key2_to_double(const std::pair< long long, unsigned long long > &p)
+bool chernikov::operator<(const DataStruct &lhs, const DataStruct &rhs)
 {
-  return static_cast< double >(p.first) / static_cast< double >(p.second);
-}
-
-bool chernikov::compare_data(const DataStruct &a, const DataStruct &b)
-{
-  double abs_a = std::abs(a.key1);
-  double abs_b = std::abs(b.key1);
-
-  if (abs_a != abs_b)
+  double abs_lhs = std::abs(lhs.key1);
+  double abs_rhs = std::abs(rhs.key1);
+  if (abs_lhs != abs_rhs)
   {
-    return abs_a < abs_b;
+    return abs_lhs < abs_rhs;
   }
 
-  double val_a = key2_to_double(a.key2);
-  double val_b = key2_to_double(b.key2);
-
-  if (val_a != val_b)
+  double val_lhs = static_cast< double >(lhs.key2.first) / static_cast< double >(lhs.key2.second);
+  double val_rhs = static_cast< double >(rhs.key2.first) / static_cast< double >(rhs.key2.second);
+  if (val_lhs != val_rhs)
   {
-    return val_a < val_b;
+    return val_lhs < val_rhs;
   }
 
-  return a.key3.length() < b.key3.length();
+  return lhs.key3.length() < rhs.key3.length();
 }
 
-std::istream &chernikov::operator>>(std::istream &in, DataStruct &data)
+std::istream &chernikov::operator>>(std::istream &in, DataStruct &dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -39,105 +32,51 @@ std::istream &chernikov::operator>>(std::istream &in, DataStruct &data)
     return in;
   }
 
-  char c;
-  if (!(in >> c) || c != '(')
+  DataStruct tmp;
+  bool got1 = false;
+  bool got2 = false;
+  bool got3 = false;
+
+  in >> DelimIO{'('};
+
+  while (in && (!got1 || !got2 || !got3))
   {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-  if (!(in >> c) || c != ':')
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
+    std::string label;
+    in >> label;
 
-  bool has_key1 = false;
-  bool has_key2 = false;
-  bool has_key3 = false;
-
-  while (in.good())
-  {
-    std::string key;
-    char next_char = static_cast< char >(in.peek());
-
-    if (next_char == ':')
+    if (label == ":key1" && !got1)
     {
-      in >> c;
-      in >> c;
-      break;
-    }
-
-    while (in.get(c) && c != ' ' && c != ':')
+      in >> CmpLspIO{tmp.key1};
+      if (in)
+      {
+        got1 = true;
+      }
+    } else if (label == ":key2" && !got2)
     {
-      key += c;
-    }
-
-    if (c == ' ')
+      in >> RatLspIO{tmp.key2};
+      if (in)
+      {
+        got2 = true;
+      }
+    } else if (label == ":key3" && !got3)
     {
-      if (!(in >> c) || c != ':')
+      in >> StringIO{tmp.key3};
+      if (in)
       {
-        in.setstate(std::ios::failbit);
-        return in;
+        got3 = true;
       }
-    }
-
-    if (key == "key1")
-    {
-      if (has_key1)
-      {
-        in.setstate(std::ios::failbit);
-        return in;
-      }
-      in >> ComplexIO(data.key1);
-      if (!in)
-      {
-        return in;
-      }
-      has_key1 = true;
-    } else if (key == "key2")
-    {
-      if (has_key2)
-      {
-        in.setstate(std::ios::failbit);
-        return in;
-      }
-      in >> RationalIO(data.key2);
-      if (!in)
-      {
-        return in;
-      }
-      has_key2 = true;
-    } else if (key == "key3")
-    {
-      if (has_key3)
-      {
-        in.setstate(std::ios::failbit);
-        return in;
-      }
-      in >> StringIO(data.key3);
-      if (!in)
-      {
-        return in;
-      }
-      has_key3 = true;
     } else
     {
       in.setstate(std::ios::failbit);
-      return in;
-    }
-
-    next_char = static_cast< char >(in.peek());
-    if (next_char == ':')
-    {
-      in >> c;
-    } else
-    {
-      in.setstate(std::ios::failbit);
-      return in;
     }
   }
 
-  if (!has_key1 || !has_key2 || !has_key3)
+  in >> LabelIO{":)"};
+
+  if (in && got1 && got2 && got3)
+  {
+    dest = tmp;
+  } else
   {
     in.setstate(std::ios::failbit);
   }
@@ -145,10 +84,17 @@ std::istream &chernikov::operator>>(std::istream &in, DataStruct &data)
   return in;
 }
 
-std::ostream &chernikov::operator<<(std::ostream &out, const DataStruct &data)
+std::ostream &chernikov::operator<<(std::ostream &out, const DataStruct &src)
 {
-  out << "(:key1 #c(" << data.key1.real() << " " << data.key1.imag() << "):"
-      << "key2 (:N " << data.key2.first << ":D " << data.key2.second << ":):"
-      << "key3 \"" << data.key3 << "\":)";
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
+
+  out << "(:key1 #c(" << std::fixed << std::setprecision(1) << src.key1.real() << " " << src.key1.imag() << "):"
+      << "key2 (:N " << src.key2.first << ":D " << src.key2.second << ":):"
+      << "key3 " << std::quoted(src.key3) << ":)";
+
   return out;
 }
