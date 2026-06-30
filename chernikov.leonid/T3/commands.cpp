@@ -7,7 +7,6 @@
 #include <numeric>
 #include <stdexcept>
 #include <string>
-#include <iostream>
 
 namespace {
   bool isEven(const chernikov::Polygon &p)
@@ -127,16 +126,15 @@ namespace {
                          std::bind(chernikov::isPermutationOf, std::placeholders::_1, target));
   }
 
-  void handleEcho(std::vector< chernikov::Polygon > &polygons, const chernikov::Polygon &target)
+  void handleEcho(std::ostream &out, std::vector< chernikov::Polygon > &polygons, const chernikov::Polygon &target)
   {
     size_t added = 0;
     std::vector< chernikov::Polygon > result;
-    result.reserve(polygons.size() * 2);
 
     for (const auto &p : polygons)
     {
       result.push_back(p);
-      if (p.points == target.points)
+      if (chernikov::isPermutationOf(p, target))
       {
         result.push_back(p);
         ++added;
@@ -144,7 +142,54 @@ namespace {
     }
 
     polygons = std::move(result);
-    std::cout << added;
+    out << added;
+  }
+
+  void handleMaxseq(std::ostream &out, const std::vector< chernikov::Polygon > &polygons,
+                    const chernikov::Polygon &target)
+  {
+    size_t maxSeq = 0;
+    size_t current = 0;
+
+    for (const auto &p : polygons)
+    {
+      if (chernikov::isPermutationOf(p, target))
+      {
+        ++current;
+        if (current > maxSeq)
+        {
+          maxSeq = current;
+        }
+      } else
+      {
+        current = 0;
+      }
+    }
+
+    out << maxSeq;
+  }
+
+  void handleRmecho(std::ostream &out, std::vector< chernikov::Polygon > &polygons, const chernikov::Polygon &target)
+  {
+    size_t removed = 0;
+    std::vector< chernikov::Polygon > result;
+
+    for (size_t i = 0; i < polygons.size(); ++i)
+    {
+      bool isTarget = chernikov::isPermutationOf(polygons[i], target);
+      bool prevIsTarget = !result.empty() && chernikov::isPermutationOf(result.back(), target);
+
+      if (isTarget && prevIsTarget)
+      {
+        ++removed;
+      } else
+      {
+        result.push_back(polygons[i]);
+      }
+    }
+
+    polygons = std::move(result);
+    out << removed;
   }
 
   void handleRects(std::ostream &out, const std::vector< chernikov::Polygon > &polygons)
@@ -259,14 +304,14 @@ void chernikov::perms(std::istream &in, std::ostream &out, const std::vector< Po
   handlePerms(out, polygons, target);
 }
 
-void chernikov::echo(std::istream &in, std::ostream &, std::vector< Polygon > &polygons)
+void chernikov::echo(std::istream &in, std::ostream &out, std::vector< Polygon > &polygons)
 {
   Polygon target;
   if (!(in >> target))
   {
     throw std::invalid_argument("invalid");
   }
-  handleEcho(polygons, target);
+  handleEcho(out, polygons, target);
 }
 
 void chernikov::maxseq(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
@@ -276,26 +321,7 @@ void chernikov::maxseq(std::istream &in, std::ostream &out, const std::vector< P
   {
     throw std::invalid_argument("invalid");
   }
-
-  size_t maxSeq = 0;
-  size_t current = 0;
-
-  for (const auto &p : polygons)
-  {
-    if (p.points == target.points)
-    {
-      ++current;
-      if (current > maxSeq)
-      {
-        maxSeq = current;
-      }
-    } else
-    {
-      current = 0;
-    }
-  }
-
-  out << maxSeq;
+  handleMaxseq(out, polygons, target);
 }
 
 void chernikov::rmecho(std::istream &in, std::ostream &out, std::vector< Polygon > &polygons)
@@ -305,24 +331,7 @@ void chernikov::rmecho(std::istream &in, std::ostream &out, std::vector< Polygon
   {
     throw std::invalid_argument("invalid");
   }
-
-  size_t removed = 0;
-  auto it = polygons.begin();
-
-  while (it != polygons.end())
-  {
-    auto next = std::next(it);
-    if (next != polygons.end() && it->points == target.points && next->points == target.points)
-    {
-      it = polygons.erase(next);
-      ++removed;
-    } else
-    {
-      ++it;
-    }
-  }
-
-  out << removed;
+  handleRmecho(out, polygons, target);
 }
 
 void chernikov::rects(std::istream &, std::ostream &out, const std::vector< Polygon > &polygons)
