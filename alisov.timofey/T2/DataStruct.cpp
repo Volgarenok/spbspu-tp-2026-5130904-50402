@@ -102,10 +102,9 @@ std::istream &alisov::operator>>(std::istream &in, DataStruct &dest)
     }
     key += c;
 
-    in >> c;
-    if (c != ' ') {
-      in.setstate(std::ios_base::failbit);
-      return in;
+    // Вместо жесткого in >> c, который может пропускать пробелы некорректно:
+    if (in.peek() == ' ') {
+      in.get(c);
     }
 
     if (key == "key1") {
@@ -122,6 +121,8 @@ std::istream &alisov::operator>>(std::istream &in, DataStruct &dest)
         return in;
       has_k2 = true;
     } else if (key == "key3") {
+      // Перед std::quoted очистим возможные пробелы
+      in >> std::ws;
       if (!(in >> std::quoted(k3)))
         return in;
       has_k3 = true;
