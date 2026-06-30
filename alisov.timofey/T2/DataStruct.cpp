@@ -133,5 +133,20 @@ std::istream &alisov::operator>>(std::istream &in, DataStruct &dest)
       return in;
     }
   }
+
+  in >> c;
+  if (c != ')') {
+    in.setstate(std::ios_base::failbit);
+    return in;
+  }
+
+  if (has_k1 && has_k2 && has_k3) {
+    dest.key1 = k1;
+    dest.key2 = k2;
+    dest.key3 = k3;
+  } else {
+    in.setstate(std::ios_base::failbit);
+  }
+
   return in;
 }
