@@ -2,11 +2,13 @@
 #include <algorithm>
 #include <functional>
 #include <ioguard.hpp>
-#include <iomanip>
+#include "ioguard.hpp"
 #include <map>
 #include <numeric>
 #include <stdexcept>
 #include "geometry.hpp"
+#include <iostream>
+#include <iomanip>
 
 namespace {
   bool isEven(const chernikov::Polygon &p)
