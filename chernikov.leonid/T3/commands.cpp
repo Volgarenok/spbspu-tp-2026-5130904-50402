@@ -201,17 +201,6 @@ namespace {
   {
     out << std::count_if(polygons.begin(), polygons.end(), chernikov::hasRightAngle);
   }
-
-  bool readPolygon(std::istream &in, chernikov::Polygon &target)
-  {
-    in >> target;
-    if (!in || target.points.empty())
-    {
-      return false;
-    }
-    in >> std::ws;
-    return in.peek() == EOF;
-  }
 }
 
 void chernikov::area(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
@@ -318,7 +307,7 @@ void chernikov::perms(std::istream &in, std::ostream &out, const std::vector< Po
 void chernikov::echo(std::istream &in, std::ostream &out, std::vector< Polygon > &polygons)
 {
   Polygon target;
-  if (!readPolygon(in, target))
+  if (!(in >> target) || target.points.empty())
   {
     throw std::invalid_argument("invalid");
   }
@@ -328,7 +317,7 @@ void chernikov::echo(std::istream &in, std::ostream &out, std::vector< Polygon >
 void chernikov::maxseq(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
   Polygon target;
-  if (!readPolygon(in, target))
+  if (!(in >> target) || target.points.empty())
   {
     throw std::invalid_argument("invalid");
   }
@@ -338,21 +327,19 @@ void chernikov::maxseq(std::istream &in, std::ostream &out, const std::vector< P
 void chernikov::rmecho(std::istream &in, std::ostream &out, std::vector< Polygon > &polygons)
 {
   Polygon target;
-  if (!readPolygon(in, target))
+  if (!(in >> target) || target.points.empty())
   {
     throw std::invalid_argument("invalid");
   }
   handleRmecho(out, polygons, target);
 }
 
-void chernikov::rects(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+void chernikov::rects(std::istream &, std::ostream &out, const std::vector< Polygon > &polygons)
 {
-  (void)in;
   handleRects(out, polygons);
 }
 
-void chernikov::rightshapes(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+void chernikov::rightshapes(std::istream &, std::ostream &out, const std::vector< Polygon > &polygons)
 {
-  (void)in;
   handleRightshapes(out, polygons);
 }
