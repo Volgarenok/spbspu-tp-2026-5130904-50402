@@ -15,13 +15,13 @@ std::istream& muh::operator>>(std::istream& in, Point& point)
   {
     return in;
   }
-  in >> point.x_;
+  in >> point.x;
   in >> DelimiterIO{';'};
   if (!in)
   {
     return in;
   }
-  in >> point.y_;
+  in >> point.y;
   return in >> DelimiterIO{')'};
 }
 
@@ -38,12 +38,12 @@ std::istream& muh::operator>>(std::istream& in, Polygon& polygon)
     in.setstate(std::ios::failbit);
     return in;
   }
-  polygon.points_.resize(count);
+  polygon.points.resize(count);
   using iit_t = std::istream_iterator<Point>;
-  std::copy_n(iit_t(in), count, polygon.points_.begin());
+  std::copy_n(iit_t(in), count, polygon.points.begin());
   if (!in)
   {
-    polygon.points_.clear();
+    polygon.points.clear();
     in.setstate(std::ios::failbit);
   }
   return in;
@@ -51,7 +51,7 @@ std::istream& muh::operator>>(std::istream& in, Polygon& polygon)
 
 bool muh::operator==(const Point& lhs, const Point& rhs)
 {
-  return (lhs.x_ == rhs.x_) && (lhs.y_ == rhs.y_);
+  return (lhs.x == rhs.x) && (lhs.y == rhs.y);
 }
 
 

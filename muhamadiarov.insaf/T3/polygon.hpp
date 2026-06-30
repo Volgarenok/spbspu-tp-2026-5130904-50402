@@ -4,18 +4,19 @@
 #include <iostream>
 #include <iterator>
 #include <algorithm>
+#include <delimiterio.hpp>
 
 namespace muhamadiarov
 {
   struct Point
   {
-    int x_;
-    int y_;
+    int x;
+    int y;
   };
 
   struct Polygon
   {
-    std::vector< Point > points_;
+    std::vector< Point > points;
   };
 
   bool operator==(const Point& lhs, const Point& rhs);

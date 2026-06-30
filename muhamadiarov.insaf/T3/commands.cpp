@@ -1,10 +1,12 @@
 #include "commands.hpp"
 
-namespace muhamadiarov
+namespace detail
 {
+  using namespace muhamadiarov;
+
   double getArea(const Polygon& p)
   {
-    if (p.points_.size() < 3)
+    if (p.points.size() < 3)
     {
       return 0.0;
     }
@@ -13,19 +15,19 @@ namespace muhamadiarov
     {
       double operator()(const Point& a, const Point& b)
       {
-        return static_cast<double>(a.x_ * b.y_ - a.y_ * b.x_);
+        return static_cast< double >(a.x * b.y - a.y * b.x);
       }
     };
 
     std::vector< double > crossProducts;
     std::transform(
-      p.points_.begin(),
-      p.points_.end() - 1,
-      p.points_.begin() + 1,
+      p.points.begin(),
+      p.points.end() - 1,
+      p.points.begin() + 1,
       std::back_inserter(crossProducts), Accumulator()
     );
 
-    crossProducts.push_back(Accumulator()(p.points_.back(), p.points_.front()));
+    crossProducts.push_back(Accumulator()(p.points.back(), p.points.front()));
     const double sum = std::accumulate(crossProducts.begin(), crossProducts.end(), 0.0);
     return std::abs(sum) / 2.0;
   }
@@ -39,77 +41,77 @@ namespace muhamadiarov
 
   bool isOdd(const Polygon& p)
   {
-    return (p.points_.size() % 2) != 0;
+    return (p.points.size() % 2) != 0;
   }
 
   bool isEven(const Polygon& p)
   {
-    return (p.points_.size() % 2) == 0;
+    return (p.points.size() % 2) == 0;
   }
 
   bool isCountOfVertices(const Polygon& p, size_t n)
   {
-    return n == p.points_.size();
+    return n == p.points.size();
   }
 
   size_t getVerticesCount(const Polygon& p)
   {
-    return p.points_.size();
+    return p.points.size();
   }
 
   bool isRightAngle(const Point& a, const Point& b, const Point& c)
   {
-    double dx1 = b.x_ - a.x_;
-    double dy1 = b.y_ - a.y_;
-    double dx2 = c.x_ - b.x_;
-    double dy2 = c.y_ - b.y_;
+    double dx1 = b.x - a.x;
+    double dy1 = b.y - a.y;
+    double dx2 = c.x - b.x;
+    double dy2 = c.y - b.y;
     double result = dx1 * dx2 + dy1 * dy2;
     return std::abs(result) < 1e-9;
   }
 
   struct CheckAngleFunctor
   {
-    const Polygon& polygon_;
+    const Polygon& polygon;
 
     CheckAngleFunctor(const Polygon& polygon):
-      polygon_(polygon)
+      polygon(polygon)
     {}
 
     bool operator()(const Point& current) const
     {
       auto it = std::find_if(
-        polygon_.points_.begin(),
-        polygon_.points_.end(),
+        polygon.points.begin(),
+        polygon.points.end(),
         std::bind(std::equal_to<Point>(), std::placeholders::_1, current)
       );
 
-      if (it == polygon_.points_.end())
+      if (it == polygon.points.end())
       {
         return false;
       }
 
-      size_t idx = std::distance(polygon_.points_.begin(), it);
+      size_t idx = std::distance(polygon.points.begin(), it);
 
-      size_t prev = (idx == 0) ? polygon_.points_.size() - 1 : idx - 1;
-      size_t next = (idx + 1) % polygon_.points_.size();
+      size_t prev = (idx == 0) ? polygon.points.size() - 1 : idx - 1;
+      size_t next = (idx + 1) % polygon.points.size();
 
       return isRightAngle(
-        polygon_.points_[prev],
-        polygon_.points_[idx],
-        polygon_.points_[next]);
+        polygon.points[prev],
+        polygon.points[idx],
+        polygon.points[next]);
     }
   };
 
   bool hasRightAngle(const Polygon& p)
   {
-    if (p.points_.size() < 3)
+    if (p.points.size() < 3)
     {
       return false;
     }
 
-    std::vector< bool > cHas(p.points_.size());
+    std::vector< bool > cHas(p.points.size());
     CheckAngleFunctor angleChecker(p);
-    std::transform(p.points_.begin(), p.points_.end(), cHas.begin(), angleChecker);
+    std::transform(p.points.begin(), p.points.end(), cHas.begin(), angleChecker);
 
     return std::any_of(
       cHas.begin(),
@@ -120,15 +122,15 @@ namespace muhamadiarov
 
   struct Segment
   {
-    Point p1_;
-    Point p2_;
+    Point p1;
+    Point p2;
   };
 
   Segment getSegment(const Point& p1, const Point& p2)
   {
     Segment seg;
-    seg.p1_ = p1;
-    seg.p2_ = p2;
+    seg.p1 = p1;
+    seg.p2 = p2;
     return seg;
   }
 
@@ -136,37 +138,37 @@ namespace muhamadiarov
   {
     std::vector<Segment> operator()(const Polygon& polygon) const
     {
-      std::vector<Segment> segments(polygon.points_.size());
+      std::vector<Segment> segments(polygon.points.size());
       std::transform(
-        polygon.points_.begin(),
-        polygon.points_.end() - 1,
-        polygon.points_.begin() + 1,
+        polygon.points.begin(),
+        polygon.points.end() - 1,
+        polygon.points.begin() + 1,
         segments.begin(),
         getSegment
       );
 
-      segments.back().p1_ = polygon.points_.back();
-      segments.back().p2_ = polygon.points_.front();
+      segments.back().p1 = polygon.points.back();
+      segments.back().p2 = polygon.points.front();
 
       return segments;
     }
   };
 
   double crossProduct(const Point& a, const Point& b, const Point& c) {
-    return (b.x_ - a.x_) * (c.y_ - a.y_) - (b.y_ - a.y_) * (c.x_ - a.x_);
+    return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
   }
 
   bool onSegment(const Point& a, const Point& b, const Point& c) {
-    bool b1 = c.x_ <= std::max(a.x_, b.x_) && c.x_ >= std::min(a.x_, b.x_);
-    bool b2 = c.y_ <= std::max(a.y_, b.y_) && c.y_ >= std::min(a.y_, b.y_);
+    bool b1 = c.x <= std::max(a.x, b.x) && c.x >= std::min(a.x, b.x);
+    bool b2 = c.y <= std::max(a.y, b.y) && c.y >= std::min(a.y, b.y);
     return b1 && b2;
   }
 
   bool doIntersect(const Segment& s1, const Segment& s2) {
-    Point p1 = s1.p1_;
-    Point p2 = s1.p2_;
-    Point p3 = s2.p1_;
-    Point p4 = s2.p2_;
+    Point p1 = s1.p1;
+    Point p2 = s1.p2;
+    Point p3 = s2.p1;
+    Point p4 = s2.p2;
 
     double d1 = crossProduct(p3, p4, p1);
     double d2 = crossProduct(p3, p4, p2);
@@ -203,31 +205,31 @@ namespace muhamadiarov
 
   struct AnySegmentIntersectsFunctor
   {
-    const Segment& seg_;
+    const Segment& seg;
 
     AnySegmentIntersectsFunctor(const Segment& seg):
-      seg_(seg)
+      seg(seg)
     {}
 
     bool operator()(const Segment& other) const
     {
-      return doIntersect(other, seg_);
+      return doIntersect(other, seg);
     }
   };
 
   struct SegmentIntersectsPolygonFunctor
   {
-    const std::vector< Segment >& segs_;
+    const std::vector< Segment >& segs;
 
     SegmentIntersectsPolygonFunctor(const std::vector< Segment >& segs):
-      segs_(segs)
+      segs(segs)
     {}
 
     bool operator()(const Segment& seg) const
     {
       return std::any_of(
-        segs_.begin(),
-        segs_.end(),
+        segs.begin(),
+        segs.end(),
         AnySegmentIntersectsFunctor(seg)
       );
     }
@@ -235,19 +237,19 @@ namespace muhamadiarov
 
   struct PointInPolygonFunctor
   {
-    const std::vector< Segment >& segs_;
+    const std::vector< Segment >& segs;
 
     PointInPolygonFunctor(const std::vector< Segment >& segs):
-      segs_(segs)
+      segs(segs)
     {}
 
     bool operator()(const Point& p) const
     {
-      Point far{ 1000000, p.y_ };
+      Point far{ 1000000, p.y };
       Segment ray{ p, far };
       size_t cnt = std::count_if(
-        segs_.begin(),
-        segs_.end(),
+        segs.begin(),
+        segs.end(),
         std::bind(doIntersect, std::placeholders::_1, ray)
       );
       return (cnt % 2) == 1;
@@ -256,16 +258,16 @@ namespace muhamadiarov
 
   struct PolygonIntersectionFunctor
   {
-    const Polygon& p_;
+    const Polygon& p;
 
     PolygonIntersectionFunctor(const Polygon& polygon):
-      p_(polygon)
+      p(polygon)
     {}
 
     bool operator()(const Polygon& other) const
     {
       GetSegmentsFunctor gs;
-      std::vector< Segment > segsP  = gs(p_);
+      std::vector< Segment > segsP  = gs(p);
       std::vector< Segment > segsOther = gs(other);
 
       bool edgesIntersect = std::any_of(
@@ -279,8 +281,8 @@ namespace muhamadiarov
       }
 
       bool pInsideOther = std::any_of(
-        p_.points_.begin(),
-        p_.points_.end(),
+        p.points.begin(),
+        p.points.end(),
         PointInPolygonFunctor(segsOther)
       );
       if (pInsideOther)
@@ -289,8 +291,8 @@ namespace muhamadiarov
       }
 
       return std::any_of(
-        other.points_.begin(),
-        other.points_.end(),
+        other.points.begin(),
+        other.points.end(),
         PointInPolygonFunctor(segsP)
       );
     }
@@ -321,9 +323,9 @@ void muh::area(
       polygons.begin(),
       polygons.end(),
       std::back_inserter(polygonsIf),
-      isEven
+      detail::isEven
     );
-    out << sumArea(polygonsIf) << '\n';
+    out << detail::sumArea(polygonsIf) << '\n';
   }
   else if (command == "ODD")
   {
@@ -331,9 +333,9 @@ void muh::area(
       polygons.begin(),
       polygons.end(),
       std::back_inserter(polygonsIf),
-      isOdd
+      detail::isOdd
     );
-    out << sumArea(polygonsIf) << '\n';
+    out << detail::sumArea(polygonsIf) << '\n';
   }
   else if (command == "MEAN")
   {
@@ -341,7 +343,7 @@ void muh::area(
     {
       throw std::logic_error("Empty collection");
     }
-    out << sumArea(polygons) / static_cast< double >(polygons.size()) << '\n';
+    out << detail::sumArea(polygons) / static_cast< double >(polygons.size()) << '\n';
   }
   else
   {
@@ -355,9 +357,9 @@ void muh::area(
       polygons.begin(),
       polygons.end(),
       std::back_inserter(polygonsIf),
-      std::bind(isCountOfVertices, std::placeholders::_1, count)
+      std::bind(detail::isCountOfVertices, std::placeholders::_1, count)
     );
-    out << sumArea(polygonsIf) << '\n';
+    out << detail::sumArea(polygonsIf) << '\n';
   }
 }
 
@@ -381,7 +383,7 @@ void muh::max(
   if (command == "AREA")
   {
     std::vector< double > areas(polygons.size());
-    std::transform(polygons.begin(), polygons.end(), areas.begin(), getArea);
+    std::transform(polygons.begin(), polygons.end(), areas.begin(), detail::getArea);
     auto it = std::max_element(areas.begin(), areas.end());
     if (it != areas.end())
     {
@@ -396,7 +398,7 @@ void muh::max(
       polygons.begin(),
       polygons.end(),
       std::back_inserter(counts),
-      getVerticesCount
+      detail::getVerticesCount
     );
     auto it = std::max_element(counts.begin(), counts.end());
     if (it != counts.end())
@@ -430,7 +432,7 @@ void muh::min(
   if (command == "AREA")
   {
     std::vector< double > areas(polygons.size());
-    std::transform(polygons.begin(), polygons.end(), areas.begin(), getArea);
+    std::transform(polygons.begin(), polygons.end(), areas.begin(), detail::getArea);
     auto it = std::min_element(areas.begin(), areas.end());
     if (it != areas.end())
     {
@@ -445,7 +447,7 @@ void muh::min(
       polygons.begin(),
       polygons.end(),
       std::back_inserter(counts),
-      getVerticesCount
+      detail::getVerticesCount
     );
     auto it = std::min_element(counts.begin(), counts.end());
     if (it != counts.end())
@@ -472,11 +474,11 @@ void muh::count(
   }
   if (command == "EVEN")
   {
-    out << std::count_if(polygons.begin(), polygons.end(), isEven) << '\n';
+    out << std::count_if(polygons.begin(), polygons.end(), detail::isEven) << '\n';
   }
   else if (command == "ODD")
   {
-    out << std::count_if(polygons.begin(), polygons.end(), isOdd) << '\n';
+    out << std::count_if(polygons.begin(), polygons.end(), detail::isOdd) << '\n';
   }
   else
   {
@@ -488,7 +490,7 @@ void muh::count(
     out << std::count_if(
       polygons.begin(),
       polygons.end(),
-      std::bind(isCountOfVertices, std::placeholders::_1, count)
+      std::bind(detail::isCountOfVertices, std::placeholders::_1, count)
     );
      out << '\n';
   }
@@ -500,7 +502,7 @@ void muh::rightshapes(
   const std::vector< Polygon >& polygons
 )
 {
-  out << std::count_if(polygons.begin(), polygons.end(), hasRightAngle) << '\n';
+  out << std::count_if(polygons.begin(), polygons.end(), detail::hasRightAngle) << '\n';
 }
 
 void muh::intersections(
@@ -522,6 +524,6 @@ void muh::intersections(
     throw std::runtime_error("Invalid polygon");
   }
 
-  PolygonIntersectionFunctor checker{inPoligon};
+  detail::PolygonIntersectionFunctor checker{inPoligon};
   out << std::count_if(polygons.begin(), polygons.end(), checker) << '\n';
 }
