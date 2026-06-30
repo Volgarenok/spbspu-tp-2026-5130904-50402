@@ -1,14 +1,18 @@
 #include "ioguard.hpp"
 
-chernikov::IOguard::IOguard(std::basic_ios< char > &stream):
-  stream_(stream),
-  flags_(stream.flags()),
-  precision_(stream.precision())
+chernikov::IOguard::IOguard(std::basic_ios< char > &s):
+  s_(s),
+  width_(s.width()),
+  precision_(s.precision()),
+  fmt_(s.flags()),
+  fill_(s.fill())
 {
 }
 
 chernikov::IOguard::~IOguard()
 {
-  stream_.flags(flags_);
-  stream_.precision(precision_);
+  s_.width(width_);
+  s_.precision(precision_);
+  s_.flags(fmt_);
+  s_.fill(fill_);
 }

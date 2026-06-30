@@ -1,7 +1,6 @@
 #ifndef DELIM_HPP
 #define DELIM_HPP
-
-#include <istream>
+#include <iostream>
 
 namespace chernikov {
   struct DelimIO
