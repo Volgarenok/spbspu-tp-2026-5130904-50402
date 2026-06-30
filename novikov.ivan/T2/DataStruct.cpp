@@ -2,7 +2,6 @@
 #include <algorithm>
 #include <cctype>
 #include <iomanip>
-#include <limits>
 
 std::istream& novikov::operator>>(std::istream& in, DataStruct& dest)
 {
@@ -31,12 +30,9 @@ std::istream& novikov::operator>>(std::istream& in, DataStruct& dest)
     if (in)
     {
       dest = input;
-      return in;
     }
 
-    in.clear();
-    auto toIgnore = std::numeric_limits< std::streamsize >::max();
-    in.ignore(toIgnore, '\n');
+    return in;
   }
 }
 
@@ -48,6 +44,7 @@ std::istream& novikov::operator>>(std::istream& in, key&& dest)
     in.setstate(std::ios::failbit);
     return in;
   }
+  IOGuard g(in);
 
   DataType currentType = dest.used.back();
 
@@ -105,6 +102,7 @@ std::istream& novikov::operator>>(std::istream& in, sep&& dest)
   {
     return in;
   }
+  IOGuard g(in);
   char c = 0;
   if (in.get(c))
   {
@@ -123,6 +121,7 @@ std::istream& novikov::operator>>(std::istream& in, uncase_sep&& dest)
   {
     return in;
   }
+  IOGuard g(in);
   char c = 0;
   if (in.get(c))
   {
@@ -141,13 +140,37 @@ std::istream& novikov::operator>>(std::istream& in, label&& dest)
   {
     return in;
   }
+  IOGuard g(in);
 
   std::string data;
-  if (!std::getline(in, data, ' '))
+  for (size_t i = 0; i < 4; ++i)
   {
-    in.setstate(std::ios::failbit);
+    char c = 0;
+    if (in.get(c))
+    {
+      data += c;
+    }
+    else
+    {
+      break;
+    }
+  }
+
+  char space = 0;
+  if (in.get(space))
+  {
+    if (space != ' ')
+    {
+      in.putback(space);
+      in.setstate(std::ios::failbit);
+    }
+  }
+
+  if (!in)
+  {
     return in;
   }
+
   DataType inputType = DataType::Unknown;
 
   if (data == dest.possibleLabels[0])
@@ -178,6 +201,7 @@ std::istream& novikov::operator>>(std::istream& in, dbl_lit&& dest)
   {
     return in;
   }
+  IOGuard g(in);
 
   double val = 0.0;
   in >> val >> uncase_sep{'d'};
@@ -196,6 +220,7 @@ std::istream& novikov::operator>>(std::istream& in, cmp_lsp&& dest)
   {
     return in;
   }
+  IOGuard g(in);
 
   double real, imag;
 
@@ -219,6 +244,7 @@ std::istream& novikov::operator>>(std::istream& in, str&& dest)
   {
     return in;
   }
+  IOGuard g(in);
   in >> sep{'"'};
   if (!in)
   {
