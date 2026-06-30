@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <cctype>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
@@ -14,7 +13,6 @@
 namespace
 {
   double getPolygonArea(const novikov::Polygon&);
-  bool isCharDigit(char);
   void areaEven(std::ostream&, const novikov::plg_t&);
   void areaOdd(std::ostream&, const novikov::plg_t&);
   void areaMean(std::ostream&, const novikov::plg_t&);
@@ -105,11 +103,6 @@ namespace
     return std::abs(std::accumulate(partialAreas.begin(), partialAreas.end(), 0.0)) / 2;
   }
 
-  bool isCharDigit(char c)
-  {
-    return std::isdigit(static_cast< unsigned char >(c)) != 0;
-  }
-
   void areaEven(std::ostream& out, const novikov::plg_t& polygons)
   {
     std::vector< double > areas(polygons.size());
@@ -164,20 +157,34 @@ void novikov::area(std::istream& in, std::ostream& out, novikov::plg_t& polygons
   {
     subCmds[subCmd](out, polygons);
   }
-  else if (std::all_of(subCmd.begin(), subCmd.end(), isCharDigit))
+  else
   {
-    size_t num = std::stoull(subCmd);
-    if (num >= 3)
+    try
     {
-      areaNum(out, polygons, num);
+      size_t idx = 0;
+      size_t num = std::stoull(subCmd, &idx);
+
+      if (idx != subCmd.length())
+      {
+        throw std::logic_error("Invalid subcommand");
+      }
+
+      if (num >= 3)
+      {
+        areaNum(out, polygons, num);
+      }
+      else
+      {
+        throw std::logic_error("Invalid number of vertices");
+      }
     }
-    else
+    catch (const std::invalid_argument&)
+    {
+      throw std::logic_error("Invalid subcommand");
+    }
+    catch (const std::out_of_range&)
     {
       throw std::logic_error("Invalid number of vertices");
     }
-  }
-  else
-  {
-    throw std::logic_error("Invalid subcommand");
   }
 }
