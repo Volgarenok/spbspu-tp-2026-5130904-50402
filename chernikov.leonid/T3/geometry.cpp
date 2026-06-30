@@ -1,31 +1,11 @@
 #include "geometry.hpp"
-#include "io_utils.hpp"
 #include <algorithm>
-#include <cmath>
+#include <delim.hpp>
 #include <functional>
+#include <ioguard.hpp>
 #include <iterator>
 #include <numeric>
 #include <set>
-#include <iostream>
-
-bool chernikov::operator==(const Point &a, const Point &b)
-{
-  return (a.x == b.x) && (a.y == b.y);
-}
-
-bool chernikov::operator<(const Point &a, const Point &b)
-{
-  if (a.x != b.x)
-  {
-    return a.x < b.x;
-  }
-  return a.y < b.y;
-}
-
-bool chernikov::operator==(const Polygon &a, const Polygon &b)
-{
-  return a.points == b.points;
-}
 
 namespace {
   double crossTerm(const std::vector< chernikov::Point > &pts, size_t i, size_t n)
@@ -86,23 +66,6 @@ std::istream &chernikov::operator>>(std::istream &in, Polygon &polygon)
   return in;
 }
 
-std::ostream &chernikov::operator<<(std::ostream &out, const Point &point)
-{
-  out << "(" << point.x << ";" << point.y << ")";
-  return out;
-}
-
-std::ostream &chernikov::operator<<(std::ostream &out, const Polygon &polygon)
-{
-  out << polygon.points.size();
-  if (!polygon.points.empty())
-  {
-    out << " ";
-    std::copy(polygon.points.begin(), polygon.points.end(), std::ostream_iterator< Point >(out, " "));
-  }
-  return out;
-}
-
 double chernikov::calcArea(const Polygon &polygon)
 {
   size_t n = polygon.points.size();
@@ -127,17 +90,6 @@ bool chernikov::isRect(const Polygon &polygon)
   return std::all_of(idxs.begin(), idxs.end(), func);
 }
 
-bool chernikov::isPermutationOf(const Polygon &a, const Polygon &b)
-{
-  if (a.points.size() != b.points.size())
-  {
-    return false;
-  }
-  std::multiset< Point > setA(a.points.begin(), a.points.end());
-  std::multiset< Point > setB(b.points.begin(), b.points.end());
-  return setA == setB;
-}
-
 bool chernikov::hasRightAngle(const Polygon &polygon)
 {
   size_t n = polygon.points.size();
@@ -149,4 +101,15 @@ bool chernikov::hasRightAngle(const Polygon &polygon)
   std::iota(idxs.begin(), idxs.end(), 0);
   auto func = std::bind(checkRightAngle, std::cref(polygon.points), std::placeholders::_1, n);
   return std::any_of(idxs.begin(), idxs.end(), func);
+}
+
+bool chernikov::isPermutationOf(const Polygon &a, const Polygon &b)
+{
+  if (a.points.size() != b.points.size())
+  {
+    return false;
+  }
+  std::multiset< Point > setA(a.points.begin(), a.points.end());
+  std::multiset< Point > setB(b.points.begin(), b.points.end());
+  return setA == setB;
 }

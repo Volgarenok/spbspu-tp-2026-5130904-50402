@@ -1,15 +1,9 @@
-#ifndef IO_UTILS_HPP
-#define IO_UTILS_HPP
+#ifndef IOGUARD_HPP
+#define IOGUARD_HPP
 
 #include <ios>
-#include <istream>
 
 namespace chernikov {
-  struct DelimIO
-  {
-    char exp;
-  };
-
   struct IOguard
   {
     explicit IOguard(std::basic_ios< char > &stream);
@@ -20,7 +14,5 @@ namespace chernikov {
     std::ios_base::fmtflags flags_;
     std::streamsize precision_;
   };
-
-  std::istream &operator>>(std::istream &in, DelimIO &&dest);
 }
 #endif

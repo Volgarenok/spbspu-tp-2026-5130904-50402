@@ -1,12 +1,12 @@
 #include "commands.hpp"
-#include "io_utils.hpp"
 #include <algorithm>
 #include <functional>
+#include <ioguard.hpp>
 #include <iomanip>
 #include <map>
 #include <numeric>
 #include <stdexcept>
-#include <string>
+#include "geometry.hpp"
 
 namespace {
   bool isEven(const chernikov::Polygon &p)
@@ -32,8 +32,7 @@ namespace {
     std::vector< double > areas;
     areas.reserve(filtered.size());
     std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), chernikov::calcArea);
-    out << std::fixed << std::setprecision(1)
-        << std::accumulate(areas.begin(), areas.end(), 0.0, std::plus< double >());
+    out << std::accumulate(areas.begin(), areas.end(), 0.0, std::plus< double >());
   }
 
   bool lessArea(const chernikov::Polygon &a, const chernikov::Polygon &b)
@@ -56,7 +55,7 @@ namespace {
     areas.reserve(polygons.size());
     std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), chernikov::calcArea);
     double sum = std::accumulate(areas.begin(), areas.end(), 0.0, std::plus< double >());
-    out << std::fixed << std::setprecision(1) << sum / polygons.size();
+    out << sum / polygons.size();
   }
 
   void handleAreaEven(std::ostream &out, const std::vector< chernikov::Polygon > &polygons)
@@ -118,89 +117,6 @@ namespace {
   {
     out << std::count_if(polygons.begin(), polygons.end(), isOdd);
   }
-
-  void handlePerms(std::ostream &out, const std::vector< chernikov::Polygon > &polygons,
-                   const chernikov::Polygon &target)
-  {
-    out << std::count_if(polygons.begin(), polygons.end(),
-                         std::bind(chernikov::isPermutationOf, std::placeholders::_1, target));
-  }
-
-  void handleEcho(std::ostream &out, std::vector< chernikov::Polygon > &polygons, const chernikov::Polygon &target)
-  {
-    size_t added = 0;
-    std::vector< chernikov::Polygon > result;
-
-    for (const auto &p : polygons)
-    {
-      result.push_back(p);
-      if (chernikov::isPermutationOf(p, target))
-      {
-        result.push_back(p);
-        ++added;
-      }
-    }
-
-    polygons = std::move(result);
-    out << added;
-  }
-
-  void handleMaxseq(std::ostream &out, const std::vector< chernikov::Polygon > &polygons,
-                    const chernikov::Polygon &target)
-  {
-    size_t maxSeq = 0;
-    size_t current = 0;
-
-    for (const auto &p : polygons)
-    {
-      if (chernikov::isPermutationOf(p, target))
-      {
-        ++current;
-        if (current > maxSeq)
-        {
-          maxSeq = current;
-        }
-      } else
-      {
-        current = 0;
-      }
-    }
-
-    out << maxSeq;
-  }
-
-  void handleRmecho(std::ostream &out, std::vector< chernikov::Polygon > &polygons, const chernikov::Polygon &target)
-  {
-    size_t removed = 0;
-    std::vector< chernikov::Polygon > result;
-
-    for (size_t i = 0; i < polygons.size(); ++i)
-    {
-      bool isTarget = chernikov::isPermutationOf(polygons[i], target);
-      bool prevIsTarget = !result.empty() && chernikov::isPermutationOf(result.back(), target);
-
-      if (isTarget && prevIsTarget)
-      {
-        ++removed;
-      } else
-      {
-        result.push_back(polygons[i]);
-      }
-    }
-
-    polygons = std::move(result);
-    out << removed;
-  }
-
-  void handleRects(std::ostream &out, const std::vector< chernikov::Polygon > &polygons)
-  {
-    out << std::count_if(polygons.begin(), polygons.end(), chernikov::isRect);
-  }
-
-  void handleRightshapes(std::ostream &out, const std::vector< chernikov::Polygon > &polygons)
-  {
-    out << std::count_if(polygons.begin(), polygons.end(), chernikov::hasRightAngle);
-  }
 }
 
 void chernikov::area(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
@@ -212,6 +128,7 @@ void chernikov::area(std::istream &in, std::ostream &out, const std::vector< Pol
   }
 
   IOguard guard(out);
+  out << std::fixed << std::setprecision(1);
 
   std::map< std::string, void (*)(std::ostream &, const std::vector< Polygon > &) > handlers;
   handlers["MEAN"] = handleAreaMean;
@@ -235,13 +152,12 @@ void chernikov::area(std::istream &in, std::ostream &out, const std::vector< Pol
 
 void chernikov::max(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
+  IOguard guard(out);
   std::string param;
   if (!(in >> param))
   {
     throw std::invalid_argument("invalid");
   }
-
-  IOguard guard(out);
 
   std::map< std::string, void (*)(std::ostream &, const std::vector< Polygon > &) > handlers;
   handlers["AREA"] = handleMaxArea;
@@ -252,13 +168,12 @@ void chernikov::max(std::istream &in, std::ostream &out, const std::vector< Poly
 
 void chernikov::min(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
+  IOguard guard(out);
   std::string param;
   if (!(in >> param))
   {
     throw std::invalid_argument("invalid");
   }
-
-  IOguard guard(out);
 
   std::map< std::string, void (*)(std::ostream &, const std::vector< Polygon > &) > handlers;
   handlers["AREA"] = handleMinArea;
@@ -294,52 +209,58 @@ void chernikov::count(std::istream &in, std::ostream &out, const std::vector< Po
   out << std::count_if(polygons.begin(), polygons.end(), std::bind(matchVertexes, std::placeholders::_1, n));
 }
 
+void chernikov::rects(std::istream &, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  out << std::count_if(polygons.begin(), polygons.end(), isRect);
+}
+
+void chernikov::rightshapes(std::istream &, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  out << std::count_if(polygons.begin(), polygons.end(), hasRightAngle);
+}
+
 void chernikov::perms(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
   Polygon target;
-  if (!(in >> target) || target.points.empty())
+  if (!(in >> target))
   {
     throw std::invalid_argument("invalid");
   }
-  handlePerms(out, polygons, target);
+  in >> std::ws;
+  if (in.peek() != EOF)
+  {
+    throw std::invalid_argument("invalid");
+  }
+
+  out << std::count_if(polygons.begin(), polygons.end(), std::bind(isPermutationOf, std::placeholders::_1, target));
 }
 
 void chernikov::echo(std::istream &in, std::ostream &out, std::vector< Polygon > &polygons)
 {
   Polygon target;
-  if (!(in >> target) || target.points.empty())
+  if (!(in >> target))
   {
     throw std::invalid_argument("invalid");
   }
-  handleEcho(out, polygons, target);
-}
-
-void chernikov::maxseq(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
-{
-  Polygon target;
-  if (!(in >> target) || target.points.empty())
+  in >> std::ws;
+  if (in.peek() != EOF)
   {
     throw std::invalid_argument("invalid");
   }
-  handleMaxseq(out, polygons, target);
-}
 
-void chernikov::rmecho(std::istream &in, std::ostream &out, std::vector< Polygon > &polygons)
-{
-  Polygon target;
-  if (!(in >> target) || target.points.empty())
+  size_t added = 0;
+  std::vector< Polygon > result;
+
+  for (const auto &p : polygons)
   {
-    throw std::invalid_argument("invalid");
+    result.push_back(p);
+    if (isPermutationOf(p, target))
+    {
+      result.push_back(p);
+      ++added;
+    }
   }
-  handleRmecho(out, polygons, target);
-}
 
-void chernikov::rects(std::istream &, std::ostream &out, const std::vector< Polygon > &polygons)
-{
-  handleRects(out, polygons);
-}
-
-void chernikov::rightshapes(std::istream &, std::ostream &out, const std::vector< Polygon > &polygons)
-{
-  handleRightshapes(out, polygons);
+  polygons = std::move(result);
+  out << added;
 }

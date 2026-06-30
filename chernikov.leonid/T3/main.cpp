@@ -1,4 +1,3 @@
-#include "commands.hpp"
 #include <algorithm>
 #include <fstream>
 #include <functional>
@@ -8,9 +7,12 @@
 #include <map>
 #include <string>
 #include <vector>
+#include "commands.hpp"
 
 int main(int argc, char **argv)
 {
+  using iit_t = std::istream_iterator< chernikov::Polygon >;
+
   if (argc != 2)
   {
     std::cerr << "Incorrect parameters\n";
@@ -19,7 +21,6 @@ int main(int argc, char **argv)
 
   std::vector< chernikov::Polygon > polygons;
   std::ifstream file(argv[1]);
-
   if (!file)
   {
     std::cerr << "Error: cannot open file\n";
@@ -28,8 +29,7 @@ int main(int argc, char **argv)
 
   while (!file.eof())
   {
-    std::copy(std::istream_iterator< chernikov::Polygon >(file), std::istream_iterator< chernikov::Polygon >(),
-              std::back_inserter(polygons));
+    std::copy(iit_t(file), iit_t(), std::back_inserter(polygons));
     if (!file)
     {
       file.clear();
@@ -37,25 +37,23 @@ int main(int argc, char **argv)
     }
   }
 
-  std::map< std::string, std::function< void(std::istream &, std::ostream &) > > commands;
-  commands["AREA"] = std::bind(chernikov::area, std::placeholders::_1, std::placeholders::_2, std::cref(polygons));
-  commands["MAX"] = std::bind(chernikov::max, std::placeholders::_1, std::placeholders::_2, std::cref(polygons));
-  commands["MIN"] = std::bind(chernikov::min, std::placeholders::_1, std::placeholders::_2, std::cref(polygons));
-  commands["COUNT"] = std::bind(chernikov::count, std::placeholders::_1, std::placeholders::_2, std::cref(polygons));
-  commands["PERMS"] = std::bind(chernikov::perms, std::placeholders::_1, std::placeholders::_2, std::cref(polygons));
-  commands["ECHO"] = std::bind(chernikov::echo, std::placeholders::_1, std::placeholders::_2, std::ref(polygons));
-  commands["MAXSEQ"] = std::bind(chernikov::maxseq, std::placeholders::_1, std::placeholders::_2, std::cref(polygons));
-  commands["RMECHO"] = std::bind(chernikov::rmecho, std::placeholders::_1, std::placeholders::_2, std::ref(polygons));
-  commands["RECTS"] = std::bind(chernikov::rects, std::placeholders::_1, std::placeholders::_2, std::cref(polygons));
+  std::map< std::string, std::function< void() > > commands;
+  commands["AREA"] = std::bind(chernikov::area, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["MAX"] = std::bind(chernikov::max, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["MIN"] = std::bind(chernikov::min, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["COUNT"] = std::bind(chernikov::count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["RECTS"] = std::bind(chernikov::rects, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["RIGHTSHAPES"] =
-      std::bind(chernikov::rightshapes, std::placeholders::_1, std::placeholders::_2, std::cref(polygons));
+      std::bind(chernikov::rightshapes, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["PERMS"] = std::bind(chernikov::perms, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["ECHO"] = std::bind(chernikov::echo, std::ref(std::cin), std::ref(std::cout), std::ref(polygons));
 
   std::string command;
   while (std::cin >> command)
   {
     try
     {
-      commands.at(command)(std::cin, std::cout);
+      commands.at(command)();
       std::cout << '\n';
     } catch (const std::exception &)
     {
