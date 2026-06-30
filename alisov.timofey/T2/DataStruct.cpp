@@ -107,6 +107,31 @@ std::istream &alisov::operator>>(std::istream &in, DataStruct &dest)
       in.setstate(std::ios_base::failbit);
       return in;
     }
+
+    if (key == "key1") {
+      if (!(in >> k1))
+        return in;
+      in >> c;
+      if (c != 'd' && c != 'D') {
+        in.setstate(std::ios_base::failbit);
+        return in;
+      }
+      has_k1 = true;
+    } else if (key == "key2") {
+      if (!(in >> k2))
+        return in;
+      has_k2 = true;
+    } else if (key == "key3") {
+      if (!(in >> std::quoted(k3)))
+        return in;
+      has_k3 = true;
+    }
+
+    in >> c;
+    if (c != ':') {
+      in.setstate(std::ios_base::failbit);
+      return in;
+    }
   }
   return in;
 }
