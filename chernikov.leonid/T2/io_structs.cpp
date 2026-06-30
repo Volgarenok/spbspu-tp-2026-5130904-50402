@@ -1,25 +1,8 @@
 #include "io_structs.hpp"
 #include <istream>
-#include <cctype>
-#include <cstdlib>
-#include <cstring>
+#include <string>
 
-chernikov::ComplexIO::ComplexIO(std::complex< double > &ref):
-  ref_(ref)
-{
-}
-
-chernikov::RationalIO::RationalIO(std::pair< long long, unsigned long long > &ref):
-  ref_(ref)
-{
-}
-
-chernikov::StringIO::StringIO(std::string &ref):
-  ref_(ref)
-{
-}
-
-std::istream &chernikov::operator>>(std::istream &in, ComplexIO &&value)
+std::istream &chernikov::operator>>(std::istream &in, DelimIO &&dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -27,125 +10,84 @@ std::istream &chernikov::operator>>(std::istream &in, ComplexIO &&value)
     return in;
   }
 
-  char c;
-  if (!(in >> c) || c != '#')
+  char c = '\0';
+  in >> c;
+  if (!in || c != dest.exp)
   {
     in.setstate(std::ios::failbit);
+  }
+
+  return in;
+}
+
+std::istream &chernikov::operator>>(std::istream &in, LabelIO &&dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
     return in;
   }
-  if (!(in >> c) || c != 'c')
+
+  for (size_t i = 0; i < dest.exp.size(); ++i)
   {
-    in.setstate(std::ios::failbit);
-    return in;
+    char c = '\0';
+    in >> c;
+    if (!in || c != dest.exp[i])
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
   }
-  if (!(in >> c) || c != '(')
+
+  return in;
+}
+
+std::istream &chernikov::operator>>(std::istream &in, CmpLspIO &&dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
   {
-    in.setstate(std::ios::failbit);
     return in;
   }
 
   double real = 0.0;
   double imag = 0.0;
 
-  if (!(in >> real))
+  in >> LabelIO{"#c("} >> real >> imag >> DelimIO{')'};
+
+  if (in)
   {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-  if (!(in >> imag))
-  {
-    in.setstate(std::ios::failbit);
-    return in;
+    dest.ref = std::complex< double >(real, imag);
   }
 
-  if (!(in >> c) || c != ')')
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-
-  value.ref_ = std::complex< double >(real, imag);
   return in;
 }
 
-std::istream &chernikov::operator>>(std::istream &in, RationalIO &&value)
+std::istream &chernikov::operator>>(std::istream &in, RatLspIO &&dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
   {
-    return in;
-  }
-
-  std::string token;
-  char c;
-
-  if (!(in >> c) || c != '(')
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-
-  if (!(in >> c) || c != ':')
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-
-  if (!(in >> c) || c != 'N')
-  {
-    in.setstate(std::ios::failbit);
     return in;
   }
 
   long long num = 0;
-  if (!(in >> num))
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-
-  if (!(in >> c) || c != ':')
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-
-  if (!(in >> c) || c != 'D')
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-
   unsigned long long den = 0;
-  if (!(in >> den))
+
+  in >> LabelIO{"(:N"} >> num >> LabelIO{":D"} >> den >> LabelIO{":)"};
+
+  if (in && den != 0)
+  {
+    dest.ref = std::make_pair(num, den);
+  } else
   {
     in.setstate(std::ios::failbit);
-    return in;
   }
 
-  if (!(in >> c) || c != ':')
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-
-  if (!(in >> c) || c != ')')
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-
-  if (den == 0)
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-
-  value.ref_ = std::make_pair(num, den);
   return in;
 }
 
-std::istream &chernikov::operator>>(std::istream &in, StringIO &&value)
+std::istream &chernikov::operator>>(std::istream &in, StringIO &&dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -153,25 +95,17 @@ std::istream &chernikov::operator>>(std::istream &in, StringIO &&value)
     return in;
   }
 
-  char c;
-  if (!(in >> c) || c != '"')
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
+  in >> DelimIO{'"'};
 
-  value.ref_.clear();
-  while (in.get(c))
+  dest.ref.clear();
+  char c = '\0';
+  while (in.get(c) && c != '"')
   {
-    if (c == '"')
-    {
-      return in;
-    }
     if (c == '\\')
     {
       if (in.get(c))
       {
-        value.ref_ += c;
+        dest.ref += c;
       } else
       {
         in.setstate(std::ios::failbit);
@@ -179,10 +113,14 @@ std::istream &chernikov::operator>>(std::istream &in, StringIO &&value)
       }
     } else
     {
-      value.ref_ += c;
+      dest.ref += c;
     }
   }
 
-  in.setstate(std::ios::failbit);
+  if (c != '"')
+  {
+    in.setstate(std::ios::failbit);
+  }
+
   return in;
 }

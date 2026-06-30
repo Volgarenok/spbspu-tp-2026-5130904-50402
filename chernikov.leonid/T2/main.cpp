@@ -1,25 +1,29 @@
-#include "data_struct.hpp"
-#include <iostream>
-#include <vector>
 #include <algorithm>
+#include <iostream>
 #include <iterator>
+#include <limits>
+#include <vector>
+#include "data_struct.hpp"
 
 int main()
 {
-  std::vector< chernikov::DataStruct > data_vector;
+  using data_t = chernikov::DataStruct;
+  using iit_t = std::istream_iterator< data_t >;
+  using oit_t = std::ostream_iterator< data_t >;
 
-  std::copy(std::istream_iterator< chernikov::DataStruct >(std::cin), std::istream_iterator< chernikov::DataStruct >(),
-            std::back_inserter(data_vector));
+  std::vector< data_t > data;
 
-  if (!std::cin.eof())
+  while (!std::cin.eof())
   {
-    std::cerr << "Input error\n";
-    return 1;
+    std::copy(iit_t{std::cin}, iit_t{}, std::back_inserter(data));
+    if (std::cin.fail())
+    {
+      std::cin.clear(std::cin.rdstate() & ~std::ios::failbit);
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    }
   }
 
-  std::sort(data_vector.begin(), data_vector.end(), chernikov::compare_data);
+  std::sort(data.begin(), data.end());
 
-  std::copy(data_vector.begin(), data_vector.end(), std::ostream_iterator< chernikov::DataStruct >(std::cout, "\n"));
-
-  return 0;
+  std::copy(data.begin(), data.end(), oit_t{std::cout, "\n"});
 }
