@@ -92,9 +92,12 @@ std::istream &alisov::operator>>(std::istream &in, DataStruct &dest)
     return in;
   }
 
-  in >> Delimiter{'('} >> Delimiter{':'};
-  if (!in)
+  char c = 0;
+  in >> c;
+  if (c != '(') {
+    in.setstate(std::ios_base::failbit);
     return in;
+  }
 
   double k1 = 0.0;
   double k2 = 0.0;
@@ -102,34 +105,26 @@ std::istream &alisov::operator>>(std::istream &in, DataStruct &dest)
   bool has_k1 = false, has_k2 = false, has_k3 = false;
 
   for (size_t i = 0; i < 3; ++i) {
-    std::string key = "";
-    char c = 0;
+    in >> c;
+    if (c != ':') {
+      in.setstate(std::ios_base::failbit);
+      return in;
+    }
 
-    // Аккуратно читаем имя ключа "keyX" без пробелов
-    in >> c;
-    if (c != 'k') {
+    std::string key = "";
+    for (size_t j = 0; j < 4; ++j) {
+      char key_char = 0;
+      if (in >> key_char) {
+        key += key_char;
+      }
+    }
+
+    in >> std::noskipws >> c;
+    std::skipws(in);
+    if (c != ' ') {
       in.setstate(std::ios_base::failbit);
       return in;
     }
-    key += c;
-    in >> c;
-    if (c != 'e') {
-      in.setstate(std::ios_base::failbit);
-      return in;
-    }
-    key += c;
-    in >> c;
-    if (c != 'y') {
-      in.setstate(std::ios_base::failbit);
-      return in;
-    }
-    key += c;
-    in >> c;
-    if (c != '1' && c != '2' && c != '3') {
-      in.setstate(std::ios_base::failbit);
-      return in;
-    }
-    key += c;
 
     if (key == "key1") {
       if (!(in >> k1))
@@ -149,16 +144,24 @@ std::istream &alisov::operator>>(std::istream &in, DataStruct &dest)
       if (!(in >> std::quoted(k3)))
         return in;
       has_k3 = true;
-    }
-
-    in >> Delimiter{':'};
-    if (!in)
+    } else {
+      in.setstate(std::ios_base::failbit);
       return in;
+    }
   }
 
-  in >> Delimiter{')'};
+  in >> c;
+  if (c != ':') {
+    in.setstate(std::ios_base::failbit);
+    return in;
+  }
+  in >> c;
+  if (c != ')') {
+    in.setstate(std::ios_base::failbit);
+    return in;
+  }
 
-  if (in && has_k1 && has_k2 && has_k3) {
+  if (has_k1 && has_k2 && has_k3) {
     dest.key1 = k1;
     dest.key2 = k2;
     dest.key3 = k3;
