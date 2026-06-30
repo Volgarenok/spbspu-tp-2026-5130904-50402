@@ -20,7 +20,7 @@ namespace lavrentev
 }
 
 template < typename Predicate >
-void areaIf(const std::vector< lavrentev::Polygon > &plgs, Predicate pred)
+void lavrentev::areaIf(const std::vector< lavrentev::Polygon > &plgs, Predicate pred)
 {
   using namespace std::placeholders;
 
