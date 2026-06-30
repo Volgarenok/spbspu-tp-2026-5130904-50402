@@ -37,25 +37,25 @@ int main(int argc, char **argv)
     }
   }
 
-  std::map< std::string, std::function< void() > > commands;
-  commands["AREA"] = std::bind(chernikov::area, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["MAX"] = std::bind(chernikov::max, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["MIN"] = std::bind(chernikov::min, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["COUNT"] = std::bind(chernikov::count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["PERMS"] = std::bind(chernikov::perms, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["ECHO"] = std::bind(chernikov::echo, std::ref(std::cin), std::ref(std::cout), std::ref(polygons));
-  commands["MAXSEQ"] = std::bind(chernikov::maxseq, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["RMECHO"] = std::bind(chernikov::rmecho, std::ref(std::cin), std::ref(std::cout), std::ref(polygons));
-  commands["RECTS"] = std::bind(chernikov::rects, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  std::map< std::string, std::function< void(std::istream &, std::ostream &) > > commands;
+  commands["AREA"] = std::bind(chernikov::area, std::placeholders::_1, std::placeholders::_2, std::cref(polygons));
+  commands["MAX"] = std::bind(chernikov::max, std::placeholders::_1, std::placeholders::_2, std::cref(polygons));
+  commands["MIN"] = std::bind(chernikov::min, std::placeholders::_1, std::placeholders::_2, std::cref(polygons));
+  commands["COUNT"] = std::bind(chernikov::count, std::placeholders::_1, std::placeholders::_2, std::cref(polygons));
+  commands["PERMS"] = std::bind(chernikov::perms, std::placeholders::_1, std::placeholders::_2, std::cref(polygons));
+  commands["ECHO"] = std::bind(chernikov::echo, std::placeholders::_1, std::placeholders::_2, std::ref(polygons));
+  commands["MAXSEQ"] = std::bind(chernikov::maxseq, std::placeholders::_1, std::placeholders::_2, std::cref(polygons));
+  commands["RMECHO"] = std::bind(chernikov::rmecho, std::placeholders::_1, std::placeholders::_2, std::ref(polygons));
+  commands["RECTS"] = std::bind(chernikov::rects, std::placeholders::_1, std::placeholders::_2, std::cref(polygons));
   commands["RIGHTSHAPES"] =
-      std::bind(chernikov::rightshapes, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+      std::bind(chernikov::rightshapes, std::placeholders::_1, std::placeholders::_2, std::cref(polygons));
 
   std::string command;
   while (std::cin >> command)
   {
     try
     {
-      commands.at(command)();
+      commands.at(command)(std::cin, std::cout);
       std::cout << '\n';
     } catch (const std::exception &)
     {

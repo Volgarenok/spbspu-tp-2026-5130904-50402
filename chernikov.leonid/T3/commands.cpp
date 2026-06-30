@@ -210,7 +210,7 @@ namespace {
       return false;
     }
     in >> std::ws;
-    return in.eof();
+    return in.peek() == EOF;
   }
 }
 
@@ -345,12 +345,14 @@ void chernikov::rmecho(std::istream &in, std::ostream &out, std::vector< Polygon
   handleRmecho(out, polygons, target);
 }
 
-void chernikov::rects(std::istream &, std::ostream &out, const std::vector< Polygon > &polygons)
+void chernikov::rects(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
+  (void)in;
   handleRects(out, polygons);
 }
 
-void chernikov::rightshapes(std::istream &, std::ostream &out, const std::vector< Polygon > &polygons)
+void chernikov::rightshapes(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
+  (void)in;
   handleRightshapes(out, polygons);
 }
