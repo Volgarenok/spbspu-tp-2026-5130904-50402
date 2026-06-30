@@ -31,17 +31,29 @@ std::ostream &alisov::operator<<(std::ostream &out, const DataStruct &src)
   size_t e_pos = sci_str.find('e');
   if (e_pos != std::string::npos) {
     out << sci_str.substr(0, e_pos + 1);
-    if (sci_str[e_pos + 1] != '+' && sci_str[e_pos + 1] != '-') {
+
+    char sign = sci_str[e_pos + 1];
+    std::string exp_val = sci_str.substr(e_pos + 1);
+
+    if (sign == '+' || sign == '-') {
+      out << sign;
+      exp_val = exp_val.substr(1);
+    } else {
       out << "+";
     }
 
-    std::string exp_val = sci_str.substr(e_pos + 1);
-    if (exp_val[0] == '+' || exp_val[0] == '-') {
-      out << exp_val[0];
-      exp_val = exp_val.substr(1);
+    size_t start = exp_val.find_first_not_of('0');
+    if (start == std::string::npos) {
+      exp_val = "0";
+    } else {
+      exp_val = exp_val.substr(start);
     }
-    long long exp_num = std::stoll(exp_val);
-    out << exp_num;
+
+    if (exp_val.length() < 2) {
+      out << "0" << exp_val;
+    } else {
+      out << exp_val;
+    }
   } else {
     out << sci_str;
   }
@@ -102,9 +114,10 @@ std::istream &alisov::operator>>(std::istream &in, DataStruct &dest)
     }
     key += c;
 
-    // Вместо жесткого in >> c, который может пропускать пробелы некорректно:
-    if (in.peek() == ' ') {
-      in.get(c);
+    in >> c;
+    if (c != ' ') {
+      in.setstate(std::ios_base::failbit);
+      return in;
     }
 
     if (key == "key1") {
@@ -121,8 +134,6 @@ std::istream &alisov::operator>>(std::istream &in, DataStruct &dest)
         return in;
       has_k2 = true;
     } else if (key == "key3") {
-      // Перед std::quoted очистим возможные пробелы
-      in >> std::ws;
       if (!(in >> std::quoted(k3)))
         return in;
       has_k3 = true;
