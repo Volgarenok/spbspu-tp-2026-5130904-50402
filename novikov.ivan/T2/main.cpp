@@ -3,7 +3,12 @@
 #include <algorithm>
 #include <iterator>
 #include <limits>
-#include "DataStruct.hpp"
+#include <DataStruct.hpp>
+#include <DataTypes.hpp>
+#include <IOGuard.hpp>
+#include <DelimiterIO.hpp>
+#include <LabelIO.hpp>
+#include <KeyIO.hpp>
 
 int main()
 {
