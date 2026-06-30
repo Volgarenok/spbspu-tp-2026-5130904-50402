@@ -37,8 +37,17 @@ int main(int argc, char **argv)
   }
 
   std::map< std::string, std::function< void() > > commands;
-  commands["RIGHTSHAPES"] = std::bind(muh::rightshapes, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["INTERSECTIONS"] = std::bind(muh::intersections, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["RIGHTSHAPES"] = std::bind(
+    muh::rightshapes,
+    std::ref(std::cin),
+    std::ref(std::cout),
+    std::cref(polygons)
+  );
+  commands["INTERSECTIONS"] = std::bind(
+    muh::intersections, std::ref(std::cin),
+    std::ref(std::cout),
+    std::cref(polygons)
+  );
   commands["AREA"] = std::bind(muh::area, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["MAX"] = std::bind(muh::max, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["MIN"] = std::bind(muh::min, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
@@ -50,6 +59,7 @@ int main(int argc, char **argv)
     try
     {
       commands.at(command)();
+      std::cout << '\n';
     }
     catch (const std::exception &)
     {
