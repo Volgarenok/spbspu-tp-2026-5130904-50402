@@ -11,3 +11,14 @@ bool alisov::operator<(const DataStruct &lhs, const DataStruct &rhs)
   }
   return lhs.key3.length() < rhs.key3.length();
 }
+
+std::ostream &alisov::operator<<(std::ostream &out, const DataStruct &src)
+{
+  std::ostream::sentry guard(out);
+  if (!guard) {
+    return out;
+  }
+
+  out << "(:key1 " << std::fixed << std::setprecision(1) << src.key1 << "d";
+  return out;
+}
