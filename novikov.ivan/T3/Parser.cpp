@@ -8,11 +8,17 @@
 
 std::istream& novikov::operator>>(std::istream& in, Point& pt)
 {
+  IOGuard g(in);
+  std::istream::sentry s(in);
+  if (!s)
+  {
+    return in;
+  }
   in >> DelimiterIO{' '} >> DelimiterIO{'('} >> pt.x >> DelimiterIO{';'} >> pt.y >> DelimiterIO{')'};
   return in;
 }
 
-std::istream& novikov::operator>>(std::istream& in, PolygonIO&& dest)
+std::istream& novikov::operator>>(std::istream& in, Polygon& polygon)
 {
   IOGuard g(in);
   std::istream::sentry s(in);
@@ -42,14 +48,9 @@ std::istream& novikov::operator>>(std::istream& in, PolygonIO&& dest)
 
   if (in)
   {
-    dest.p.points = std::move(temp_points);
+    polygon.points = std::move(temp_points);
   }
   return in;
-}
-
-std::istream& novikov::operator>>(std::istream& in, Polygon& p)
-{
-  return in >> PolygonIO{p};
 }
 
 std::istream& novikov::operator>>(std::istream& in, novikov::Line& dest)

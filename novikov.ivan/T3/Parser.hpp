@@ -6,11 +6,6 @@
 
 namespace novikov
 {
-  struct PolygonIO
-  {
-    novikov::Polygon& p;
-  };
-
   struct Line
   {
     std::string lineText;
@@ -30,7 +25,6 @@ namespace novikov
   };
 
   std::istream& operator>>(std::istream&, Point&);
-  std::istream& operator>>(std::istream&, PolygonIO&&);
   std::istream& operator>>(std::istream&, Polygon&);
   std::istream& operator>>(std::istream&, Line&);
   plg_t parse(std::istream&);
