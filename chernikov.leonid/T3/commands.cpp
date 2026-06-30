@@ -1,347 +1,336 @@
 #include "commands.hpp"
-#include <iostream>
-#include <iomanip>
-#include <sstream>
+#include "io_utils.hpp"
 #include <algorithm>
-#include <numeric>
 #include <functional>
+#include <iomanip>
+#include <map>
+#include <numeric>
+#include <stdexcept>
 #include <string>
+#include <iostream>
 
 namespace {
-
-  double getArea(const chernikov::Polygon &p)
+  bool isEven(const chernikov::Polygon &p)
   {
-    return chernikov::computeArea(p);
+    return p.points.size() % 2 == 0;
   }
 
-  size_t getVertexCount(const chernikov::Polygon &p)
+  bool isOdd(const chernikov::Polygon &p)
   {
-    return p.points.size();
+    return p.points.size() % 2 != 0;
   }
 
-  void printAreaCommand(const std::vector< chernikov::Polygon > &polygons,
-                        std::function< bool(const chernikov::Polygon &) > filter)
+  bool matchVertexes(const chernikov::Polygon &p, size_t n)
   {
-    std::vector< double > filteredAreas;
-    std::transform(polygons.begin(), polygons.end(), std::back_inserter(filteredAreas),
-                   [&filter](const chernikov::Polygon &p) {
-                     return filter(p) ? getArea(p) : 0.0;
-                   });
-
-    double total = std::accumulate(filteredAreas.begin(), filteredAreas.end(), 0.0);
-    std::cout << std::fixed << std::setprecision(1) << total << "\n";
+    return p.points.size() == n;
   }
 
-  bool isOdd(size_t n)
+  template < class Filter >
+  void printFilteredSum(std::ostream &out, const std::vector< chernikov::Polygon > &polygons, Filter filter)
   {
-    return n % 2 != 0;
+    std::vector< chernikov::Polygon > filtered;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), filter);
+    std::vector< double > areas;
+    areas.reserve(filtered.size());
+    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), chernikov::calcArea);
+    out << std::fixed << std::setprecision(1)
+        << std::accumulate(areas.begin(), areas.end(), 0.0, std::plus< double >());
   }
 
-  bool isEven(size_t n)
+  bool lessArea(const chernikov::Polygon &a, const chernikov::Polygon &b)
   {
-    return n % 2 == 0;
+    return chernikov::calcArea(a) < chernikov::calcArea(b);
   }
 
-  void handleAreaCommand(const std::vector< chernikov::Polygon > &polygons, std::istringstream &stream)
+  bool lessVertex(const chernikov::Polygon &a, const chernikov::Polygon &b)
   {
-    std::string subcommand;
-    stream >> subcommand;
-
-    if (subcommand == "EVEN")
-    {
-      if (std::none_of(polygons.begin(), polygons.end(), [](const chernikov::Polygon &p) {
-            return isEven(getVertexCount(p));
-          }))
-      {
-        std::cout << "<INVALID COMMAND>\n";
-        return;
-      }
-      printAreaCommand(polygons, [](const chernikov::Polygon &p) {
-        return isEven(getVertexCount(p));
-      });
-    } else if (subcommand == "ODD")
-    {
-      if (std::none_of(polygons.begin(), polygons.end(), [](const chernikov::Polygon &p) {
-            return isOdd(getVertexCount(p));
-          }))
-      {
-        std::cout << "<INVALID COMMAND>\n";
-        return;
-      }
-      printAreaCommand(polygons, [](const chernikov::Polygon &p) {
-        return isOdd(getVertexCount(p));
-      });
-    } else if (subcommand == "MEAN")
-    {
-      if (polygons.empty())
-      {
-        std::cout << "<INVALID COMMAND>\n";
-        return;
-      }
-
-      std::vector< double > areas;
-      std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), getArea);
-
-      double total = std::accumulate(areas.begin(), areas.end(), 0.0);
-      double mean = total / static_cast< double >(polygons.size());
-      std::cout << std::fixed << std::setprecision(1) << mean << "\n";
-    } else
-    {
-      int num = 0;
-      stream.clear();
-      stream.seekg(0);
-      stream >> num;
-
-      if (!stream || num < 3)
-      {
-        std::cout << "<INVALID COMMAND>\n";
-        return;
-      }
-
-      if (std::none_of(polygons.begin(), polygons.end(), [num](const chernikov::Polygon &p) {
-            return static_cast< int >(getVertexCount(p)) == num;
-          }))
-      {
-        std::cout << "<INVALID COMMAND>\n";
-        return;
-      }
-
-      printAreaCommand(polygons, [num](const chernikov::Polygon &p) {
-        return static_cast< int >(getVertexCount(p)) == num;
-      });
-    }
+    return a.points.size() < b.points.size();
   }
 
-  void handleMaxCommand(const std::vector< chernikov::Polygon > &polygons, std::istringstream &stream)
+  void handleAreaMean(std::ostream &out, const std::vector< chernikov::Polygon > &polygons)
   {
     if (polygons.empty())
     {
-      std::cout << "<INVALID COMMAND>\n";
-      return;
+      throw std::invalid_argument("invalid");
     }
-
-    std::string subcommand;
-    stream >> subcommand;
-
-    if (subcommand == "AREA")
-    {
-      auto it = std::max_element(polygons.begin(), polygons.end(),
-                                 [](const chernikov::Polygon &a, const chernikov::Polygon &b) {
-                                   return getArea(a) < getArea(b);
-                                 });
-      std::cout << std::fixed << std::setprecision(1) << getArea(*it) << "\n";
-    } else if (subcommand == "VERTEXES")
-    {
-      auto it = std::max_element(polygons.begin(), polygons.end(),
-                                 [](const chernikov::Polygon &a, const chernikov::Polygon &b) {
-                                   return getVertexCount(a) < getVertexCount(b);
-                                 });
-      std::cout << getVertexCount(*it) << "\n";
-    } else
-    {
-      std::cout << "<INVALID COMMAND>\n";
-    }
+    std::vector< double > areas;
+    areas.reserve(polygons.size());
+    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), chernikov::calcArea);
+    double sum = std::accumulate(areas.begin(), areas.end(), 0.0, std::plus< double >());
+    out << std::fixed << std::setprecision(1) << sum / polygons.size();
   }
 
-  void handleMinCommand(const std::vector< chernikov::Polygon > &polygons, std::istringstream &stream)
+  void handleAreaEven(std::ostream &out, const std::vector< chernikov::Polygon > &polygons)
+  {
+    printFilteredSum(out, polygons, isEven);
+  }
+
+  void handleAreaOdd(std::ostream &out, const std::vector< chernikov::Polygon > &polygons)
+  {
+    printFilteredSum(out, polygons, isOdd);
+  }
+
+  void handleMaxArea(std::ostream &out, const std::vector< chernikov::Polygon > &polygons)
   {
     if (polygons.empty())
     {
-      std::cout << "<INVALID COMMAND>\n";
-      return;
+      throw std::invalid_argument("invalid");
     }
-
-    std::string subcommand;
-    stream >> subcommand;
-
-    if (subcommand == "AREA")
-    {
-      auto it = std::min_element(polygons.begin(), polygons.end(),
-                                 [](const chernikov::Polygon &a, const chernikov::Polygon &b) {
-                                   return getArea(a) < getArea(b);
-                                 });
-      std::cout << std::fixed << std::setprecision(1) << getArea(*it) << "\n";
-    } else if (subcommand == "VERTEXES")
-    {
-      auto it = std::min_element(polygons.begin(), polygons.end(),
-                                 [](const chernikov::Polygon &a, const chernikov::Polygon &b) {
-                                   return getVertexCount(a) < getVertexCount(b);
-                                 });
-      std::cout << getVertexCount(*it) << "\n";
-    } else
-    {
-      std::cout << "<INVALID COMMAND>\n";
-    }
+    auto it = std::max_element(polygons.begin(), polygons.end(), lessArea);
+    out << std::fixed << std::setprecision(1) << chernikov::calcArea(*it);
   }
 
-  void handleCountCommand(const std::vector< chernikov::Polygon > &polygons, std::istringstream &stream)
+  void handleMaxVertexes(std::ostream &out, const std::vector< chernikov::Polygon > &polygons)
   {
-    std::string subcommand;
-    stream >> subcommand;
-
-    if (subcommand == "EVEN")
+    if (polygons.empty())
     {
-      auto count = std::count_if(polygons.begin(), polygons.end(), [](const chernikov::Polygon &p) {
-        return isEven(getVertexCount(p));
-      });
-      std::cout << count << "\n";
-    } else if (subcommand == "ODD")
-    {
-      auto count = std::count_if(polygons.begin(), polygons.end(), [](const chernikov::Polygon &p) {
-        return isOdd(getVertexCount(p));
-      });
-      std::cout << count << "\n";
-    } else
-    {
-      int num = 0;
-      stream.clear();
-      stream.seekg(0);
-      stream >> num;
-
-      if (!stream || num < 3)
-      {
-        std::cout << "<INVALID COMMAND>\n";
-        return;
-      }
-
-      auto count = std::count_if(polygons.begin(), polygons.end(), [num](const chernikov::Polygon &p) {
-        return static_cast< int >(getVertexCount(p)) == num;
-      });
-      std::cout << count << "\n";
+      throw std::invalid_argument("invalid");
     }
+    auto it = std::max_element(polygons.begin(), polygons.end(), lessVertex);
+    out << it->points.size();
   }
 
-  void handlePermsCommand(const std::vector< chernikov::Polygon > &polygons, std::istringstream &stream)
+  void handleMinArea(std::ostream &out, const std::vector< chernikov::Polygon > &polygons)
   {
-    chernikov::Polygon target;
-    stream >> target;
-
-    if (!stream || target.points.empty())
+    if (polygons.empty())
     {
-      std::cout << "<INVALID COMMAND>\n";
-      return;
+      throw std::invalid_argument("invalid");
     }
-
-    auto count = std::count_if(polygons.begin(), polygons.end(), [&target](const chernikov::Polygon &p) {
-      return chernikov::isPermutationOf(p, target);
-    });
-    std::cout << count << "\n";
+    auto it = std::min_element(polygons.begin(), polygons.end(), lessArea);
+    out << std::fixed << std::setprecision(1) << chernikov::calcArea(*it);
   }
 
-  void handleMaxseqCommand(const std::vector< chernikov::Polygon > &polygons, std::istringstream &stream)
+  void handleMinVertexes(std::ostream &out, const std::vector< chernikov::Polygon > &polygons)
   {
-    chernikov::Polygon target;
-    stream >> target;
-
-    if (!stream || target.points.empty())
+    if (polygons.empty())
     {
-      std::cout << "<INVALID COMMAND>\n";
-      return;
+      throw std::invalid_argument("invalid");
     }
-
-    size_t maxSeq = 0;
-    size_t currentSeq = 0;
-
-    auto updateSeq = [&maxSeq, &currentSeq, &target](const chernikov::Polygon &p) {
-      if (p == target)
-      {
-        ++currentSeq;
-        if (currentSeq > maxSeq)
-        {
-          maxSeq = currentSeq;
-        }
-      } else
-      {
-        currentSeq = 0;
-      }
-    };
-
-    std::for_each(polygons.begin(), polygons.end(), updateSeq);
-    std::cout << maxSeq << "\n";
+    auto it = std::min_element(polygons.begin(), polygons.end(), lessVertex);
+    out << it->points.size();
   }
 
-  void handleRmechoCommand(std::vector< chernikov::Polygon > &polygons, std::istringstream &stream)
+  void handleCountEven(std::ostream &out, const std::vector< chernikov::Polygon > &polygons)
   {
-    chernikov::Polygon target;
-    stream >> target;
+    out << std::count_if(polygons.begin(), polygons.end(), isEven);
+  }
 
-    if (!stream || target.points.empty())
-    {
-      std::cout << "<INVALID COMMAND>\n";
-      return;
-    }
+  void handleCountOdd(std::ostream &out, const std::vector< chernikov::Polygon > &polygons)
+  {
+    out << std::count_if(polygons.begin(), polygons.end(), isOdd);
+  }
 
+  void handlePerms(std::ostream &out, const std::vector< chernikov::Polygon > &polygons,
+                   const chernikov::Polygon &target)
+  {
+    out << std::count_if(polygons.begin(), polygons.end(),
+                         std::bind(chernikov::isPermutationOf, std::placeholders::_1, target));
+  }
+
+  void handleEcho(std::vector< chernikov::Polygon > &polygons, const chernikov::Polygon &target)
+  {
+    size_t added = 0;
     std::vector< chernikov::Polygon > result;
-    result.reserve(polygons.size());
+    result.reserve(polygons.size() * 2);
 
-    int removed = 0;
-
-    for (size_t i = 0; i < polygons.size(); ++i)
+    for (const auto &p : polygons)
     {
-      bool isCurrentTarget = (polygons[i] == target);
-
-      if (isCurrentTarget && !result.empty() && (result.back() == target))
+      result.push_back(p);
+      if (p.points == target.points)
       {
-        ++removed;
-      } else
-      {
-        result.push_back(polygons[i]);
+        result.push_back(p);
+        ++added;
       }
     }
 
     polygons = std::move(result);
-    std::cout << removed << "\n";
+    std::cout << added;
   }
 
-  void handleRectsCommand(const std::vector< chernikov::Polygon > &polygons)
+  void handleRects(std::ostream &out, const std::vector< chernikov::Polygon > &polygons)
   {
-    auto count = std::count_if(polygons.begin(), polygons.end(), chernikov::isRectangle);
-    std::cout << count << "\n";
+    out << std::count_if(polygons.begin(), polygons.end(), chernikov::isRect);
   }
 
-  void handleRightshapesCommand(const std::vector< chernikov::Polygon > &polygons)
+  void handleRightshapes(std::ostream &out, const std::vector< chernikov::Polygon > &polygons)
   {
-    auto count = std::count_if(polygons.begin(), polygons.end(), chernikov::hasRightAngle);
-    std::cout << count << "\n";
+    out << std::count_if(polygons.begin(), polygons.end(), chernikov::hasRightAngle);
   }
-
 }
 
-void chernikov::processCommand(const std::string &line, std::vector< Polygon > &polygons)
+void chernikov::area(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
-  std::istringstream stream(line);
-  std::string command;
-  stream >> command;
-
-  if (command == "AREA")
+  std::string param;
+  if (!(in >> param))
   {
-    handleAreaCommand(polygons, stream);
-  } else if (command == "MAX")
-  {
-    handleMaxCommand(polygons, stream);
-  } else if (command == "MIN")
-  {
-    handleMinCommand(polygons, stream);
-  } else if (command == "COUNT")
-  {
-    handleCountCommand(polygons, stream);
-  } else if (command == "PERMS")
-  {
-    handlePermsCommand(polygons, stream);
-  } else if (command == "MAXSEQ")
-  {
-    handleMaxseqCommand(polygons, stream);
-  } else if (command == "RMECHO")
-  {
-    handleRmechoCommand(polygons, stream);
-  } else if (command == "RECTS")
-  {
-    handleRectsCommand(polygons);
-  } else if (command == "RIGHTSHAPES")
-  {
-    handleRightshapesCommand(polygons);
-  } else
-  {
-    std::cout << "<INVALID COMMAND>\n";
+    throw std::invalid_argument("invalid");
   }
+
+  IOguard guard(out);
+
+  std::map< std::string, void (*)(std::ostream &, const std::vector< Polygon > &) > handlers;
+  handlers["MEAN"] = handleAreaMean;
+  handlers["EVEN"] = handleAreaEven;
+  handlers["ODD"] = handleAreaOdd;
+
+  auto it = handlers.find(param);
+  if (it != handlers.end())
+  {
+    it->second(out, polygons);
+    return;
+  }
+
+  size_t n = std::stoul(param);
+  if (n < 3)
+  {
+    throw std::invalid_argument("invalid");
+  }
+  printFilteredSum(out, polygons, std::bind(matchVertexes, std::placeholders::_1, n));
+}
+
+void chernikov::max(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  std::string param;
+  if (!(in >> param))
+  {
+    throw std::invalid_argument("invalid");
+  }
+
+  IOguard guard(out);
+
+  std::map< std::string, void (*)(std::ostream &, const std::vector< Polygon > &) > handlers;
+  handlers["AREA"] = handleMaxArea;
+  handlers["VERTEXES"] = handleMaxVertexes;
+
+  handlers.at(param)(out, polygons);
+}
+
+void chernikov::min(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  std::string param;
+  if (!(in >> param))
+  {
+    throw std::invalid_argument("invalid");
+  }
+
+  IOguard guard(out);
+
+  std::map< std::string, void (*)(std::ostream &, const std::vector< Polygon > &) > handlers;
+  handlers["AREA"] = handleMinArea;
+  handlers["VERTEXES"] = handleMinVertexes;
+
+  handlers.at(param)(out, polygons);
+}
+
+void chernikov::count(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  std::string param;
+  if (!(in >> param))
+  {
+    throw std::invalid_argument("invalid");
+  }
+
+  std::map< std::string, void (*)(std::ostream &, const std::vector< Polygon > &) > handlers;
+  handlers["EVEN"] = handleCountEven;
+  handlers["ODD"] = handleCountOdd;
+
+  auto it = handlers.find(param);
+  if (it != handlers.end())
+  {
+    it->second(out, polygons);
+    return;
+  }
+
+  size_t n = std::stoul(param);
+  if (n < 3)
+  {
+    throw std::invalid_argument("invalid");
+  }
+  out << std::count_if(polygons.begin(), polygons.end(), std::bind(matchVertexes, std::placeholders::_1, n));
+}
+
+void chernikov::perms(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  Polygon target;
+  if (!(in >> target))
+  {
+    throw std::invalid_argument("invalid");
+  }
+  handlePerms(out, polygons, target);
+}
+
+void chernikov::echo(std::istream &in, std::ostream &out, std::vector< Polygon > &polygons)
+{
+  Polygon target;
+  if (!(in >> target))
+  {
+    throw std::invalid_argument("invalid");
+  }
+  handleEcho(polygons, target);
+}
+
+void chernikov::maxseq(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  Polygon target;
+  if (!(in >> target))
+  {
+    throw std::invalid_argument("invalid");
+  }
+
+  size_t maxSeq = 0;
+  size_t current = 0;
+
+  for (const auto &p : polygons)
+  {
+    if (p.points == target.points)
+    {
+      ++current;
+      if (current > maxSeq)
+      {
+        maxSeq = current;
+      }
+    } else
+    {
+      current = 0;
+    }
+  }
+
+  out << maxSeq;
+}
+
+void chernikov::rmecho(std::istream &in, std::ostream &out, std::vector< Polygon > &polygons)
+{
+  Polygon target;
+  if (!(in >> target))
+  {
+    throw std::invalid_argument("invalid");
+  }
+
+  size_t removed = 0;
+  auto it = polygons.begin();
+
+  while (it != polygons.end())
+  {
+    auto next = std::next(it);
+    if (next != polygons.end() && it->points == target.points && next->points == target.points)
+    {
+      it = polygons.erase(next);
+      ++removed;
+    } else
+    {
+      ++it;
+    }
+  }
+
+  out << removed;
+}
+
+void chernikov::rects(std::istream &, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  handleRects(out, polygons);
+}
+
+void chernikov::rightshapes(std::istream &, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  handleRightshapes(out, polygons);
 }

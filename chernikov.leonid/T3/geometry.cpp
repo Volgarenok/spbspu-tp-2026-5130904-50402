@@ -1,13 +1,12 @@
 #include "geometry.hpp"
-#include <istream>
-#include <ostream>
+#include "io_utils.hpp"
 #include <algorithm>
-#include <numeric>
-#include <iterator>
 #include <cmath>
+#include <functional>
+#include <iomanip>
+#include <iterator>
+#include <numeric>
 #include <set>
-#include <string>
-#include <cstdlib>
 
 bool chernikov::operator==(const Point &a, const Point &b)
 {
@@ -23,17 +22,66 @@ bool chernikov::operator<(const Point &a, const Point &b)
   return a.y < b.y;
 }
 
+bool chernikov::operator==(const Polygon &a, const Polygon &b)
+{
+  return a.points == b.points;
+}
+
+namespace {
+  double crossTerm(const std::vector< chernikov::Point > &pts, size_t i, size_t n)
+  {
+    size_t j = (i + 1) % n;
+    return pts[i].x * pts[j].y - pts[j].x * pts[i].y;
+  }
+
+  bool checkRightAngle(const std::vector< chernikov::Point > &pts, size_t i, size_t n)
+  {
+    size_t prev = (i + n - 1) % n;
+    size_t next = (i + 1) % n;
+    int dx1 = pts[i].x - pts[prev].x;
+    int dy1 = pts[i].y - pts[prev].y;
+    int dx2 = pts[next].x - pts[i].x;
+    int dy2 = pts[next].y - pts[i].y;
+    return dx1 * dx2 + dy1 * dy2 == 0;
+  }
+}
+
 std::istream &chernikov::operator>>(std::istream &in, Point &point)
 {
-  char openParen = '\0';
-  char semicolon = '\0';
-  char closeParen = '\0';
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  Point pt{0, 0};
+  in >> DelimIO{'('} >> pt.x >> DelimIO{';'} >> pt.y >> DelimIO{')'};
+  if (in)
+  {
+    point = pt;
+  }
+  return in;
+}
 
-  in >> openParen >> point.x >> semicolon >> point.y >> closeParen;
-
-  if (openParen != '(' || semicolon != ';' || closeParen != ')')
+std::istream &chernikov::operator>>(std::istream &in, Polygon &polygon)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  IOguard guard(in);
+  size_t count = 0;
+  if (!(in >> count) || count < 3)
   {
     in.setstate(std::ios::failbit);
+    return in;
+  }
+  std::vector< Point > points;
+  points.reserve(count);
+  std::copy_n(std::istream_iterator< Point >(in), count, std::back_inserter(points));
+  if (in)
+  {
+    polygon.points = std::move(points);
   }
   return in;
 }
@@ -42,72 +90,6 @@ std::ostream &chernikov::operator<<(std::ostream &out, const Point &point)
 {
   out << "(" << point.x << ";" << point.y << ")";
   return out;
-}
-
-bool chernikov::operator==(const Polygon &a, const Polygon &b)
-{
-  if (a.points.size() != b.points.size())
-  {
-    return false;
-  }
-
-  if (a.points.empty())
-  {
-    return true;
-  }
-
-  auto it = std::search(a.points.begin(), a.points.end(), b.points.begin(), b.points.end());
-
-  if (it != a.points.end())
-  {
-    return true;
-  }
-
-  std::vector< Point > doubled(a.points.begin(), a.points.end());
-  doubled.insert(doubled.end(), a.points.begin(), a.points.end());
-
-  it = std::search(doubled.begin(), doubled.end(), b.points.begin(), b.points.end());
-
-  return it != doubled.end();
-}
-
-bool chernikov::operator<(const Polygon &a, const Polygon &b)
-{
-  if (a.points.size() != b.points.size())
-  {
-    return a.points.size() < b.points.size();
-  }
-  return std::lexicographical_compare(a.points.begin(), a.points.end(), b.points.begin(), b.points.end());
-}
-
-std::istream &chernikov::operator>>(std::istream &in, Polygon &polygon)
-{
-  int vertexCount = 0;
-  in >> vertexCount;
-
-  if (!in || vertexCount < 3)
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-
-  std::vector< Point > temp;
-  temp.reserve(vertexCount);
-
-  std::generate_n(std::back_inserter(temp), vertexCount, [&in]() {
-    Point p;
-    in >> p;
-    return p;
-  });
-
-  if (!in)
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-
-  polygon.points = std::move(temp);
-  return in;
 }
 
 std::ostream &chernikov::operator<<(std::ostream &out, const Polygon &polygon)
@@ -121,84 +103,28 @@ std::ostream &chernikov::operator<<(std::ostream &out, const Polygon &polygon)
   return out;
 }
 
-double chernikov::computeArea(const Polygon &polygon)
+double chernikov::calcArea(const Polygon &polygon)
 {
-  if (polygon.points.size() < 3)
-  {
-    return 0.0;
-  }
-
-  std::vector< int > products(polygon.points.size());
-
-  std::transform(polygon.points.begin(), polygon.points.end(), products.begin(),
-                 [&polygon, i = 0u](const Point &current) mutable {
-                   const Point &next = polygon.points[(i + 1) % polygon.points.size()];
-                   int result = current.x * next.y - current.y * next.x;
-                   ++i;
-                   return result;
-                 });
-
-  int sum = std::accumulate(products.begin(), products.end(), 0);
+  size_t n = polygon.points.size();
+  std::vector< size_t > idxs(n);
+  std::iota(idxs.begin(), idxs.end(), 0);
+  std::vector< double > terms(n);
+  auto func = std::bind(crossTerm, std::cref(polygon.points), std::placeholders::_1, n);
+  std::transform(idxs.begin(), idxs.end(), terms.begin(), func);
+  double sum = std::accumulate(terms.begin(), terms.end(), 0.0, std::plus< double >());
   return std::abs(sum) / 2.0;
 }
 
-bool chernikov::isRectangle(const Polygon &polygon)
+bool chernikov::isRect(const Polygon &polygon)
 {
   if (polygon.points.size() != 4)
   {
     return false;
   }
-
-  auto dotProduct = [](const Point &a, const Point &b) {
-    return a.x * b.x + a.y * b.y;
-  };
-
-  auto subtract = [](const Point &a, const Point &b) {
-    return Point{a.x - b.x, a.y - b.y};
-  };
-
-  Point ab = subtract(polygon.points[1], polygon.points[0]);
-  Point bc = subtract(polygon.points[2], polygon.points[1]);
-  Point cd = subtract(polygon.points[3], polygon.points[2]);
-  Point da = subtract(polygon.points[0], polygon.points[3]);
-
-  return (dotProduct(ab, bc) == 0) && (dotProduct(bc, cd) == 0) && (dotProduct(cd, da) == 0)
-         && (dotProduct(da, ab) == 0);
-}
-
-bool chernikov::hasRightAngle(const Polygon &polygon)
-{
-  if (polygon.points.size() < 3)
-  {
-    return false;
-  }
-
-  auto dotProduct = [](const Point &a, const Point &b) {
-    return a.x * b.x + a.y * b.y;
-  };
-
-  auto subtract = [](const Point &a, const Point &b) {
-    return Point{a.x - b.x, a.y - b.y};
-  };
-
-  std::vector< bool > results(polygon.points.size());
-
-  std::transform(polygon.points.begin(), polygon.points.end(), results.begin(),
-                 [&polygon, &dotProduct, &subtract, i = 0u](const Point &) mutable {
-                   size_t first = i;
-                   size_t second = (i + 1) % polygon.points.size();
-                   size_t third = (i + 2) % polygon.points.size();
-
-                   Point v1 = subtract(polygon.points[second], polygon.points[first]);
-                   Point v2 = subtract(polygon.points[third], polygon.points[second]);
-
-                   ++i;
-                   return dotProduct(v1, v2) == 0;
-                 });
-
-  return std::any_of(results.begin(), results.end(), [](bool val) {
-    return val;
-  });
+  std::vector< size_t > idxs(4);
+  std::iota(idxs.begin(), idxs.end(), 0);
+  auto func = std::bind(checkRightAngle, std::cref(polygon.points), std::placeholders::_1, 4);
+  return std::all_of(idxs.begin(), idxs.end(), func);
 }
 
 bool chernikov::isPermutationOf(const Polygon &a, const Polygon &b)
@@ -207,9 +133,20 @@ bool chernikov::isPermutationOf(const Polygon &a, const Polygon &b)
   {
     return false;
   }
-
   std::multiset< Point > setA(a.points.begin(), a.points.end());
   std::multiset< Point > setB(b.points.begin(), b.points.end());
-
   return setA == setB;
+}
+
+bool chernikov::hasRightAngle(const Polygon &polygon)
+{
+  size_t n = polygon.points.size();
+  if (n < 3)
+  {
+    return false;
+  }
+  std::vector< size_t > idxs(n);
+  std::iota(idxs.begin(), idxs.end(), 0);
+  auto func = std::bind(checkRightAngle, std::cref(polygon.points), std::placeholders::_1, n);
+  return std::any_of(idxs.begin(), idxs.end(), func);
 }
