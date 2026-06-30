@@ -53,12 +53,6 @@ void lavrentev::count(std::istream &is, const std::vector< Polygon > &plgs)
   }
 }
 
-template < typename Predicate >
-void countIf(const std::vector< lavrentev::Polygon > &plgs, Predicate pred)
-{
-  std::cout << std::count_if(plgs.begin(), plgs.end(), pred) << "\n";
-}
-
 void lavrentev::countEven(std::istream &, const std::vector< Polygon > &plgs)
 {
   countIf(plgs, isEven);
