@@ -259,7 +259,7 @@ void chernikov::perms(std::istream &in, std::ostream &out, const std::vector< Po
   handlePerms(out, polygons, target);
 }
 
-void chernikov::echo(std::istream &in, std::ostream &out, std::vector< Polygon > &polygons)
+void chernikov::echo(std::istream &in, std::ostream &, std::vector< Polygon > &polygons)
 {
   Polygon target;
   if (!(in >> target))

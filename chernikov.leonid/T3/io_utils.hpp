@@ -1,7 +1,8 @@
 #ifndef IO_UTILS_HPP
 #define IO_UTILS_HPP
 
-#include <iosfwd>
+#include <ios>
+#include <istream>
 
 namespace chernikov {
   struct DelimIO
@@ -16,7 +17,7 @@ namespace chernikov {
 
   private:
     std::basic_ios< char > &stream_;
-    std::basic_ios< char >::fmtflags flags_;
+    std::ios_base::fmtflags flags_;
     std::streamsize precision_;
   };
 
