@@ -100,8 +100,8 @@ void pozdnyakov::cmdShow(std::istream &in, std::ostream &out, pozdnyakov::Databa
     for (size_t i = 1; i < lines.size(); ++i) {
       out << "\n" << lines[i];
     }
-    out << "\n";
   }
+  out << "\n";
 }
 
 void pozdnyakov::cmdDrop(std::istream &in, std::ostream &, pozdnyakov::Database &db)
@@ -162,8 +162,8 @@ void pozdnyakov::cmdMind(std::istream &in, std::ostream &out, pozdnyakov::Databa
         out << "\n" << nextP->name;
       }
     }
-    out << "\n";
   }
+  out << "\n";
 }
 
 void pozdnyakov::cmdHalt(std::istream &in, std::ostream &, pozdnyakov::Database &db)
