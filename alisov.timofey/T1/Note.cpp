@@ -1,0 +1,140 @@
+#include "Note.hpp"
+#include <iomanip>
+
+void alisov::note(std::istream &in, std::ostream &, NotesMap &notes)
+{
+  std::string name;
+  if (in >> name) {
+    if (notes.find(name) == notes.end()) {
+      notes[name] = std::make_shared< alisov::Note >();
+    }
+  }
+}
+
+void alisov::line(std::istream &in, std::ostream &, NotesMap &notes)
+{
+  std::string name;
+  if (in >> name) {
+    std::string text;
+    if (in >> std::quoted(text)) {
+      auto it = notes.find(name);
+      if (it != notes.end()) {
+        it->second->lines.push_back(text);
+      }
+    }
+  }
+}
+
+void alisov::show(std::istream &in, std::ostream &out, NotesMap &notes)
+{
+  std::string name;
+  if (in >> name) {
+    auto it = notes.find(name);
+    if (it != notes.end()) {
+      for (const auto &str : it->second->lines) {
+        out << str << "\n";
+      }
+    }
+  }
+}
+
+void alisov::drop(std::istream &in, std::ostream &, NotesMap &notes)
+{
+  std::string name;
+  if (in >> name) {
+    auto it = notes.find(name);
+    if (it != notes.end()) {
+      notes.erase(it);
+    }
+  }
+}
+
+void alisov::link(std::istream &in, std::ostream &, NotesMap &notes)
+{
+  std::string from_name, to_name;
+  if (in >> from_name >> to_name) {
+    auto it_from = notes.find(from_name);
+    auto it_to = notes.find(to_name);
+    if (it_from != notes.end() && it_to != notes.end()) {
+      bool exists = false;
+      for (const auto &w_ptr : it_from->second->links) {
+        if (auto s_ptr = w_ptr.lock()) {
+          if (s_ptr == it_to->second) {
+            exists = true;
+            break;
+          }
+        }
+      }
+      if (!exists) {
+        it_from->second->links.push_back(it_to->second);
+      }
+    }
+  }
+}
+
+void alisov::mind(std::istream &in, std::ostream &out, NotesMap &notes)
+{
+  std::string name;
+  if (in >> name) {
+    auto it = notes.find(name);
+    if (it != notes.end()) {
+      for (const auto &w_ptr : it->second->links) {
+        if (auto s_ptr = w_ptr.lock()) {
+          for (const auto &pair : notes) {
+            if (pair.second == s_ptr) {
+              out << pair.first << "\n";
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+void alisov::halt(std::istream &in, std::ostream &, NotesMap &notes)
+{
+  std::string from_name, to_name;
+  if (in >> from_name >> to_name) {
+    auto it_from = notes.find(from_name);
+    auto it_to = notes.find(to_name);
+    if (it_from != notes.end() && it_to != notes.end()) {
+      auto &links = it_from->second->links;
+      for (auto it = links.begin(); it != links.end(); ++it) {
+        if (auto s_ptr = it->lock()) {
+          if (s_ptr == it_to->second) {
+            links.erase(it);
+            break;
+          }
+        }
+      }
+    }
+  }
+}
+
+void alisov::expired(std::istream &, std::ostream &out, NotesMap &notes)
+{
+  size_t count = 0;
+  for (const auto &pair : notes) {
+    for (const auto &w_ptr : pair.second->links) {
+      if (w_ptr.expired()) {
+        ++count;
+      }
+    }
+  }
+  out << count << "\n";
+}
+
+void alisov::refresh(std::istream &, std::ostream &, NotesMap &notes)
+{
+  for (auto &pair : notes) {
+    auto &links = pair.second->links;
+    for (auto it = links.begin(); it != links.end();) {
+      if (it->expired()) {
+        it = links.erase(it);
+      } else {
+        ++it;
+      }
+    }
+  }
+}
