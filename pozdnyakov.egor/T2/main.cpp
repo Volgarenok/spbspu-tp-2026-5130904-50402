@@ -1,9 +1,11 @@
 #include <algorithm>
+#include <forward_list>
+#include <functional>
 #include <iostream>
 #include <iterator>
 #include <limits>
-#include <vector>
 #include "data.hpp"
+#include "sort.hpp"
 
 int main()
 {
@@ -11,12 +13,12 @@ int main()
   using IStreamIterator = std::istream_iterator< DataStruct >;
   using OStreamIterator = std::ostream_iterator< DataStruct >;
 
-  std::vector< DataStruct > parsedData;
+  std::forward_list< DataStruct > parsedData;
 
   while (!std::cin.eof()) {
     IStreamIterator iter(std::cin);
     IStreamIterator end;
-    std::copy(iter, end, std::back_inserter(parsedData));
+    std::copy(iter, end, std::front_inserter(parsedData));
 
     if (std::cin.fail() && !std::cin.eof()) {
       std::cin.clear();
@@ -24,7 +26,7 @@ int main()
     }
   }
 
-  std::sort(parsedData.begin(), parsedData.end());
+  pozdnyakov::sort(parsedData.begin(), parsedData.end(), std::less< DataStruct >());
 
   OStreamIterator outIter(std::cout, "\n");
   std::copy(parsedData.begin(), parsedData.end(), outIter);

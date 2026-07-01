@@ -1,4 +1,4 @@
-#include "iofmtguard.hpp"
+#include "IoFmtGuard.hpp"
 
 pozdnyakov::IoFmtGuard::IoFmtGuard(std::basic_ios< char > &s):
   s_(s),

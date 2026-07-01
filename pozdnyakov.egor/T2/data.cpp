@@ -1,7 +1,7 @@
 #include "data.hpp"
 #include <cmath>
 #include <iomanip>
-#include "iofmtguard.hpp"
+#include "IoFmtGuard.hpp"
 
 std::istream &pozdnyakov::operator>>(std::istream &in, pozdnyakov::LabelIO &&dest)
 {
