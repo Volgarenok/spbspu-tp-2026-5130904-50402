@@ -1,179 +1,177 @@
+#include "data.hpp"
 #include <cmath>
 #include <iomanip>
-#include "data.hpp"
+#include "iofmtguard.hpp"
 
-namespace pozdnyakov
+std::istream &pozdnyakov::operator>>(std::istream &in, pozdnyakov::LabelIO &&dest)
 {
-
-  IoFmtGuard::IoFmtGuard(std::basic_ios< char > &s):
-    s_(s),
-    fill_(s.fill()),
-    precision_(s.precision()),
-    fmt_(s.flags())
-  {}
-
-  IoFmtGuard::~IoFmtGuard()
-  {
-    s_.fill(fill_);
-    s_.precision(precision_);
-    s_.flags(fmt_);
-  }
-
-  std::istream &operator>>(std::istream &in, LabelIO &&dest)
-  {
-    std::istream::sentry sentry(in);
-    if (!sentry) {
-      return in;
-    }
-
-    for (const char *p = dest.exp; *p != '\0'; ++p) {
-      if (in.get() != *p) {
-        in.setstate(std::ios::failbit);
-        break;
-      }
-    }
+  std::istream::sentry sentry(in);
+  if (!sentry) {
     return in;
   }
 
-  std::istream &operator>>(std::istream &in, KeyIO &&dest)
-  {
-    std::istream::sentry sentry(in);
-    if (!sentry) {
-      return in;
-    }
-
-    dest.ref.clear();
-    while (in && std::isalnum(in.peek())) {
-      dest.ref += static_cast< char >(in.get());
-    }
-
-    if (dest.ref.empty()) {
+  for (const char *p = dest.exp; *p != '\0'; ++p) {
+    char c = '\0';
+    in.get(c);
+    if (c != *p) {
       in.setstate(std::ios::failbit);
+      break;
     }
+  }
+  return in;
+}
+
+std::istream &pozdnyakov::operator>>(std::istream &in, pozdnyakov::KeyIO &&dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry) {
     return in;
   }
 
-  std::istream &operator>>(std::istream &in, OctIO &&dest)
-  {
-    std::istream::sentry sentry(in);
-    if (!sentry) {
-      return in;
+  dest.ref.clear();
+  char c = '\0';
+  while (in.get(c)) {
+    if (std::isalnum(c)) {
+      dest.ref += c;
+    } else {
+      in.unget();
+      break;
     }
+  }
 
-    if (in.peek() != '0') {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
+  if (dest.ref.empty()) {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
+}
 
+std::istream &pozdnyakov::operator>>(std::istream &in, pozdnyakov::OctIO &&dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry) {
+    return in;
+  }
+
+  char c = '\0';
+  in.get(c);
+
+  if (in && c == '0') {
+    in.unget();
     return in >> std::oct >> dest.ref;
   }
 
-  std::istream &operator>>(std::istream &in, RatLspIO &&dest)
-  {
-    std::istream::sentry sentry(in);
-    if (!sentry) {
-      return in;
-    }
+  in.setstate(std::ios::failbit);
+  return in;
+}
 
-    long long numerator = 0;
-    unsigned long long denominator = 0;
-
-    in >> LabelIO{"(:N"} >> numerator >> LabelIO{":D"} >> denominator >> LabelIO{":)"};
-
-    if (in) {
-      dest.ref.first = numerator;
-      dest.ref.second = denominator;
-    }
+std::istream &pozdnyakov::operator>>(std::istream &in, pozdnyakov::RatLspIO &&dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry) {
     return in;
   }
 
-  std::istream &operator>>(std::istream &in, StringIO &&dest)
-  {
-    std::istream::sentry sentry(in);
-    if (!sentry) {
-      return in;
-    }
+  long long numerator = 0;
+  unsigned long long denominator = 0;
 
-    return in >> std::quoted(dest.ref);
+  in >> pozdnyakov::LabelIO{"(:N"};
+  in >> numerator;
+  in >> pozdnyakov::LabelIO{":D"};
+  in >> denominator;
+  in >> pozdnyakov::LabelIO{":)"};
+
+  if (in) {
+    dest.ref.first = numerator;
+    dest.ref.second = denominator;
+  }
+  return in;
+}
+
+std::istream &pozdnyakov::operator>>(std::istream &in, pozdnyakov::StringIO &&dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry) {
+    return in;
   }
 
-  std::istream &operator>>(std::istream &in, DataStruct &dest)
-  {
-    std::istream::sentry sentry(in);
-    if (!sentry) {
-      return in;
-    }
+  return in >> std::quoted(dest.ref);
+}
 
-    DataStruct inputData{0, {0, 0}, ""};
-    bool hasKey1 = false;
-    bool hasKey2 = false;
-    bool hasKey3 = false;
+std::istream &pozdnyakov::operator>>(std::istream &in, pozdnyakov::DataStruct &dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry) {
+    return in;
+  }
 
-    in >> LabelIO{"(:"};
+  pozdnyakov::DataStruct inputData{0, {0, 0}, ""};
+  bool hasKey1 = false;
+  bool hasKey2 = false;
+  bool hasKey3 = false;
 
-    for (int i = 0; i < 3; ++i) {
-      std::string currentKey;
-      in >> KeyIO{currentKey};
+  in >> pozdnyakov::LabelIO{"(:"};
 
-      if (currentKey == "key1") {
-        in >> OctIO{inputData.key1};
-        hasKey1 = true;
-      } else if (currentKey == "key2") {
-        in >> RatLspIO{inputData.key2};
-        hasKey2 = true;
-      } else if (currentKey == "key3") {
-        in >> StringIO{inputData.key3};
-        hasKey3 = true;
-      } else {
-        in.setstate(std::ios::failbit);
-      }
+  for (int i = 0; i < 3; ++i) {
+    std::string currentKey;
+    in >> pozdnyakov::KeyIO{currentKey};
 
-      if (i < 2) {
-        in >> LabelIO{":"};
-      }
-    }
-
-    in >> LabelIO{":)"};
-
-    if (in && hasKey1 && hasKey2 && hasKey3) {
-      dest = inputData;
+    if (currentKey == "key1") {
+      in >> pozdnyakov::OctIO{inputData.key1};
+      hasKey1 = true;
+    } else if (currentKey == "key2") {
+      in >> pozdnyakov::RatLspIO{inputData.key2};
+      hasKey2 = true;
+    } else if (currentKey == "key3") {
+      in >> pozdnyakov::StringIO{inputData.key3};
+      hasKey3 = true;
     } else {
       in.setstate(std::ios::failbit);
     }
 
-    return in;
+    if (i < 2) {
+      in >> pozdnyakov::LabelIO{":"};
+    }
   }
 
-  std::ostream &operator<<(std::ostream &out, const DataStruct &src)
-  {
-    std::ostream::sentry sentry(out);
-    if (!sentry) {
-      return out;
-    }
+  in >> pozdnyakov::LabelIO{":)"};
 
-    IoFmtGuard fmtGuard(out);
+  if (in && hasKey1 && hasKey2 && hasKey3) {
+    dest = inputData;
+  } else {
+    in.setstate(std::ios::failbit);
+  }
 
-    out << "(:key1 0" << std::oct << src.key1 << std::dec << ":key2 (:N " << src.key2.first << ":D " << src.key2.second
-        << ":)"
-        << ":key3 " << std::quoted(src.key3) << ":)";
+  return in;
+}
 
+std::ostream &pozdnyakov::operator<<(std::ostream &out, const pozdnyakov::DataStruct &src)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry) {
     return out;
   }
 
-  bool operator<(const DataStruct &lhs, const DataStruct &rhs)
-  {
-    if (lhs.key1 != rhs.key1) {
-      return lhs.key1 < rhs.key1;
-    }
+  pozdnyakov::IoFmtGuard fmtGuard(out);
 
-    double r1 = static_cast< double >(lhs.key2.first) / lhs.key2.second;
-    double r2 = static_cast< double >(rhs.key2.first) / rhs.key2.second;
+  out << "(:key1 0" << std::oct << src.key1 << std::dec;
+  out << ":key2 (:N " << src.key2.first << ":D " << src.key2.second << ":)";
+  out << ":key3 " << std::quoted(src.key3) << ":)";
 
-    if (std::abs(r1 - r2) > 1e-9) {
-      return r1 < r2;
-    }
+  return out;
+}
 
-    return lhs.key3.length() < rhs.key3.length();
+bool pozdnyakov::operator<(const pozdnyakov::DataStruct &lhs, const pozdnyakov::DataStruct &rhs)
+{
+  if (lhs.key1 != rhs.key1) {
+    return lhs.key1 < rhs.key1;
   }
 
+  double r1 = static_cast< double >(lhs.key2.first) / lhs.key2.second;
+  double r2 = static_cast< double >(rhs.key2.first) / rhs.key2.second;
+
+  if (std::abs(r1 - r2) > 1e-9) {
+    return r1 < r2;
+  }
+
+  return lhs.key3.length() < rhs.key3.length();
 }

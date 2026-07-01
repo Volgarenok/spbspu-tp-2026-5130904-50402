@@ -20,19 +20,6 @@ namespace pozdnyakov
 
   bool operator<(const DataStruct &lhs, const DataStruct &rhs);
 
-  class IoFmtGuard
-  {
-  public:
-    explicit IoFmtGuard(std::basic_ios< char > &s);
-    ~IoFmtGuard();
-
-  private:
-    std::basic_ios< char > &s_;
-    char fill_;
-    std::streamsize precision_;
-    std::basic_ios< char >::fmtflags fmt_;
-  };
-
   struct LabelIO
   {
     const char *exp;
